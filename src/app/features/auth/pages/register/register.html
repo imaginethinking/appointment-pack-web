@@ -1,1 +1,49 @@
-<p>register works!</p>
+<section class="mx-auto max-w-md p-8">
+  <h1 class="mb-6 text-2xl font-bold">Register</h1>
+
+  <div class="space-y-4">
+    <input
+      class="w-full rounded border p-2"
+      type="text"
+      placeholder="First name"
+      [(ngModel)]="firstName"
+    />
+
+    <input
+      class="w-full rounded border p-2"
+      type="text"
+      placeholder="Last name"
+      [(ngModel)]="lastName"
+    />
+
+    <input
+      class="w-full rounded border p-2"
+      type="email"
+      placeholder="Email"
+      [(ngModel)]="email"
+    />
+
+    <input
+      class="w-full rounded border p-2"
+      type="password"
+      placeholder="Password"
+      [(ngModel)]="password"
+    />
+
+    <input
+      class="w-full rounded border p-2"
+      type="date"
+      [(ngModel)]="dateOfBirth"
+    />
+
+    <button
+      class="w-full rounded bg-black p-2 text-white"
+      type="button"
+      (click)="register()"
+    >
+      Register
+    </button>
+
+    <p>{{ message }}</p>
+  </div>
+</section>
