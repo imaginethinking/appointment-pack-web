@@ -12,7 +12,7 @@ import {
   MfaSetupResponse,
   RegisterRequest,
   RegisterResponse
-} from '../models/auth.model';
+} from '../models/auth-model';
 
 interface JwtPayload {
   exp?: number;

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { UserService } from '../../../../core/services/user.service';
-import { CreateUserRequest } from '../../../../core/models/user.model';
+import { UserService } from '../../../../core/services/user-service';
+import { CreateUserRequest } from '../../../../core/models/user-model';
 import { FormsModule } from '@angular/forms';
 
 @Component({

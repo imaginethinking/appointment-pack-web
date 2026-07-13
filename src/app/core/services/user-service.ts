@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 
-import { CreateUserRequest, UserResponse } from '../models/user.model';
+import { CreateUserRequest, UserResponse } from '../models/user-model';
 
 @Injectable({
   providedIn: 'root'
