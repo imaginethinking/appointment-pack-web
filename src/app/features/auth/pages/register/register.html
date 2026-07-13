@@ -1,49 +1,205 @@
 <section class="mx-auto max-w-md p-8">
   <h1 class="mb-6 text-2xl font-bold">Register</h1>
 
-  <div class="space-y-4">
-    <input
-      class="w-full rounded border p-2"
-      type="text"
-      placeholder="First name"
-      [(ngModel)]="firstName"
-    />
+  <form
+    #registerForm="ngForm"
+    class="space-y-4"
+    novalidate
+    (ngSubmit)="register(registerForm)"
+  >
+    <div>
+      <label
+        class="mb-1 block font-medium"
+        for="firstName"
+      >
+        First name
+      </label>
 
-    <input
-      class="w-full rounded border p-2"
-      type="text"
-      placeholder="Last name"
-      [(ngModel)]="lastName"
-    />
+      <input
+        #firstNameModel="ngModel"
+        id="firstName"
+        name="firstName"
+        class="w-full rounded border p-2"
+        type="text"
+        autocomplete="given-name"
+        required
+        [(ngModel)]="firstName"
+      />
 
-    <input
-      class="w-full rounded border p-2"
-      type="email"
-      placeholder="Email"
-      [(ngModel)]="email"
-    />
+      @if (
+        firstNameModel.invalid &&
+        firstNameModel.touched
+        ) {
+        <p class="mt-1 text-sm text-red-700">
+          First name is required.
+        </p>
+      }
+    </div>
 
-    <input
-      class="w-full rounded border p-2"
-      type="password"
-      placeholder="Password"
-      [(ngModel)]="password"
-    />
+    <div>
+      <label
+        class="mb-1 block font-medium"
+        for="lastName"
+      >
+        Last name
+      </label>
 
-    <input
-      class="w-full rounded border p-2"
-      type="date"
-      [(ngModel)]="dateOfBirth"
-    />
+      <input
+        #lastNameModel="ngModel"
+        id="lastName"
+        name="lastName"
+        class="w-full rounded border p-2"
+        type="text"
+        autocomplete="family-name"
+        required
+        [(ngModel)]="lastName"
+      />
+
+      @if (
+        lastNameModel.invalid &&
+        lastNameModel.touched
+        ) {
+        <p class="mt-1 text-sm text-red-700">
+          Last name is required.
+        </p>
+      }
+    </div>
+
+    <div>
+      <label
+        class="mb-1 block font-medium"
+        for="email"
+      >
+        Email
+      </label>
+
+      <input
+        #emailModel="ngModel"
+        id="email"
+        name="email"
+        class="w-full rounded border p-2"
+        type="email"
+        autocomplete="email"
+        required
+        email
+        [(ngModel)]="email"
+      />
+
+      @if (emailModel.invalid && emailModel.touched) {
+        <p class="mt-1 text-sm text-red-700">
+          Enter a valid email address.
+        </p>
+      }
+    </div>
+
+    <div>
+      <label
+        class="mb-1 block font-medium"
+        for="dateOfBirth"
+      >
+        Date of birth
+      </label>
+
+      <input
+        #dateOfBirthModel="ngModel"
+        id="dateOfBirth"
+        name="dateOfBirth"
+        class="w-full rounded border p-2"
+        type="date"
+        autocomplete="bday"
+        required
+        [(ngModel)]="dateOfBirth"
+      />
+
+      @if (
+        dateOfBirthModel.invalid &&
+        dateOfBirthModel.touched
+        ) {
+        <p class="mt-1 text-sm text-red-700">
+          Date of birth is required.
+        </p>
+      }
+    </div>
+
+    <div>
+      <label
+        class="mb-1 block font-medium"
+        for="password"
+      >
+        Password
+      </label>
+
+      <input
+        #passwordModel="ngModel"
+        id="password"
+        name="password"
+        class="w-full rounded border p-2"
+        type="password"
+        autocomplete="new-password"
+        required
+        minlength="8"
+        [(ngModel)]="password"
+      />
+
+      @if (
+        passwordModel.invalid &&
+        passwordModel.touched
+        ) {
+        <p class="mt-1 text-sm text-red-700">
+          Password must contain at least 8 characters.
+        </p>
+      }
+    </div>
+
+    <div>
+      <label
+        class="mb-1 block font-medium"
+        for="confirmPassword"
+      >
+        Confirm password
+      </label>
+
+      <input
+        #confirmPasswordModel="ngModel"
+        id="confirmPassword"
+        name="confirmPassword"
+        class="w-full rounded border p-2"
+        type="password"
+        autocomplete="new-password"
+        required
+        minlength="8"
+        [(ngModel)]="confirmPassword"
+      />
+
+      @if (
+        confirmPasswordModel.touched &&
+        confirmPassword !== password
+        ) {
+        <p class="mt-1 text-sm text-red-700">
+          Passwords do not match.
+        </p>
+      }
+    </div>
 
     <button
-      class="w-full rounded bg-black p-2 text-white"
-      type="button"
-      (click)="register()"
+      class="w-full rounded bg-black p-2 text-white disabled:cursor-not-allowed disabled:opacity-50"
+      type="submit"
+      [disabled]="
+        registerForm.invalid ||
+        password !== confirmPassword ||
+        isSubmitting
+      "
     >
-      Register
+      {{ isSubmitting ? 'Registering...' : 'Register' }}
     </button>
 
-    <p>{{ message }}</p>
-  </div>
+    @if (errorMessage) {
+      <p
+        class="text-red-700"
+        role="alert"
+      >
+        {{ errorMessage }}
+      </p>
+    }
+  </form>
 </section>

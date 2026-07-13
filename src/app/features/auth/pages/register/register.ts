@@ -50,7 +50,11 @@ export class Register {
     this.authService.register(request)
       .pipe(finalize(() => this.isSubmitting = false))
       .subscribe({
-        next: () => this.router.navigate(['/login']),
+        next: () => this.router.navigate(['/login'], {
+          queryParams: {
+            registered: 'true'
+          }
+        }),
         error: (error: unknown) => getHttpErrorMessage(error, 'Registration failed')
       });
   }

@@ -1,1 +1,102 @@
-<p>login works!</p>
+<section class="mx-auto max-w-md p-8">
+  <h1 class="mb-6 text-2xl font-bold">Login</h1>
+
+  @if (registrationSuccessful) {
+    <p
+      class="mb-4 rounded border border-green-700 p-3 text-green-800"
+      role="status"
+    >
+      Registration successful. You can now log in.
+    </p>
+  }
+
+  <form
+    #loginForm="ngForm"
+    class="space-y-4"
+    novalidate
+    (ngSubmit)="login(loginForm)"
+  >
+    <div>
+      <label
+        class="mb-1 block font-medium"
+        for="email"
+      >
+        Email
+      </label>
+
+      <input
+        #emailModel="ngModel"
+        id="email"
+        name="email"
+        class="w-full rounded border p-2"
+        type="email"
+        autocomplete="email"
+        required
+        email
+        [(ngModel)]="email"
+      />
+
+      @if (emailModel.invalid && emailModel.touched) {
+        <p class="mt-1 text-sm text-red-700">
+          Enter a valid email address.
+        </p>
+      }
+    </div>
+
+    <div>
+      <label
+        class="mb-1 block font-medium"
+        for="password"
+      >
+        Password
+      </label>
+
+      <input
+        #passwordModel="ngModel"
+        id="password"
+        name="password"
+        class="w-full rounded border p-2"
+        type="password"
+        autocomplete="current-password"
+        required
+        [(ngModel)]="password"
+      />
+
+      @if (
+        passwordModel.invalid &&
+        passwordModel.touched
+        ) {
+        <p class="mt-1 text-sm text-red-700">
+          Password is required.
+        </p>
+      }
+    </div>
+
+    <button
+      class="w-full rounded bg-black p-2 text-white disabled:cursor-not-allowed disabled:opacity-50"
+      type="submit"
+      [disabled]="loginForm.invalid || isSubmitting"
+    >
+      {{ isSubmitting ? 'Logging in...' : 'Login' }}
+    </button>
+
+    @if (errorMessage) {
+      <p
+        class="text-red-700"
+        role="alert"
+      >
+        {{ errorMessage }}
+      </p>
+    }
+
+    <p class="text-center">
+      Do not have an account?
+      <a
+        class="underline"
+        routerLink="/register"
+      >
+        Register
+      </a>
+    </p>
+  </form>
+</section>
