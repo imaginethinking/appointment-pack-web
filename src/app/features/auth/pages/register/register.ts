@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
-import { UserService } from '../../../../core/services/user-service';
-import { CreateUserRequest } from '../../../../core/models/user-model';
-import { FormsModule } from '@angular/forms';
+import {Component, inject} from '@angular/core';
+import {FormsModule, NgForm} from '@angular/forms';
+import {Router} from '@angular/router';
+import {AuthService} from '../../../../core/services/auth-service';
+import {RegisterRequest} from '../../../../core/models/auth-model';
+import {finalize} from 'rxjs';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
 
 @Component({
   selector: 'app-register',
@@ -10,33 +13,45 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './register.css',
 })
 export class Register {
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+
   firstName = '';
   lastName = '';
   email = '';
   password = '';
+  confirmPassword = '';
   dateOfBirth = '';
 
-  message: string = '';
+  protected errorMessage = '';
+  protected isSubmitting = false;
 
-  constructor(private readonly userService: UserService) {}
 
-  register(): void {
-    const request: CreateUserRequest = {
+
+  register(form: NgForm): void {
+    this.errorMessage = '';
+
+    if (form.invalid) {
+      form.control.markAllAsTouched();
+      return;
+    }
+
+    const request: RegisterRequest = {
       firstName: this.firstName,
       lastName: this.lastName,
       email: this.email,
       password: this.password,
-      dateOfBirth: this.dateOfBirth,
-      role: 'PATIENT',
+      confirmPassword: this.confirmPassword,
+      dateOfBirth: this.dateOfBirth
     };
 
-    this.userService.createUser(request).subscribe({
-      next: (response) => {
-        this.message = `User Created: ${response.email}`;
-      },
-      error: (error) => {
-        this.message = `Error: ${error.message}`;
-      },
-    });
+    this.isSubmitting = true;
+
+    this.authService.register(request)
+      .pipe(finalize(() => this.isSubmitting = false))
+      .subscribe({
+        next: () => this.router.navigate(['/login']),
+        error: (error: unknown) => getHttpErrorMessage(error, 'Registration failed')
+      });
   }
 }
