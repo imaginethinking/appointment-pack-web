@@ -8,7 +8,7 @@ export interface RegisterRequest {
 }
 
 export interface RegisterResponse {
-  userId: string;
+  id: string;
   email: string;
   profileId: string;
 }
