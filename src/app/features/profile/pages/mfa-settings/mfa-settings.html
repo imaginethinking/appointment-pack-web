@@ -1,0 +1,131 @@
+<section class="mx-auto max-w-xl p-8">
+  <a
+    class="mb-6 inline-block underline"
+    routerLink="/home"
+  >
+    Back to home
+  </a>
+
+  <h1 class="mb-3 text-2xl font-bold">
+    Multi factor authentication
+  </h1>
+
+  @if (mfaEnabled()) {
+    <div
+      class="rounded border border-green-700 p-4 text-green-800"
+      role="status"
+    >
+      Multi factor authentication is enabled.
+    </div>
+  } @else {
+    <p class="mb-6">
+      Use authenticator to scan the QR code, then enter the generated six-digit code.
+    </p>
+
+    @if (!provisioningUri()) {
+      <button
+        class="rounded bg-black px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-50"
+        type="button"
+        [disabled]="isStartingSetup()"
+        (click)="startSetup()"
+      >
+        {{
+          isStartingSetup()
+            ? 'Starting setup...'
+            : 'Set up MFA'
+        }}
+      </button>
+    }
+
+    @if (provisioningUri(); as uri) {
+      <div class="mt-6 space-y-6">
+        <div
+          class="inline-block rounded border bg-white p-4"
+        >
+          <qr-code
+            [value]="uri"
+            [size]="240"
+            errorCorrectionLevel="M"
+          ></qr-code>
+        </div>
+
+        <p class="text-sm">
+          Do not refresh this page until setup has been confirmed.
+        </p>
+
+        <form
+          #confirmForm="ngForm"
+          class="space-y-4"
+          novalidate
+          (ngSubmit)="confirmMfa(confirmForm)"
+        >
+          <div>
+            <label
+              class="mb-1 block font-medium"
+              for="mfaCode"
+            >
+              Authentication code
+            </label>
+
+            <input
+              #codeModel="ngModel"
+              id="mfaCode"
+              name="mfaCode"
+              class="w-full rounded border p-2 tracking-widest"
+              type="text"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              required
+              minlength="6"
+              maxlength="6"
+              pattern="[0-9]{6}"
+              [(ngModel)]="code"
+            />
+
+            @if (
+              codeModel.invalid &&
+              codeModel.touched
+              ) {
+              <p class="mt-1 text-sm text-red-700">
+                Enter a six digit numeric code.
+              </p>
+            }
+          </div>
+
+          <button
+            class="w-full rounded bg-black p-2 text-white disabled:cursor-not-allowed disabled:opacity-50"
+            type="submit"
+            [disabled]="
+              confirmForm.invalid ||
+              isConfirming()
+            "
+          >
+            {{
+              isConfirming()
+                ? 'Confirming...'
+                : 'Confirm MFA'
+            }}
+          </button>
+        </form>
+      </div>
+    }
+  }
+
+  @if (successMessage()) {
+    <p
+      class="mt-4 text-green-800"
+      role="status"
+    >
+      {{ successMessage() }}
+    </p>
+  }
+
+  @if (errorMessage()) {
+    <p
+      class="mt-4 text-red-700"
+      role="alert"
+    >
+      {{ errorMessage() }}
+    </p>
+  }
+</section>

@@ -6,6 +6,7 @@ import {mfaLoginGuard} from './core/guards/mfa-login-guard';
 import {Login} from './features/auth/pages/login/login';
 import {Home} from './features/home/pages/home/home';
 import {authGuard} from './core/guards/auth-guard';
+import {MfaSettings} from './features/profile/pages/mfa-settings/mfa-settings';
 
 export const routes: Routes = [
   {
@@ -29,6 +30,11 @@ export const routes: Routes = [
   {
     path: 'home',
     component: Home,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'profile/settings/mfa',
+    component: MfaSettings,
     canActivate: [authGuard],
   },
   {
