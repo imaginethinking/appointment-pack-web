@@ -4,7 +4,7 @@ import { Register } from './features/auth/pages/register/register';
 import {MfaLogin} from './features/auth/pages/mfa-login/mfa-login';
 import {mfaLoginGuard} from './core/guards/mfa-login-guard';
 import {Login} from './features/auth/pages/login/login';
-import {Home} from './features/auth/pages/home/home';
+import {Home} from './features/home/pages/home/home';
 import {authGuard} from './core/guards/auth-guard';
 
 export const routes: Routes = [
