@@ -1,3 +1,27 @@
 /* You can add global styles to this file, and also import other style files */
-
+@import url('https://fonts.googleapis.com/css2?family=Cause:wght@100..900&display=swap');
 @import 'tailwindcss';
+
+@theme {
+  --color-brand-peach: #f3ceb9;
+  --color-brand-pink: #f9cddb;
+  --color-brand-mint: #6ad7ae;
+  --color-brand-coral: #d8605f;
+  --color-brand-plum: #3a303b;
+  --color-brand-off-white: #fff8f2;
+
+  --font-sans: 'Cause', sans-serif;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+}
