@@ -1,214 +1,144 @@
-<nav class="rounded-2xl border-brand-peach/30 bg-brand-plum text-brand-off-white">
+<nav class="rounded-2xl border border-brand-peach/30 bg-brand-plum text-brand-off-white">
   <div class="w-full px-4 sm:px-6 lg:px-8">
-
-    <!-- Main navbar row -->
     <div class="grid h-16 grid-cols-[1fr_auto_1fr] items-center">
-
-      <!-- Application name -->
       <a
-        routerLink="/home"
+        [routerLink]="isAuthenticated() ? '/home' : '/login'"
         class="col-start-1 justify-self-start text-lg font-bold text-brand-off-white"
         (click)="closeMenus()"
       >
         The Appointment Pack
       </a>
 
-      <!-- Desktop navigation -->
-      <div class="col-start-2 hidden items-center gap-1 justify-self-center lg:flex">
-        <a
-          routerLink="/home"
-          routerLinkActive="bg-brand-peach text-brand-plum"
-          [routerLinkActiveOptions]="{ exact: true }"
-          class="rounded-md px-3 py-2 text-sm font-medium text-brand-off-white hover:bg-brand-off-white/10"
-        >
-          Dashboard
-        </a>
+      @if (isAuthenticated()) {
+        <div class="col-start-2 hidden items-center gap-1 justify-self-center lg:flex">
+          <a
+            routerLink="/home"
+            routerLinkActive="bg-brand-peach text-brand-plum"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="btn btn-ghost"
+          >
+            Dashboard
+          </a>
+        </div>
+      }
 
-        <a
-          routerLink="/patient"
-          routerLinkActive="bg-brand-peach text-brand-plum"
-          class="rounded-md px-3 py-2 text-sm font-medium text-brand-off-white hover:bg-brand-off-white/10"
-        >
-          Patient Record
-        </a>
-
-        <a
-          routerLink="/documents"
-          routerLinkActive="bg-brand-peach text-brand-plum"
-          class="rounded-md px-3 py-2 text-sm font-medium text-brand-off-white hover:bg-brand-off-white/10"
-        >
-          Documents
-        </a>
-
-        <a
-          routerLink="/appointments"
-          routerLinkActive="bg-brand-peach text-brand-plum"
-          class="rounded-md px-3 py-2 text-sm font-medium text-brand-off-white hover:bg-brand-off-white/10"
-        >
-          Appointments
-        </a>
-
-        <a
-          routerLink="/packs"
-          routerLinkActive="bg-brand-peach text-brand-plum"
-          class="rounded-md px-3 py-2 text-sm font-medium text-brand-off-white hover:bg-brand-off-white/10"
-        >
-          Appointment Packs
-        </a>
-
-        <a
-          routerLink="/care-network"
-          routerLinkActive="bg-brand-peach text-brand-plum"
-          class="rounded-md px-3 py-2 text-sm font-medium text-brand-off-white hover:bg-brand-off-white/10"
-        >
-          Care Network
-        </a>
-      </div>
-
-      <!-- Right side controls -->
-      <div class="col-start-3 justify-self-end flex items-center gap-2">
-
-        <!-- Hamburger button -->
-        <button
-          type="button"
-          class="rounded-md p-2 text-brand-off-white hover:bg-brand-off-white/10 lg:hidden"
-          aria-label="Toggle navigation menu"
-          aria-controls="mobile-navigation"
-          [attr.aria-expanded]="mobileMenuOpen"
-          (click)="toggleMobileMenu()"
-        >
-          @if (mobileMenuOpen) {
-            <!-- Close icon -->
-            <svg
-              class="h-6 w-6"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18 18 6M6 6l12 12"
-              />
-            </svg>
-          } @else {
-            <!-- Hamburger icon -->
-            <svg
-              class="h-6 w-6"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          }
-        </button>
-
-        <!-- Profile menu -->
-        <div class="relative">
+      <div class="col-start-3 flex items-center gap-2 justify-self-end">
+        @if (isAuthenticated()) {
           <button
             type="button"
-            class="inline-flex h-10 w-10 items-center justify-center rounded-full text-brand-off-white hover:bg-brand-off-white/10"
-            aria-label="Open profile menu"
-            [attr.aria-expanded]="profileMenuOpen"
-            (click)="toggleProfileMenu()"
+            class="btn btn-ghost h-10 w-10 p-0 lg:hidden"
+            aria-label="Toggle navigation menu"
+            aria-controls="mobile-navigation"
+            [attr.aria-expanded]="mobileMenuOpen"
+            (click)="toggleMobileMenu()"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 16 16"
-              fill="currentColor"
-              class="h-7 w-7"
-              aria-hidden="true"
-            >
-              <path
-                d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"
-              />
-
-              <path
-                fill-rule="evenodd"
-                d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"
-              />
-            </svg>
+            @if (mobileMenuOpen) {
+              <svg
+                class="h-6 w-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
+            } @else {
+              <svg
+                class="h-6 w-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            }
           </button>
 
-          @if (profileMenuOpen) {
-            <div
-              class="absolute right-0 z-50 mt-2 w-56 rounded-md border border-brand-peach bg-brand-off-white py-2 text-brand-plum shadow-lg"
+          <div class="relative">
+            <button
+              type="button"
+              class="btn btn-ghost h-10 w-10 p-0"
+              aria-label="Open profile menu"
+              [attr.aria-expanded]="profileMenuOpen"
+              (click)="toggleProfileMenu()"
             >
-              <div class="border-b border-brand-peach px-4 py-3">
-                <p class="text-sm font-semibold">
-                  Patient Name
-                </p>
-
-                <p class="text-xs text-brand-plum/70">
-                  Patient
-                </p>
-              </div>
-
-              <a
-                routerLink="/patient/profile"
-                class="block px-4 py-2 text-sm hover:bg-brand-pink"
-                (click)="closeMenus()"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                class="h-7 w-7"
+                aria-hidden="true"
               >
-                Patient Profile
-              </a>
+                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
 
-              <a
-                routerLink="/settings/account"
-                class="block px-4 py-2 text-sm hover:bg-brand-pink"
-                (click)="closeMenus()"
+                <path
+                  fill-rule="evenodd"
+                  d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"
+                />
+              </svg>
+            </button>
+
+            @if (profileMenuOpen) {
+              <div
+                class="absolute right-0 z-50 mt-2 w-56 rounded-md border border-brand-peach bg-brand-off-white py-2 text-brand-plum shadow-lg"
               >
-                Account Settings
-              </a>
+                <div class="border-b border-brand-peach px-4 py-3">
+                  <p class="text-sm font-semibold">
+                    Account
+                  </p>
+                </div>
 
-              <a
-                routerLink="/settings/security"
-                class="block px-4 py-2 text-sm hover:bg-brand-pink"
-                (click)="closeMenus()"
-              >
-                Security and MFA
-              </a>
-
-              <a
-                routerLink="/settings/permissions"
-                class="block px-4 py-2 text-sm hover:bg-brand-pink"
-                (click)="closeMenus()"
-              >
-                Carer Permissions
-              </a>
-
-              <a
-                routerLink="/settings/audit-log"
-                class="block px-4 py-2 text-sm hover:bg-brand-pink"
-                (click)="closeMenus()"
-              >
-                Audit Log
-              </a>
-
-              <div class="mt-2 border-t border-brand-peach pt-2">
-                <button
-                  type="button"
-                  class="block w-full px-4 py-2 text-left text-sm font-medium text-brand-coral hover:bg-brand-pink"
+                <a
+                  routerLink="/profile/settings/mfa"
+                  class="block px-4 py-2 text-sm hover:bg-brand-pink"
+                  (click)="closeMenus()"
                 >
-                  Log out
-                </button>
+                  Security and MFA
+                </a>
+
+                <div class="mt-2 border-t border-brand-peach px-2 pt-2">
+                  <button
+                    type="button"
+                    class="btn btn-danger w-full"
+                    (click)="logout()"
+                  >
+                    Log out
+                  </button>
+                </div>
               </div>
-            </div>
-          }
-        </div>
+            }
+          </div>
+        } @else {
+          <a
+            routerLink="/login"
+            routerLinkActive="bg-brand-peach text-brand-plum"
+            class="btn btn-ghost"
+          >
+            Login
+          </a>
+
+          <a
+            routerLink="/register"
+            class="btn btn-secondary"
+          >
+            Register
+          </a>
+        }
       </div>
     </div>
 
-    <!-- Mobile navigation -->
-    @if (mobileMenuOpen) {
+    @if (isAuthenticated() && mobileMenuOpen) {
       <div
         id="mobile-navigation"
         class="border-t border-brand-peach/30 py-3 lg:hidden"
@@ -218,55 +148,10 @@
             routerLink="/home"
             routerLinkActive="bg-brand-peach text-brand-plum"
             [routerLinkActiveOptions]="{ exact: true }"
-            class="rounded-md px-3 py-2 text-sm font-medium text-brand-off-white hover:bg-brand-off-white/10"
+            class="btn btn-ghost w-full justify-start"
             (click)="closeMenus()"
           >
             Dashboard
-          </a>
-
-          <a
-            routerLink="/patient"
-            routerLinkActive="bg-brand-peach text-brand-plum"
-            class="rounded-md px-3 py-2 text-sm font-medium text-brand-off-white hover:bg-brand-off-white/10"
-            (click)="closeMenus()"
-          >
-            Patient Record
-          </a>
-
-          <a
-            routerLink="/documents"
-            routerLinkActive="bg-brand-peach text-brand-plum"
-            class="rounded-md px-3 py-2 text-sm font-medium text-brand-off-white hover:bg-brand-off-white/10"
-            (click)="closeMenus()"
-          >
-            Documents
-          </a>
-
-          <a
-            routerLink="/appointments"
-            routerLinkActive="bg-brand-peach text-brand-plum"
-            class="rounded-md px-3 py-2 text-sm font-medium text-brand-off-white hover:bg-brand-off-white/10"
-            (click)="closeMenus()"
-          >
-            Appointments
-          </a>
-
-          <a
-            routerLink="/packs"
-            routerLinkActive="bg-brand-peach text-brand-plum"
-            class="rounded-md px-3 py-2 text-sm font-medium text-brand-off-white hover:bg-brand-off-white/10"
-            (click)="closeMenus()"
-          >
-            Appointment Packs
-          </a>
-
-          <a
-            routerLink="/care-network"
-            routerLinkActive="bg-brand-peach text-brand-plum"
-            class="rounded-md px-3 py-2 text-sm font-medium text-brand-off-white hover:bg-brand-off-white/10"
-            (click)="closeMenus()"
-          >
-            Care Network
           </a>
         </div>
       </div>

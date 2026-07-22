@@ -1,31 +1,44 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+
+import { AuthService} from '../../../core/services/auth-service';
 
 @Component({
   selector: 'app-navbar',
-  imports: [
-    RouterLink,
-    RouterLinkActive
-  ],
+  imports: [RouterLink, RouterLinkActive],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
 export class Navbar {
-  mobileMenuOpen = false;
-  profileMenuOpen = false;
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
-  toggleMobileMenu(): void {
+  protected mobileMenuOpen = false;
+  protected profileMenuOpen = false;
+
+  protected isAuthenticated(): boolean {
+    return this.authService.isAuthenticated();
+  }
+
+  protected toggleMobileMenu(): void {
     this.mobileMenuOpen = !this.mobileMenuOpen;
     this.profileMenuOpen = false;
   }
 
-  toggleProfileMenu(): void {
+  protected toggleProfileMenu(): void {
     this.profileMenuOpen = !this.profileMenuOpen;
     this.mobileMenuOpen = false;
   }
 
-  closeMenus(): void {
+  protected closeMenus(): void {
     this.mobileMenuOpen = false;
     this.profileMenuOpen = false;
+  }
+
+  protected logout(): void {
+    this.authService.logout();
+    this.closeMenus();
+
+    void this.router.navigate(['/login']);
   }
 }
