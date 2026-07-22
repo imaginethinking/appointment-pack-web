@@ -3,23 +3,10 @@
     <h1 class="text-2xl font-bold">Home</h1>
   </div>
 
-  <div class="rounded border p-6">
+  <div class="rounded p-6">
     <h2 class="mb-2 text-xl font-semibold">
-      Authentication successful
+      Logged in
     </h2>
 
-    <p class="mb-6">
-      MFA status:
-      <strong>
-        {{ isMfaEnabled() ? 'Enabled' : 'Disabled' }}
-      </strong>
-    </p>
-
-    <a
-      class="inline-block rounded bg-black px-4 py-2 text-white"
-      routerLink="/profile/settings/mfa"
-    >
-      MFA settings
-    </a>
   </div>
 </section>

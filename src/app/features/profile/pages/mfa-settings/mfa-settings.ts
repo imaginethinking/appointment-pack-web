@@ -53,6 +53,13 @@ export class MfaSettings {
       });
   }
 
+  protected cancelSetup(): void {
+    this.provisioningUri.set(null);
+    this.mfaEnabled.set(false);
+    this.isStartingSetup.set(false);
+    this.code = '';
+  }
+
   protected confirmMfa(form: NgForm): void {
     this.successMessage.set('');
     this.errorMessage.set('');

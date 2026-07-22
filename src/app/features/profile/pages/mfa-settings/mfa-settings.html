@@ -1,11 +1,4 @@
 <section class="mx-auto max-w-xl p-8">
-  <a
-    class="mb-6 inline-block underline"
-    routerLink="/home"
-  >
-    Back to home
-  </a>
-
   <h1 class="mb-3 text-2xl font-bold">
     Multi factor authentication
   </h1>
@@ -19,12 +12,12 @@
     </div>
   } @else {
     <p class="mb-6">
-      Use authenticator to scan the QR code, then enter the generated six-digit code.
+      Use authenticator to scan the QR code, then enter the generated six digit code.
     </p>
 
     @if (!provisioningUri()) {
       <button
-        class="rounded bg-black px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-50"
+        class="btn btn-primary w-full"
         type="button"
         [disabled]="isStartingSetup()"
         (click)="startSetup()"
@@ -93,7 +86,7 @@
           </div>
 
           <button
-            class="w-full rounded bg-black p-2 text-white disabled:cursor-not-allowed disabled:opacity-50"
+            class="btn btn-primary w-full"
             type="submit"
             [disabled]="
               confirmForm.invalid ||
@@ -106,6 +99,16 @@
                 : 'Confirm MFA'
             }}
           </button>
+
+          <button
+            class="btn btn-danger w-full"
+            type="button"
+            (click)="cancelSetup()"
+            [disabled]="isConfirming()"
+          >
+            Cancel
+          </button>
+
         </form>
       </div>
     }

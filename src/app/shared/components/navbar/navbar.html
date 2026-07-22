@@ -13,7 +13,7 @@
         <div class="col-start-2 hidden items-center gap-1 justify-self-center lg:flex">
           <a
             routerLink="/home"
-            routerLinkActive="bg-brand-peach text-brand-plum"
+            routerLinkActive="bg-brand-pink text-brand-plum"
             [routerLinkActiveOptions]="{ exact: true }"
             class="btn btn-ghost"
           >
@@ -22,7 +22,7 @@
 
           <a
             routerLink="/patient"
-            routerLinkActive="bg-brand-peach text-brand-plum"
+            routerLinkActive="bg-brand-pink text-brand-plum"
             [routerLinkActiveOptions]="{ exact: true }"
             class="btn btn-ghost"
           >
@@ -140,14 +140,15 @@
         } @else {
           <a
             routerLink="/login"
-            routerLinkActive="bg-brand-peach text-brand-plum"
-            class="btn btn-ghost"
+            routerLinkActive="bg-brand-pink text-brand-plum"
+            class="btn btn-secondary"
           >
             Login
           </a>
 
           <a
             routerLink="/register"
+            routerLinkActive="bg-brand-pink text-brand-plum"
             class="btn btn-secondary"
           >
             Register
@@ -164,12 +165,22 @@
         <div class="flex flex-col gap-1">
           <a
             routerLink="/home"
-            routerLinkActive="bg-brand-peach text-brand-plum"
+            routerLinkActive="bg-brand-pink text-brand-plum"
             [routerLinkActiveOptions]="{ exact: true }"
             class="btn btn-ghost w-full justify-start"
             (click)="closeMenus()"
           >
             Dashboard
+          </a>
+
+          <a
+            routerLink="/patient"
+            routerLinkActive="bg-brand-pink text-brand-plum"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="btn btn-ghost w-full justify-start"
+            (click)="closeMenus()"
+          >
+            Patient
           </a>
         </div>
       </div>
