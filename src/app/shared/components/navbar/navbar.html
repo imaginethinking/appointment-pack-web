@@ -20,13 +20,6 @@
             Dashboard
           </a>
 
-          <a
-            routerLink="/profile"
-            class="block px-4 py-2 text-sm hover:bg-brand-pink"
-            (click)="closeMenus()"
-          >
-            Profile
-          </a>
         </div>
       }
 
@@ -106,6 +99,14 @@
                     Account
                   </p>
                 </div>
+
+                <a
+                  routerLink="/profile"
+                  class="block px-4 py-2 text-sm hover:bg-brand-pink"
+                  (click)="closeMenus()"
+                >
+                  Profile
+                </a>
 
                 <a
                   routerLink="/profile/settings/mfa"
