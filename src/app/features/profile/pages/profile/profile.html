@@ -1,0 +1,90 @@
+<section class="mx-auto max-w-3xl">
+  <div class="mb-6 flex items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-brand-plum">
+        Your profile
+      </h1>
+
+      <p class="mt-1 text-brand-plum/70">
+        View and manage your personal details.
+      </p>
+    </div>
+
+    @if (profile()) {
+      <a
+        routerLink="/profile/edit"
+        class="btn btn-primary"
+      >
+        Edit profile
+      </a>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div
+      class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum"
+      role="status"
+    >
+      Loading your profile...
+    </div>
+  } @else if (errorMessage()) {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      role="alert"
+    >
+      <p class="text-brand-coral">
+        {{ errorMessage() }}
+      </p>
+
+      <button
+        type="button"
+        class="btn btn-secondary mt-4"
+        (click)="loadProfile()"
+      >
+        Try again
+      </button>
+    </div>
+  } @else if (profile(); as currentProfile) {
+    <dl class="grid gap-4 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 sm:grid-cols-2">
+      <div>
+        <dt class="text-sm font-semibold text-brand-plum/70">
+          First name
+        </dt>
+
+        <dd class="mt-1 text-brand-plum">
+          {{ currentProfile.firstName }}
+        </dd>
+      </div>
+
+      <div>
+        <dt class="text-sm font-semibold text-brand-plum/70">
+          Last name
+        </dt>
+
+        <dd class="mt-1 text-brand-plum">
+          {{ currentProfile.lastName }}
+        </dd>
+      </div>
+
+      <div>
+        <dt class="text-sm font-semibold text-brand-plum/70">
+          Date of birth
+        </dt>
+
+        <dd class="mt-1 text-brand-plum">
+          {{ currentProfile.dateOfBirth | date: 'd MMMM y' }}
+        </dd>
+      </div>
+
+      <div>
+        <dt class="text-sm font-semibold text-brand-plum/70">
+          Gender
+        </dt>
+
+        <dd class="mt-1 text-brand-plum">
+          {{ currentProfile.gender || 'Not provided' }}
+        </dd>
+      </div>
+    </dl>
+  }
+</section>
