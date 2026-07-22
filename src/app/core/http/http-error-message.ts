@@ -1,5 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 
+import { getHttpProblemDetail } from './http-problem-detail';
+
 export function getHttpErrorMessage(error: unknown, fallbackMessage = 'An unexpected error occurred.'): string {
   if (error instanceof HttpErrorResponse) {
     if (error.status === 0) {
@@ -10,13 +12,13 @@ export function getHttpErrorMessage(error: unknown, fallbackMessage = 'An unexpe
       return error.error;
     }
 
-    if (isObject(error.error)) {
-      const detail = error.error['detail'];
+    const problemDetail = getHttpProblemDetail(error);
 
-      if (typeof detail === 'string' && detail.trim().length > 0) {
-        return detail;
-      }
+    if (problemDetail?.detail != null) {
+      return problemDetail.detail;
+    }
 
+    if (isRecord(error.error)) {
       const message = error.error['message'];
 
       if (typeof message === 'string' && message.trim().length > 0) {
@@ -40,6 +42,6 @@ export function getHttpErrorMessage(error: unknown, fallbackMessage = 'An unexpe
   return fallbackMessage;
 }
 
-function isObject(value: unknown): value is Record<string, unknown> {
+function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }
