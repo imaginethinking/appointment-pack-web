@@ -1,0 +1,287 @@
+<section class="mx-auto max-w-2xl">
+  <div class="mb-6">
+    <a
+      routerLink="/patient"
+      class="text-sm font-semibold text-brand-plum underline"
+    >
+      Back to patient record
+    </a>
+
+    <h1 class="mt-4 text-3xl font-bold text-brand-plum">
+      Create patient record
+    </h1>
+
+    <p class="mt-1 text-brand-plum/70">
+      All fields are optional and can be updated later.
+    </p>
+  </div>
+
+  <form
+    class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6"
+    [formGroup]="form"
+    novalidate
+    (ngSubmit)="create()"
+  >
+    <div>
+      <label
+        for="nhsNumber"
+        class="mb-1 block font-semibold text-brand-plum"
+      >
+        NHS number
+      </label>
+
+      <input
+        id="nhsNumber"
+        type="text"
+        class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+        formControlName="nhsNumber"
+      />
+
+      @if (form.controls.nhsNumber.hasError('maxlength')) {
+        <p class="mt-1 text-sm text-brand-coral">
+          NHS number must not exceed 20 characters.
+        </p>
+      } @else if (
+        form.controls.nhsNumber.errors?.['server'];
+        as message
+        ) {
+        <p class="mt-1 text-sm text-brand-coral">
+          {{ message }}
+        </p>
+      }
+    </div>
+
+    <div>
+      <label
+        for="chiNumber"
+        class="mb-1 block font-semibold text-brand-plum"
+      >
+        CHI number
+      </label>
+
+      <input
+        id="chiNumber"
+        type="text"
+        class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+        formControlName="chiNumber"
+      />
+
+      @if (form.controls.chiNumber.hasError('maxlength')) {
+        <p class="mt-1 text-sm text-brand-coral">
+          CHI number must not exceed 20 characters.
+        </p>
+      } @else if (
+        form.controls.chiNumber.errors?.['server'];
+        as message
+        ) {
+        <p class="mt-1 text-sm text-brand-coral">
+          {{ message }}
+        </p>
+      }
+    </div>
+
+    <div>
+      <label
+        for="hcNumber"
+        class="mb-1 block font-semibold text-brand-plum"
+      >
+        H&amp;C number
+      </label>
+
+      <input
+        id="hcNumber"
+        type="text"
+        class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+        formControlName="hcNumber"
+      />
+
+      @if (form.controls.hcNumber.hasError('maxlength')) {
+        <p class="mt-1 text-sm text-brand-coral">
+          H&amp;C number must not exceed 20 characters.
+        </p>
+      } @else if (
+        form.controls.hcNumber.errors?.['server'];
+        as message
+        ) {
+        <p class="mt-1 text-sm text-brand-coral">
+          {{ message }}
+        </p>
+      }
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div>
+        <label
+          for="height"
+          class="mb-1 block font-semibold text-brand-plum"
+        >
+          Height
+        </label>
+
+        <input
+          id="height"
+          type="number"
+          min="0.01"
+          max="9999.99"
+          step="0.01"
+          class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+          formControlName="height"
+        />
+
+        @if (
+          form.controls.height.hasError('min') ||
+          form.controls.height.hasError('max')
+          ) {
+          <p class="mt-1 text-sm text-brand-coral">
+            Enter a height between 0.01 and 9999.99.
+          </p>
+        } @else if (
+          form.controls.height.errors?.['server'];
+          as message
+          ) {
+          <p class="mt-1 text-sm text-brand-coral">
+            {{ message }}
+          </p>
+        }
+      </div>
+
+      <div>
+        <label
+          for="heightUnit"
+          class="mb-1 block font-semibold text-brand-plum"
+        >
+          Height unit
+        </label>
+
+        <select
+          id="heightUnit"
+          class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+          formControlName="heightUnit"
+        >
+          <option [ngValue]="null">
+            Not provided
+          </option>
+
+          @for (unit of heightUnits; track unit) {
+            <option [ngValue]="unit">
+              {{ formatOption(unit) }}
+            </option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div>
+        <label
+          for="weight"
+          class="mb-1 block font-semibold text-brand-plum"
+        >
+          Weight
+        </label>
+
+        <input
+          id="weight"
+          type="number"
+          min="0.01"
+          max="9999.99"
+          step="0.01"
+          class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+          formControlName="weight"
+        />
+
+        @if (
+          form.controls.weight.hasError('min') ||
+          form.controls.weight.hasError('max')
+          ) {
+          <p class="mt-1 text-sm text-brand-coral">
+            Enter a weight between 0.01 and 9999.99.
+          </p>
+        } @else if (
+          form.controls.weight.errors?.['server'];
+          as message
+          ) {
+          <p class="mt-1 text-sm text-brand-coral">
+            {{ message }}
+          </p>
+        }
+      </div>
+
+      <div>
+        <label
+          for="weightUnit"
+          class="mb-1 block font-semibold text-brand-plum"
+        >
+          Weight unit
+        </label>
+
+        <select
+          id="weightUnit"
+          class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+          formControlName="weightUnit"
+        >
+          <option [ngValue]="null">
+            Not provided
+          </option>
+
+          @for (unit of weightUnits; track unit) {
+            <option [ngValue]="unit">
+              {{ formatOption(unit) }}
+            </option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <label
+        for="bloodType"
+        class="mb-1 block font-semibold text-brand-plum"
+      >
+        Blood type
+      </label>
+
+      <select
+        id="bloodType"
+        class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+        formControlName="bloodType"
+      >
+        <option [ngValue]="null">
+          Not provided
+        </option>
+
+        @for (bloodType of bloodTypes; track bloodType) {
+          <option [ngValue]="bloodType">
+            {{ formatOption(bloodType) }}
+          </option>
+        }
+      </select>
+    </div>
+
+    @if (errorMessage()) {
+      <p
+        class="text-brand-coral"
+        role="alert"
+      >
+        {{ errorMessage() }}
+      </p>
+    }
+
+    <div class="flex flex-wrap gap-3">
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="isSaving()"
+      >
+        {{ isSaving() ? 'Creating...' : 'Create record' }}
+      </button>
+
+      <a
+        routerLink="/patient"
+        class="btn btn-secondary"
+      >
+        Cancel
+      </a>
+    </div>
+  </form>
+</section>

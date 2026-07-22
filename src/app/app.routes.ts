@@ -9,6 +9,8 @@ import { Home } from './features/home/pages/home/home';
 import { Profile } from './features/profile/pages/profile/profile';
 import { ProfileEdit } from './features/profile/pages/profile-edit/profile-edit';
 import { MfaSettings } from './features/profile/pages/mfa-settings/mfa-settings';
+import {PatientRecord} from './features/patient-record/pages/patient-record/patient-record';
+import {PatientRecordCreate} from './features/patient-record/pages/patient-record-create/patient-record-create';
 
 export const routes: Routes = [
   {
@@ -48,6 +50,20 @@ export const routes: Routes = [
     path: 'profile/settings/mfa',
     component: MfaSettings,
     canActivate: [authGuard],
+  },
+  {
+    path: 'patient',
+    component: PatientRecord,
+    canActivate: [
+      authGuard
+    ]
+  },
+  {
+    path: 'patient/create',
+    component: PatientRecordCreate,
+    canActivate: [
+      authGuard
+    ]
   },
   {
     path: '**',

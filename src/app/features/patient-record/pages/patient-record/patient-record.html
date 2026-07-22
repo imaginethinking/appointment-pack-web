@@ -1,0 +1,139 @@
+<section class="mx-auto max-w-4xl">
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-brand-plum">
+      Patient record
+    </h1>
+
+    <p class="mt-1 text-brand-plum/70">
+      View your personal healthcare information.
+    </p>
+  </div>
+
+  @if (isLoading()) {
+    <div
+      class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum"
+      role="status"
+    >
+      Loading your patient record...
+    </div>
+  } @else if (errorMessage()) {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      role="alert"
+    >
+      <p class="text-brand-coral">
+        {{ errorMessage() }}
+      </p>
+
+      <button
+        type="button"
+        class="btn btn-secondary mt-4"
+        (click)="loadPatientRecord()"
+      >
+        Try again
+      </button>
+    </div>
+  } @else if (patientRecord(); as currentRecord) {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <dl class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div>
+          <dt class="text-sm font-semibold text-brand-plum/70">
+            NHS number
+          </dt>
+
+          <dd class="mt-1 text-brand-plum">
+            {{ currentRecord.nhsNumber || 'Not provided' }}
+          </dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-semibold text-brand-plum/70">
+            CHI number
+          </dt>
+
+          <dd class="mt-1 text-brand-plum">
+            {{ currentRecord.chiNumber || 'Not provided' }}
+          </dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-semibold text-brand-plum/70">
+            H&amp;C number
+          </dt>
+
+          <dd class="mt-1 text-brand-plum">
+            {{ currentRecord.hcNumber || 'Not provided' }}
+          </dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-semibold text-brand-plum/70">
+            Height
+          </dt>
+
+          <dd class="mt-1 text-brand-plum">
+            @if (currentRecord.height !== null) {
+              {{ currentRecord.height }}
+              {{ formatEnum(currentRecord.heightUnit) }}
+            } @else {
+              Not provided
+            }
+          </dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-semibold text-brand-plum/70">
+            Weight
+          </dt>
+
+          <dd class="mt-1 text-brand-plum">
+            @if (currentRecord.weight !== null) {
+              {{ currentRecord.weight }}
+              {{ formatEnum(currentRecord.weightUnit) }}
+            } @else {
+              Not provided
+            }
+          </dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-semibold text-brand-plum/70">
+            Blood type
+          </dt>
+
+          <dd class="mt-1 text-brand-plum">
+            {{ formatEnum(currentRecord.bloodType) }}
+          </dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-semibold text-brand-plum/70">
+            BMI
+          </dt>
+
+          <dd class="mt-1 text-brand-plum">
+            {{ currentRecord.bmi ?? 'Not available' }}
+          </dd>
+        </div>
+      </dl>
+    </div>
+  } @else {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-8 text-center">
+      <h2 class="text-xl font-semibold text-brand-plum">
+        No patient record
+      </h2>
+
+      <p class="mx-auto mt-2 max-w-lg text-brand-plum/70">
+        Create a patient record to store your healthcare identifiers,
+        measurements and blood type.
+      </p>
+
+      <a
+        routerLink="/patient/create"
+        class="btn btn-primary mt-6"
+      >
+        Create patient record
+      </a>
+    </div>
+  }
+</section>
