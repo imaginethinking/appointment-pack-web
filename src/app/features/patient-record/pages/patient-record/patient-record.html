@@ -1,12 +1,23 @@
 <section class="mx-auto max-w-4xl">
-  <div class="mb-6">
-    <h1 class="text-3xl font-bold text-brand-plum">
-      Patient record
-    </h1>
+  <div class="mb-6 flex items-start justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-brand-plum">
+        Patient record
+      </h1>
 
-    <p class="mt-1 text-brand-plum/70">
-      View your personal healthcare information.
-    </p>
+      <p class="mt-1 text-brand-plum/70">
+        View your personal healthcare information.
+      </p>
+    </div>
+
+    @if (patientRecord()) {
+      <a
+        routerLink="/patient/edit"
+        class="btn btn-primary"
+      >
+        Edit record
+      </a>
+    }
   </div>
 
   @if (isLoading()) {

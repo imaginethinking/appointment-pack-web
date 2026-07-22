@@ -11,6 +11,7 @@ import { ProfileEdit } from './features/profile/pages/profile-edit/profile-edit'
 import { MfaSettings } from './features/profile/pages/mfa-settings/mfa-settings';
 import {PatientRecord} from './features/patient-record/pages/patient-record/patient-record';
 import {PatientRecordCreate} from './features/patient-record/pages/patient-record-create/patient-record-create';
+import {PatientRecordEdit} from './features/patient-record/pages/patient-record-edit/patient-record-edit';
 
 export const routes: Routes = [
   {
@@ -61,6 +62,13 @@ export const routes: Routes = [
   {
     path: 'patient/create',
     component: PatientRecordCreate,
+    canActivate: [
+      authGuard
+    ]
+  },
+  {
+    path: 'patient/edit',
+    component: PatientRecordEdit,
     canActivate: [
       authGuard
     ]
