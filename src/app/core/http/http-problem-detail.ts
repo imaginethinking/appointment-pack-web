@@ -28,6 +28,10 @@ export function getHttpFieldErrors(error: unknown): Readonly<Record<string, stri
   return getHttpProblemDetail(error)?.fieldErrors ?? {};
 }
 
+export function hasHttpStatus(error: unknown, status: number): boolean {
+  return error instanceof HttpErrorResponse && error.status === status;
+}
+
 export function getString(value: unknown): string | null {
   return typeof value === 'string' && value.trim().length > 0 ? value : null;
 }
