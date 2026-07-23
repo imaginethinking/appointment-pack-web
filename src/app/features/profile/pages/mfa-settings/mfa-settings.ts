@@ -1,6 +1,5 @@
 import {Component, inject, signal,} from '@angular/core';
 import {FormsModule, NgForm,} from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { QrCodeComponent } from 'ng-qrcode';
 import { finalize } from 'rxjs';
 
@@ -11,7 +10,6 @@ import { AuthService } from '../../../../core/services/auth-service';
   selector: 'app-mfa-settings',
   imports: [
     FormsModule,
-    RouterLink,
     QrCodeComponent
   ],
   templateUrl: './mfa-settings.html',
