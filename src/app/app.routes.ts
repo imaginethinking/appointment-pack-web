@@ -2,16 +2,19 @@ import { Routes } from '@angular/router';
 
 import { authGuard } from './core/guards/auth-guard';
 import { mfaLoginGuard } from './core/guards/mfa-login-guard';
+import { patientContextLoadGuard } from './core/guards/patient-context-load-guard';
+import { selectedPatientPermissionGuard } from './core/guards/selected-patient-permission-guard';
 import { Login } from './features/auth/pages/login/login';
 import { MfaLogin } from './features/auth/pages/mfa-login/mfa-login';
 import { Register } from './features/auth/pages/register/register';
+import { AccessDenied } from './features/errors/pages/access-denied/access-denied';
 import { Home } from './features/home/pages/home/home';
+import { PatientRecord } from './features/patient-record/pages/patient-record/patient-record';
+import { PatientRecordCreate } from './features/patient-record/pages/patient-record-create/patient-record-create';
+import { PatientRecordEdit } from './features/patient-record/pages/patient-record-edit/patient-record-edit';
+import { MfaSettings } from './features/profile/pages/mfa-settings/mfa-settings';
 import { Profile } from './features/profile/pages/profile/profile';
 import { ProfileEdit } from './features/profile/pages/profile-edit/profile-edit';
-import { MfaSettings } from './features/profile/pages/mfa-settings/mfa-settings';
-import {PatientRecord} from './features/patient-record/pages/patient-record/patient-record';
-import {PatientRecordCreate} from './features/patient-record/pages/patient-record-create/patient-record-create';
-import {PatientRecordEdit} from './features/patient-record/pages/patient-record-edit/patient-record-edit';
 
 export const routes: Routes = [
   {
@@ -33,45 +36,49 @@ export const routes: Routes = [
     canActivate: [mfaLoginGuard],
   },
   {
-    path: 'home',
-    component: Home,
-    canActivate: [authGuard],
-  },
-  {
-    path: 'profile',
-    component: Profile,
-    canActivate: [authGuard],
-  },
-  {
-    path: 'profile/edit',
-    component: ProfileEdit,
-    canActivate: [authGuard],
-  },
-  {
-    path: 'profile/settings/mfa',
-    component: MfaSettings,
-    canActivate: [authGuard],
-  },
-  {
-    path: 'patient',
-    component: PatientRecord,
-    canActivate: [
-      authGuard
-    ]
-  },
-  {
-    path: 'patient/create',
-    component: PatientRecordCreate,
-    canActivate: [
-      authGuard
-    ]
-  },
-  {
-    path: 'patient/edit',
-    component: PatientRecordEdit,
-    canActivate: [
-      authGuard
-    ]
+    path: '',
+    canActivate: [authGuard, patientContextLoadGuard],
+    children: [
+      {
+        path: 'home',
+        component: Home,
+      },
+      {
+        path: 'profile',
+        component: Profile,
+      },
+      {
+        path: 'profile/edit',
+        component: ProfileEdit,
+      },
+      {
+        path: 'profile/settings/mfa',
+        component: MfaSettings,
+      },
+      {
+        path: 'patient',
+        component: PatientRecord,
+      },
+      {
+        path: 'patient/create',
+        component: PatientRecordCreate,
+      },
+      {
+        path: 'patient/edit',
+        component: PatientRecordEdit,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'patient-record',
+            action: 'edit',
+          },
+        },
+      },
+      {
+        path: 'access-denied',
+        component: AccessDenied,
+      },
+    ],
   },
   {
     path: '**',

@@ -5,12 +5,14 @@
         Patient record
       </h1>
 
-      <p class="mt-1 text-brand-plum/70">
-        View your personal healthcare information.
-      </p>
+      @if (selectedPatient()) {
+        <p class="mt-1 text-brand-plum/70">
+          {{ selectedPatientName() }} · {{ contextLabel() }}
+        </p>
+      }
     </div>
 
-    @if (patientRecord()) {
+    @if (patientRecord() && canEdit()) {
       <a
         routerLink="/patient/edit"
         class="btn btn-primary"
@@ -20,29 +22,50 @@
     }
   </div>
 
-  @if (isLoading()) {
+  @if (isContextLoading()) {
     <div
       class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum"
       role="status"
     >
-      Loading your patient record...
+      Loading patient access...
+    </div>
+  } @else if (contextLoadFailed()) {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6 text-brand-coral"
+      role="alert"
+    >
+      Unable to load your patient access.
+    </div>
+  } @else if (!selectedPatient()) {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-8 text-center">
+      <h2 class="text-xl font-semibold text-brand-plum">
+        No accessible patient selected
+      </h2>
+
+      <p class="mx-auto mt-2 max-w-lg text-brand-plum/70">
+        You do not currently own a patient record or have permission to view another patient’s record.
+      </p>
+
+      <a
+        routerLink="/patient/create"
+        class="btn btn-primary mt-6"
+      >
+        Create your patient record
+      </a>
+    </div>
+  } @else if (isLoading()) {
+    <div
+      class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum"
+      role="status"
+    >
+      Loading patient record...
     </div>
   } @else if (errorMessage()) {
     <div
-      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6 text-brand-coral"
       role="alert"
     >
-      <p class="text-brand-coral">
-        {{ errorMessage() }}
-      </p>
-
-      <button
-        type="button"
-        class="btn btn-secondary mt-4"
-        (click)="loadPatientRecord()"
-      >
-        Try again
-      </button>
+      {{ errorMessage() }}
     </div>
   } @else if (patientRecord(); as currentRecord) {
     <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
@@ -127,24 +150,6 @@
           </dd>
         </div>
       </dl>
-    </div>
-  } @else {
-    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-8 text-center">
-      <h2 class="text-xl font-semibold text-brand-plum">
-        No patient record
-      </h2>
-
-      <p class="mx-auto mt-2 max-w-lg text-brand-plum/70">
-        Create a patient record to store your healthcare identifiers,
-        measurements and blood type.
-      </p>
-
-      <a
-        routerLink="/patient/create"
-        class="btn btn-primary mt-6"
-      >
-        Create patient record
-      </a>
     </div>
   }
 </section>

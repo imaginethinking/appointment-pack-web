@@ -1,9 +1,9 @@
+import { Permission } from '../../../core/models/permission-model';
+
 export const PATIENT_RECORD_PERMISSIONS = [
   'patient-record:view',
   'patient-record:edit'
-] as const;
-
-export type PatientRecordPermission = typeof PATIENT_RECORD_PERMISSIONS[number];
+] as const satisfies readonly Permission[];
 
 export const PATIENT_CARER_ACCESS_STATUSES = [
   'PENDING',
@@ -17,11 +17,11 @@ export type PatientCarerAccessStatus = typeof PATIENT_CARER_ACCESS_STATUSES[numb
 
 export interface CreateCarerInvitationRequest {
   carerEmail: string;
-  permissions: PatientRecordPermission[];
+  permissions: Permission[];
 }
 
 export interface UpdatePatientCarerPermissionsRequest {
-  permissions: PatientRecordPermission[];
+  permissions: Permission[];
 }
 
 export interface PatientAccessSummaryResponse {
@@ -45,7 +45,7 @@ export interface PatientCarerAccessResponse {
   patient: PatientAccessSummaryResponse;
   carer: CarerAccessSummaryResponse;
   status: PatientCarerAccessStatus;
-  permissions: PatientRecordPermission[];
+  permissions: Permission[];
   invitedAt: string;
   statusChangedAt: string;
 }

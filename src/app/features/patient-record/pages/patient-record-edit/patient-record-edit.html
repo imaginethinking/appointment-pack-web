@@ -11,36 +11,71 @@
       Edit patient record
     </h1>
 
-    <p class="mt-1 text-brand-plum/70">
-      Update your healthcare identifiers and measurements.
-    </p>
+    @if (selectedPatient()) {
+      <p class="mt-1 text-brand-plum/70">
+        {{ selectedPatientName() }} · {{ contextLabel() }}
+      </p>
+    }
   </div>
 
-  @if (isLoading()) {
+  @if (isContextLoading() || isLoading()) {
     <div
       class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum"
       role="status"
     >
-      Loading your patient record...
+      Loading patient record...
     </div>
-  } @else if (recordMissing()) {
+  } @else if (noSelection()) {
     <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
       <h2 class="text-xl font-semibold text-brand-plum">
-        No patient record
+        No patient selected
       </h2>
 
       <p class="mt-2 text-brand-plum/70">
-        Create a patient record before attempting to edit it.
+        Select an accessible patient before editing a patient record.
+      </p>
+    </div>
+  } @else if (accessDenied()) {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      role="alert"
+    >
+      <h2 class="text-xl font-semibold text-brand-plum">
+        Editing unavailable
+      </h2>
+
+      <p class="mt-2 text-brand-coral">
+        You do not have permission to edit this patient record.
       </p>
 
       <a
-        routerLink="/patient/create"
-        class="btn btn-primary mt-4"
+        routerLink="/patient"
+        class="btn btn-secondary mt-4"
       >
-        Create patient record
+        View patient record
       </a>
     </div>
-  } @else {
+  } @else if (recordMissing()) {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      role="alert"
+    >
+      <h2 class="text-xl font-semibold text-brand-plum">
+        Patient record unavailable
+      </h2>
+
+      <p class="mt-2 text-brand-coral">
+        The selected patient record could not be found.
+      </p>
+    </div>
+  } @else if (!recordReady() && errorMessage()) {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6 text-brand-coral"
+      role="alert"
+    >
+      {{ errorMessage() }}
+    </div>
+  } @else if (recordReady()) {
     <form
       class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6"
       [formGroup]="form"

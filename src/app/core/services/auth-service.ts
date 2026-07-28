@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { Observable, tap, throwError } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
@@ -28,6 +28,13 @@ export class AuthService {
   private readonly accessTokenKey = 'appointmentPack.accessToken'
   private readonly mfaChallengeIdKey = 'appointmentPack.mfaChallengeId'
   private readonly mfaEnabledKey = 'appointmentPack.mfaEnabled'
+
+  private readonly authenticatedValue = signal(false);
+  readonly authenticated = this.authenticatedValue.asReadonly();
+
+  constructor() {
+    this.authenticatedValue.set(this.getAccessToken() !== null);
+  }
 
   register(request: RegisterRequest): Observable<RegisterResponse> {
     return this.http.post<RegisterResponse>(`${this.authUrl}/register`, request);
@@ -97,6 +104,8 @@ export class AuthService {
       return null;
     }
 
+    this.authenticatedValue.set(true);
+
     return accessToken;
   }
 
@@ -147,16 +156,18 @@ export class AuthService {
 
   private storeAuthenticatedSession(accessToken: string, mfaEnabled: boolean): void {
     sessionStorage.setItem(this.accessTokenKey, accessToken);
-
     sessionStorage.setItem(this.mfaEnabledKey, String(mfaEnabled));
-
     sessionStorage.removeItem(this.mfaChallengeIdKey);
+
+    this.authenticatedValue.set(true);
   }
 
   private clearSession(): void {
     sessionStorage.removeItem(this.accessTokenKey);
     sessionStorage.removeItem(this.mfaChallengeIdKey);
     sessionStorage.removeItem(this.mfaEnabledKey);
+
+    this.authenticatedValue.set(false);
   }
 
   private isTokenExpired(accessToken: string): boolean {
