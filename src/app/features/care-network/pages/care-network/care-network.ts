@@ -1,7 +1,7 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { applyServerFieldErrors } from '../../../../core/forms/server-field-errors';
@@ -14,7 +14,7 @@ import { PatientCarerAccessState } from '../../services/patient-carer-access-sta
 
 @Component({
   selector: 'app-care-network',
-  imports: [DatePipe, ReactiveFormsModule, RouterLink],
+  imports: [DatePipe, ReactiveFormsModule, RouterLink, RouterLinkActive],
   templateUrl: './care-network.html',
   styleUrl: './care-network.css',
 })
@@ -32,7 +32,9 @@ export class CareNetwork implements OnInit {
   protected readonly isLoading = this.accessState.isLoadingAsPatient;
 
   protected readonly isInviting = signal(false);
+
   protected readonly editingAccessId = signal<string | null>(null);
+
   protected readonly busyAccessId = signal<string | null>(null);
 
   protected readonly errorMessage = signal('');

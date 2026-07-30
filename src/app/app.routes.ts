@@ -7,6 +7,8 @@ import { selectedPatientPermissionGuard } from './core/guards/selected-patient-p
 import { Login } from './features/auth/pages/login/login';
 import { MfaLogin } from './features/auth/pages/mfa-login/mfa-login';
 import { Register } from './features/auth/pages/register/register';
+import { CareNetwork } from './features/care-network/pages/care-network/care-network';
+import { CarerAccess } from './features/care-network/pages/carer-access/carer-access';
 import { AccessDenied } from './features/errors/pages/access-denied/access-denied';
 import { Home } from './features/home/pages/home/home';
 import { PatientRecord } from './features/patient-record/pages/patient-record/patient-record';
@@ -15,7 +17,6 @@ import { PatientRecordEdit } from './features/patient-record/pages/patient-recor
 import { MfaSettings } from './features/profile/pages/mfa-settings/mfa-settings';
 import { Profile } from './features/profile/pages/profile/profile';
 import { ProfileEdit } from './features/profile/pages/profile-edit/profile-edit';
-import { CareNetwork } from './features/care-network/pages/care-network/care-network';
 
 export const routes: Routes = [
   {
@@ -77,7 +78,21 @@ export const routes: Routes = [
       },
       {
         path: 'care-network',
-        component: CareNetwork,
+        children: [
+          {
+            path: '',
+            pathMatch: 'full',
+            redirectTo: 'carers',
+          },
+          {
+            path: 'carers',
+            component: CareNetwork,
+          },
+          {
+            path: 'patients',
+            component: CarerAccess,
+          },
+        ],
       },
       {
         path: 'access-denied',

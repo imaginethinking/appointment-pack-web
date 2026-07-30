@@ -91,6 +91,22 @@ export class PatientCarerAccessState {
     );
   }
 
+  acceptInvitation(accessId: string): Observable<PatientCarerAccessResponse> {
+    return this.accessApi.acceptInvitation(accessId).pipe(
+      tap((relationship) => {
+        this.updateAsCarerRelationship(relationship);
+      })
+    );
+  }
+
+  declineInvitation(accessId: string): Observable<PatientCarerAccessResponse> {
+    return this.accessApi.declineInvitation(accessId).pipe(
+      tap((relationship) => {
+        this.updateAsCarerRelationship(relationship);
+      })
+    );
+  }
+
   reset(): void {
     this.asPatientRelationshipsValue.set([]);
     this.asCarerRelationshipsValue.set([]);
@@ -101,17 +117,37 @@ export class PatientCarerAccessState {
   private updateAsPatientRelationship(updatedRelationship: PatientCarerAccessResponse): void {
     const relationships = this.asPatientRelationshipsValue();
 
-    const existingIndex = relationships.findIndex(
+    const relationshipExists = relationships.some(
       (relationship) => relationship.id === updatedRelationship.id,
     );
 
-    if (existingIndex === -1) {
+    if (!relationshipExists) {
       this.asPatientRelationshipsValue.set([updatedRelationship, ...relationships]);
 
       return;
     }
 
     this.asPatientRelationshipsValue.set(
+      relationships.map((relationship) =>
+        relationship.id === updatedRelationship.id ? updatedRelationship : relationship,
+      )
+    );
+  }
+
+  private updateAsCarerRelationship(updatedRelationship: PatientCarerAccessResponse): void {
+    const relationships = this.asCarerRelationshipsValue();
+
+    const relationshipExists = relationships.some(
+      (relationship) => relationship.id === updatedRelationship.id,
+    );
+
+    if (!relationshipExists) {
+      this.asCarerRelationshipsValue.set([updatedRelationship, ...relationships]);
+
+      return;
+    }
+
+    this.asCarerRelationshipsValue.set(
       relationships.map((relationship) =>
         relationship.id === updatedRelationship.id ? updatedRelationship : relationship,
       )

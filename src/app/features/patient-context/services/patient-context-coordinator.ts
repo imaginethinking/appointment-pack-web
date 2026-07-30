@@ -51,6 +51,26 @@ export class PatientContextCoordinator {
     );
   }
 
+  reloadCarerAccess(): Observable<void> {
+    this.loadingValue.set(true);
+    this.loadFailedValue.set(false);
+
+    return this.patientCarerAccessState.loadAsCarer().pipe(
+      tap(() => {
+        this.selectedPatientState.revalidateSelection();
+      }),
+      map(() => undefined),
+      catchError((error: unknown) => {
+        this.loadFailedValue.set(true);
+
+        return throwError(() => error);
+      }),
+      finalize(() => {
+        this.loadingValue.set(false);
+      }),
+    );
+  }
+
   reset(): void {
     this.profileState.reset();
     this.personalPatientRecordState.reset();

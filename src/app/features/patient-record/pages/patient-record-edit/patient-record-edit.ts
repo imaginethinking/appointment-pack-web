@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
@@ -21,6 +21,9 @@ import {
 } from '../../models/patient-record-model';
 import { PatientRecordApiService } from '../../services/patient-record-api-service';
 
+type PatientRecordEditStatus =
+  'loading' | 'ready' | 'no-selection' | 'forbidden' | 'not-found' | 'error';
+
 @Component({
   selector: 'app-patient-record-edit',
   imports: [ReactiveFormsModule, RouterLink],
@@ -29,24 +32,40 @@ import { PatientRecordApiService } from '../../services/patient-record-api-servi
 })
 export class PatientRecordEdit {
   private readonly formBuilder = inject(FormBuilder);
+
   private readonly patientRecordApi = inject(PatientRecordApiService);
+
   private readonly selectedPatientState = inject(SelectedPatientState);
+
   private readonly authorisation = inject(PatientContextAuthorisation);
-  private readonly contextCoordinator = inject(PatientContextCoordinator);
+
+  private readonly patientContextCoordinator = inject(PatientContextCoordinator);
+
   private readonly router = inject(Router);
+
+  private readonly reloadVersion = signal(0);
 
   protected readonly selectedPatient = this.selectedPatientState.selectedPatient;
 
-  protected readonly isContextLoading = this.contextCoordinator.isLoading;
+  protected readonly selectedPatientId = computed(
+    () => this.selectedPatient()?.patientRecordId ?? null,
+  );
 
-  protected readonly contextLoadFailed = this.contextCoordinator.loadFailed;
+  protected readonly selectedPatientName = computed(() => {
+    const selectedPatient = this.selectedPatient();
 
-  protected readonly isLoading = signal(false);
+    return selectedPatient === null ? '' : getPatientContextName(selectedPatient);
+  });
+
+  protected readonly canEditSelectedPatient = computed(() =>
+    this.authorisation.can(this.selectedPatient(), 'patient-record', 'edit'),
+  );
+
+  protected readonly status = signal<PatientRecordEditStatus>('loading');
+
+  protected readonly patientRecord = signal<PatientRecordResponse | null>(null);
+
   protected readonly isSaving = signal(false);
-  protected readonly recordReady = signal(false);
-  protected readonly noSelection = signal(false);
-  protected readonly accessDenied = signal(false);
-  protected readonly recordMissing = signal(false);
   protected readonly errorMessage = signal('');
 
   protected readonly bloodTypes = BLOOD_TYPES;
@@ -72,65 +91,48 @@ export class PatientRecordEdit {
 
   constructor() {
     effect((onCleanup) => {
-      const contextLoading = this.isContextLoading();
-      const contextLoadFailed = this.contextLoadFailed();
-      const context = this.selectedPatient();
+      this.reloadVersion();
 
-      this.recordReady.set(false);
-      this.noSelection.set(false);
-      this.accessDenied.set(false);
-      this.recordMissing.set(false);
+      const patientRecordId = this.selectedPatientId();
+
+      const canEdit = this.canEditSelectedPatient();
+
+      this.patientRecord.set(null);
       this.errorMessage.set('');
 
-      if (contextLoading) {
+      if (patientRecordId === null) {
+        this.status.set('no-selection');
         return;
       }
 
-      if (contextLoadFailed) {
-        this.errorMessage.set('Unable to load your patient access.');
+      if (!canEdit) {
+        this.status.set('forbidden');
         return;
       }
 
-      if (context === null) {
-        this.noSelection.set(true);
-        return;
-      }
+      this.status.set('loading');
 
-      if (!this.authorisation.can(context, 'patient-record', 'edit')) {
-        this.accessDenied.set(true);
-        return;
-      }
+      const subscription = this.patientRecordApi.getPatientRecord(patientRecordId).subscribe({
+        next: (patientRecord) => {
+          this.patientRecord.set(patientRecord);
 
-      this.isLoading.set(true);
+          this.form.reset({
+            nhsNumber: patientRecord.nhsNumber ?? '',
+            chiNumber: patientRecord.chiNumber ?? '',
+            hcNumber: patientRecord.hcNumber ?? '',
+            height: patientRecord.height,
+            heightUnit: patientRecord.heightUnit,
+            weight: patientRecord.weight,
+            weightUnit: patientRecord.weightUnit,
+            bloodType: patientRecord.bloodType,
+          });
 
-      const subscription = this.patientRecordApi
-        .getPatientRecord(context.patientRecordId)
-        .pipe(
-          finalize(() => {
-            this.isLoading.set(false);
-          }),
-        )
-        .subscribe({
-          next: (patientRecord) => {
-            this.populateForm(patientRecord);
-            this.recordReady.set(true);
-          },
-          error: (error: unknown) => {
-            if (hasHttpStatus(error, 403)) {
-              this.accessDenied.set(true);
-              return;
-            }
-
-            if (hasHttpStatus(error, 404)) {
-              this.recordMissing.set(true);
-              return;
-            }
-
-            this.errorMessage.set(
-              getHttpErrorMessage(error, 'Unable to load the selected patient record.'),
-            );
-          }
-        });
+          this.status.set('ready');
+        },
+        error: (error) => {
+          this.handleLoadError(error, patientRecordId);
+        },
+      });
 
       onCleanup(() => {
         subscription.unsubscribe();
@@ -138,13 +140,20 @@ export class PatientRecordEdit {
     });
   }
 
-  protected update(): void {
+  protected save(): void {
+    const patientRecord = this.patientRecord();
+
+    const patientRecordId = this.selectedPatientId();
+
     this.errorMessage.set('');
 
-    const context = this.selectedPatient();
+    if (patientRecord === null || patientRecordId === null || this.status() !== 'ready') {
+      return;
+    }
 
-    if (context === null || !this.authorisation.can(context, 'patient-record', 'edit')) {
-      this.accessDenied.set(true);
+    if (!this.canEditSelectedPatient()) {
+      void this.router.navigate(['/access-denied']);
+
       return;
     }
 
@@ -158,7 +167,7 @@ export class PatientRecordEdit {
     this.isSaving.set(true);
 
     this.patientRecordApi
-      .updatePatientRecord(context.patientRecordId, {
+      .updatePatientRecord(patientRecordId, {
         nhsNumber: this.emptyToNull(value.nhsNumber),
         chiNumber: this.emptyToNull(value.chiNumber),
         hcNumber: this.emptyToNull(value.hcNumber),
@@ -174,39 +183,29 @@ export class PatientRecordEdit {
         }),
       )
       .subscribe({
-        next: () => {
+        next: (updatedPatientRecord) => {
+          this.patientRecord.set(updatedPatientRecord);
+
           void this.router.navigate(['/patient']);
         },
-        error: (error: unknown) => {
+        error: (error) => {
           if (applyServerFieldErrors(this.form, error)) {
             return;
           }
 
-          if (hasHttpStatus(error, 403)) {
-            this.accessDenied.set(true);
+          if (hasHttpStatus(error, 403) || hasHttpStatus(error, 404)) {
+            this.recoverAfterSaveFailure(error, patientRecordId);
+
             return;
           }
 
-          if (hasHttpStatus(error, 404)) {
-            this.recordMissing.set(true);
-            return;
-          }
-
-          this.errorMessage.set(
-            getHttpErrorMessage(error, 'Unable to update the selected patient record.'),
-          );
-        }
+          this.errorMessage.set(getHttpErrorMessage(error, 'Unable to update the patient record.'));
+        },
       });
   }
 
-  protected selectedPatientName(): string {
-    const context = this.selectedPatient();
-
-    return context === null ? '' : getPatientContextName(context);
-  }
-
-  protected contextLabel(): string {
-    return this.selectedPatient()?.contextType === 'SELF' ? 'Your record' : 'Carer access';
+  protected retry(): void {
+    this.reloadVersion.update((version) => version + 1);
   }
 
   protected formatOption(value: string): string {
@@ -216,16 +215,58 @@ export class PatientRecordEdit {
       .replace(/\b\w/g, (character) => character.toUpperCase());
   }
 
-  private populateForm(patientRecord: PatientRecordResponse): void {
-    this.form.reset({
-      nhsNumber: patientRecord.nhsNumber ?? '',
-      chiNumber: patientRecord.chiNumber ?? '',
-      hcNumber: patientRecord.hcNumber ?? '',
-      height: patientRecord.height,
-      heightUnit: patientRecord.heightUnit,
-      weight: patientRecord.weight,
-      weightUnit: patientRecord.weightUnit,
-      bloodType: patientRecord.bloodType,
+  private handleLoadError(error: unknown, failedPatientRecordId: string): void {
+    this.patientRecord.set(null);
+
+    if (!hasHttpStatus(error, 403) && !hasHttpStatus(error, 404)) {
+      this.status.set('error');
+
+      this.errorMessage.set(
+        getHttpErrorMessage(error, 'Unable to load the patient record for editing.'),
+      );
+
+      return;
+    }
+
+    this.recoverContext(error, failedPatientRecordId);
+  }
+
+  private recoverAfterSaveFailure(error: unknown, failedPatientRecordId: string): void {
+    this.status.set('loading');
+
+    this.recoverContext(error, failedPatientRecordId);
+  }
+
+  private recoverContext(error: unknown, failedPatientRecordId: string): void {
+    const recordNotFound = hasHttpStatus(error, 404);
+
+    this.status.set('loading');
+
+    this.patientContextCoordinator.load().subscribe({
+      next: () => {
+        const selectedPatient = this.selectedPatient();
+
+        if (selectedPatient === null || selectedPatient.patientRecordId !== failedPatientRecordId) {
+          void this.router.navigate(['/patient']);
+
+          return;
+        }
+
+        if (!this.authorisation.can(selectedPatient, 'patient-record', 'edit')) {
+          void this.router.navigate(['/access-denied']);
+
+          return;
+        }
+
+        this.status.set(recordNotFound ? 'not-found' : 'forbidden');
+      },
+      error: (refreshError) => {
+        this.status.set('error');
+
+        this.errorMessage.set(
+          getHttpErrorMessage(refreshError, 'Unable to refresh your patient access.'),
+        );
+      },
     });
   }
 
