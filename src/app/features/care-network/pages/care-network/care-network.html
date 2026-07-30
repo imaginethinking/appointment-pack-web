@@ -1,0 +1,517 @@
+<section class="mx-auto max-w-5xl">
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-brand-plum">
+      Care network
+    </h1>
+
+    <p class="mt-1 text-brand-plum/70">
+      Invite carers and review access to your patient record.
+    </p>
+  </div>
+
+  @if (!personalPatientRecord()) {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-8 text-center">
+      <h2 class="text-xl font-semibold text-brand-plum">
+        Patient record required
+      </h2>
+
+      <p class="mx-auto mt-2 max-w-lg text-brand-plum/70">
+        You must create a patient record before inviting carers.
+      </p>
+
+      <a
+        routerLink="/patient/create"
+        class="btn btn-primary mt-6"
+      >
+        Create patient record
+      </a>
+    </div>
+  } @else {
+    <div class="mb-8 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <h2 class="text-xl font-semibold text-brand-plum">
+        Invite a carer
+      </h2>
+
+      <form
+        class="mt-5 space-y-5"
+        [formGroup]="invitationForm"
+        novalidate
+        (ngSubmit)="inviteCarer()"
+      >
+        <div>
+          <label
+            for="carerEmail"
+            class="mb-1 block font-semibold text-brand-plum"
+          >
+            Registered carer email
+          </label>
+
+          <input
+            id="carerEmail"
+            type="email"
+            autocomplete="email"
+            class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+            formControlName="carerEmail"
+          />
+
+          @if (
+            invitationForm.controls.carerEmail.touched &&
+            invitationForm.controls.carerEmail.hasError('required')
+            ) {
+            <p class="mt-1 text-sm text-brand-coral">
+              Carer email is required.
+            </p>
+          } @else if (
+            invitationForm.controls.carerEmail.touched &&
+            invitationForm.controls.carerEmail.hasError('email')
+            ) {
+            <p class="mt-1 text-sm text-brand-coral">
+              Enter a valid email address.
+            </p>
+          } @else if (
+            invitationForm.controls.carerEmail.errors?.['server'];
+            as message
+            ) {
+            <p class="mt-1 text-sm text-brand-coral">
+              {{ message }}
+            </p>
+          }
+        </div>
+
+        <fieldset>
+          <legend class="font-semibold text-brand-plum">
+            Patient-record permissions
+          </legend>
+
+          <div class="mt-3 space-y-3">
+            <label class="flex items-start gap-3">
+              <input
+                type="checkbox"
+                class="mt-1"
+                formControlName="canViewPatientRecord"
+              />
+
+              <span>
+                <span class="block font-medium text-brand-plum">
+                  View patient record
+                </span>
+
+                <span class="text-sm text-brand-plum/70">
+                  Allows the carer to view patient-record details.
+                </span>
+              </span>
+            </label>
+
+            <label class="flex items-start gap-3">
+              <input
+                type="checkbox"
+                class="mt-1"
+                formControlName="canEditPatientRecord"
+              />
+
+              <span>
+                <span class="block font-medium text-brand-plum">
+                  Edit patient record
+                </span>
+
+                <span class="text-sm text-brand-plum/70">
+                  Edit access automatically includes view access.
+                </span>
+              </span>
+            </label>
+          </div>
+        </fieldset>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="isInviting()"
+        >
+          {{
+            isInviting()
+              ? 'Sending invitation...'
+              : 'Invite carer'
+          }}
+        </button>
+      </form>
+    </div>
+
+    @if (successMessage()) {
+      <div
+        class="mb-6 rounded-lg border border-brand-mint bg-brand-off-white p-4 text-brand-plum"
+        role="status"
+      >
+        {{ successMessage() }}
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div
+        class="mb-6 rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral"
+        role="alert"
+      >
+        {{ errorMessage() }}
+      </div>
+    }
+
+    @if (isLoading()) {
+      <div
+        class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum"
+        role="status"
+      >
+        Loading your care network...
+      </div>
+    } @else {
+      <section class="mb-8">
+        <h2 class="mb-4 text-xl font-semibold text-brand-plum">
+          Pending invitations
+        </h2>
+
+        @if (pendingRelationships().length === 0) {
+          <p class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5 text-brand-plum/70">
+            There are no pending invitations.
+          </p>
+        } @else {
+          <div class="space-y-4">
+            @for (
+              relationship of pendingRelationships();
+              track relationship.id
+              ) {
+              <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h3 class="font-semibold text-brand-plum">
+                      {{ relationshipName(relationship) }}
+                    </h3>
+
+                    <p class="text-sm text-brand-plum/70">
+                      {{ relationship.carer.email }}
+                    </p>
+                  </div>
+
+                  <span class="rounded-full bg-brand-peach px-3 py-1 text-sm font-medium text-brand-plum">
+                    Pending
+                  </span>
+                </div>
+
+                <p class="mt-3 text-sm text-brand-plum">
+                  Invited:
+                  {{ relationship.invitedAt | date: 'd MMMM y, HH:mm' }}
+                </p>
+
+                <div class="mt-3 flex flex-wrap gap-2">
+                  @if (
+                    hasPermission(
+                      relationship,
+                      patientRecordViewPermission
+                    )
+                    ) {
+                    <span class="rounded-full bg-brand-pink px-3 py-1 text-sm text-brand-plum">
+                      View patient record
+                    </span>
+                  }
+
+                  @if (
+                    hasPermission(
+                      relationship,
+                      patientRecordEditPermission
+                    )
+                    ) {
+                    <span class="rounded-full bg-brand-pink px-3 py-1 text-sm text-brand-plum">
+                      Edit patient record
+                    </span>
+                  }
+
+                  @if (relationship.permissions.length === 0) {
+                    <span class="text-sm text-brand-plum/70">
+                      No permissions granted
+                    </span>
+                  }
+                </div>
+
+                @if (editingAccessId() === relationship.id) {
+                  <form
+                    class="mt-5 space-y-4 border-t border-brand-plum/20 pt-4"
+                    [formGroup]="permissionForm"
+                    (ngSubmit)="savePermissions()"
+                  >
+                    <fieldset>
+                      <legend class="font-semibold text-brand-plum">
+                        Edit permissions
+                      </legend>
+
+                      <div class="mt-3 space-y-3">
+                        <label class="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            formControlName="canViewPatientRecord"
+                          />
+
+                          <span class="text-brand-plum">
+                            View patient record
+                          </span>
+                        </label>
+
+                        <label class="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            formControlName="canEditPatientRecord"
+                          />
+
+                          <span class="text-brand-plum">
+                            Edit patient record
+                          </span>
+                        </label>
+                      </div>
+                    </fieldset>
+
+                    <div class="flex flex-wrap gap-3">
+                      <button
+                        type="submit"
+                        class="btn btn-primary"
+                        [disabled]="isBusy(relationship.id)"
+                      >
+                        {{
+                          isBusy(relationship.id)
+                            ? 'Saving...'
+                            : 'Save permissions'
+                        }}
+                      </button>
+
+                      <button
+                        type="button"
+                        class="btn btn-secondary"
+                        [disabled]="isBusy(relationship.id)"
+                        (click)="cancelPermissionEdit()"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                } @else {
+                  <div class="mt-5 flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      [disabled]="busyAccessId() !== null"
+                      (click)="startPermissionEdit(relationship)"
+                    >
+                      Edit permissions
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn btn-danger"
+                      [disabled]="busyAccessId() !== null"
+                      (click)="cancelInvitation(relationship)"
+                    >
+                      {{
+                        isBusy(relationship.id)
+                          ? 'Cancelling...'
+                          : 'Cancel invitation'
+                      }}
+                    </button>
+                  </div>
+                }
+              </article>
+            }
+          </div>
+        }
+      </section>
+
+      <section class="mb-8">
+        <h2 class="mb-4 text-xl font-semibold text-brand-plum">
+          Active carers
+        </h2>
+
+        @if (activeRelationships().length === 0) {
+          <p class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5 text-brand-plum/70">
+            There are no active carers.
+          </p>
+        } @else {
+          <div class="space-y-4">
+            @for (
+              relationship of activeRelationships();
+              track relationship.id
+              ) {
+              <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h3 class="font-semibold text-brand-plum">
+                      {{ relationshipName(relationship) }}
+                    </h3>
+
+                    <p class="text-sm text-brand-plum/70">
+                      {{ relationship.carer.email }}
+                    </p>
+                  </div>
+
+                  <span class="rounded-full bg-brand-mint px-3 py-1 text-sm font-medium text-brand-plum">
+                    Active
+                  </span>
+                </div>
+
+                <div class="mt-3 flex flex-wrap gap-2">
+                  @if (
+                    hasPermission(
+                      relationship,
+                      patientRecordViewPermission
+                    )
+                    ) {
+                    <span class="rounded-full bg-brand-pink px-3 py-1 text-sm text-brand-plum">
+                      View patient record
+                    </span>
+                  }
+
+                  @if (
+                    hasPermission(
+                      relationship,
+                      patientRecordEditPermission
+                    )
+                    ) {
+                    <span class="rounded-full bg-brand-pink px-3 py-1 text-sm text-brand-plum">
+                      Edit patient record
+                    </span>
+                  }
+
+                  @if (relationship.permissions.length === 0) {
+                    <span class="text-sm text-brand-plum/70">
+                      No permissions granted
+                    </span>
+                  }
+                </div>
+
+                @if (editingAccessId() === relationship.id) {
+                  <form
+                    class="mt-5 space-y-4 border-t border-brand-plum/20 pt-4"
+                    [formGroup]="permissionForm"
+                    (ngSubmit)="savePermissions()"
+                  >
+                    <fieldset>
+                      <legend class="font-semibold text-brand-plum">
+                        Edit permissions
+                      </legend>
+
+                      <div class="mt-3 space-y-3">
+                        <label class="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            formControlName="canViewPatientRecord"
+                          />
+
+                          <span class="text-brand-plum">
+                            View patient record
+                          </span>
+                        </label>
+
+                        <label class="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            formControlName="canEditPatientRecord"
+                          />
+
+                          <span class="text-brand-plum">
+                            Edit patient record
+                          </span>
+                        </label>
+                      </div>
+                    </fieldset>
+
+                    <div class="flex flex-wrap gap-3">
+                      <button
+                        type="submit"
+                        class="btn btn-primary"
+                        [disabled]="isBusy(relationship.id)"
+                      >
+                        {{
+                          isBusy(relationship.id)
+                            ? 'Saving...'
+                            : 'Save permissions'
+                        }}
+                      </button>
+
+                      <button
+                        type="button"
+                        class="btn btn-secondary"
+                        [disabled]="isBusy(relationship.id)"
+                        (click)="cancelPermissionEdit()"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                } @else {
+                  <div class="mt-5 flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      [disabled]="busyAccessId() !== null"
+                      (click)="startPermissionEdit(relationship)"
+                    >
+                      Edit permissions
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn btn-danger"
+                      [disabled]="busyAccessId() !== null"
+                      (click)="revokeAccess(relationship)"
+                    >
+                      {{
+                        isBusy(relationship.id)
+                          ? 'Revoking...'
+                          : 'Revoke access'
+                      }}
+                    </button>
+                  </div>
+                }
+              </article>
+            }
+          </div>
+        }
+      </section>
+
+      <section>
+        <h2 class="mb-4 text-xl font-semibold text-brand-plum">
+          Relationship history
+        </h2>
+
+        @if (inactiveRelationships().length === 0) {
+          <p class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5 text-brand-plum/70">
+            There is no inactive relationship history.
+          </p>
+        } @else {
+          <div class="space-y-4">
+            @for (
+              relationship of inactiveRelationships();
+              track relationship.id
+              ) {
+              <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h3 class="font-semibold text-brand-plum">
+                      {{ relationshipName(relationship) }}
+                    </h3>
+
+                    <p class="text-sm text-brand-plum/70">
+                      {{ relationship.carer.email }}
+                    </p>
+                  </div>
+
+                  <span class="rounded-full bg-brand-peach px-3 py-1 text-sm font-medium text-brand-plum">
+                    {{ relationship.status }}
+                  </span>
+                </div>
+
+                <p class="mt-3 text-sm text-brand-plum/70">
+                  Status changed:
+                  {{ relationship.statusChangedAt | date: 'd MMMM y, HH:mm' }}
+                </p>
+              </article>
+            }
+          </div>
+        }
+      </section>
+    }
+  }
+</section>

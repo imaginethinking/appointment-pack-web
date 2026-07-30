@@ -15,6 +15,7 @@ import { PatientRecordEdit } from './features/patient-record/pages/patient-recor
 import { MfaSettings } from './features/profile/pages/mfa-settings/mfa-settings';
 import { Profile } from './features/profile/pages/profile/profile';
 import { ProfileEdit } from './features/profile/pages/profile-edit/profile-edit';
+import { CareNetwork } from './features/care-network/pages/care-network/care-network';
 
 export const routes: Routes = [
   {
@@ -73,6 +74,10 @@ export const routes: Routes = [
             action: 'edit',
           },
         },
+      },
+      {
+        path: 'care-network',
+        component: CareNetwork,
       },
       {
         path: 'access-denied',
