@@ -1,20 +1,27 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { applyServerFieldErrors } from '../../../../core/forms/server-field-errors';
 import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
 import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
-import { Permission } from '../../../../core/models/permission-model';
+import {
+  addPermissionWithDependencies,
+  Permission,
+} from '../../../../core/models/permission-model';
 import { PersonalPatientRecordState } from '../../../patient-record/services/personal-patient-record-state';
-import { PatientCarerAccessResponse } from '../../models/patient-carer-access-model';
+import {
+  CARE_NETWORK_PERMISSION_GROUPS,
+  DEFAULT_CARER_PERMISSIONS,
+  PatientCarerAccessResponse,
+} from '../../models/patient-carer-access-model';
 import { PatientCarerAccessState } from '../../services/patient-carer-access-state';
 
 @Component({
   selector: 'app-care-network',
-  imports: [DatePipe, ReactiveFormsModule, RouterLink, RouterLinkActive],
+  imports: [DatePipe, ReactiveFormsModule, RouterLink, RouterLinkActive, FormsModule],
   templateUrl: './care-network.html',
   styleUrl: './care-network.css',
 })
@@ -25,11 +32,23 @@ export class CareNetwork implements OnInit {
 
   private readonly personalPatientRecordState = inject(PersonalPatientRecordState);
 
+  private readonly invitationPermissionsValue = signal<ReadonlySet<Permission>>(
+    new Set(DEFAULT_CARER_PERMISSIONS),
+  );
+
+  private readonly editingPermissionsValue = signal<ReadonlySet<Permission>>(new Set());
+
   protected readonly personalPatientRecord = this.personalPatientRecordState.patientRecord;
 
   protected readonly relationships = this.accessState.asPatientRelationships;
 
   protected readonly isLoading = this.accessState.isLoadingAsPatient;
+
+  protected readonly invitationPermissions = this.invitationPermissionsValue.asReadonly();
+
+  protected readonly editingPermissions = this.editingPermissionsValue.asReadonly();
+
+  protected readonly permissionGroups = CARE_NETWORK_PERMISSION_GROUPS;
 
   protected readonly isInviting = signal(false);
 
@@ -39,10 +58,6 @@ export class CareNetwork implements OnInit {
 
   protected readonly errorMessage = signal('');
   protected readonly successMessage = signal('');
-
-  protected readonly patientRecordViewPermission: Permission = 'patient-record:view';
-
-  protected readonly patientRecordEditPermission: Permission = 'patient-record:edit';
 
   protected readonly pendingRelationships = computed(() =>
     this.relationships().filter((relationship) => relationship.status === 'PENDING'),
@@ -63,13 +78,6 @@ export class CareNetwork implements OnInit {
 
   protected readonly invitationForm = this.formBuilder.group({
     carerEmail: this.formBuilder.nonNullable.control('', [Validators.required, Validators.email]),
-    canViewPatientRecord: this.formBuilder.nonNullable.control(true),
-    canEditPatientRecord: this.formBuilder.nonNullable.control(false),
-  });
-
-  protected readonly permissionForm = this.formBuilder.group({
-    canViewPatientRecord: this.formBuilder.nonNullable.control(false),
-    canEditPatientRecord: this.formBuilder.nonNullable.control(false),
   });
 
   ngOnInit(): void {
@@ -93,7 +101,7 @@ export class CareNetwork implements OnInit {
     this.accessState
       .inviteCarer({
         carerEmail: value.carerEmail.trim(),
-        permissions: this.buildPermissions(value.canViewPatientRecord, value.canEditPatientRecord),
+        permissions: [...this.invitationPermissions()],
       })
       .pipe(
         finalize(() => {
@@ -102,12 +110,8 @@ export class CareNetwork implements OnInit {
       )
       .subscribe({
         next: () => {
-          this.invitationForm.reset({
-            carerEmail: '',
-            canViewPatientRecord: true,
-            canEditPatientRecord: false,
-          });
-
+          this.invitationForm.reset({ carerEmail: '' });
+          this.invitationPermissionsValue.set(new Set(DEFAULT_CARER_PERMISSIONS));
           this.successMessage.set('The carer invitation has been created.');
         },
         error: (error: unknown) => {
@@ -134,22 +138,35 @@ export class CareNetwork implements OnInit {
       });
   }
 
+  protected toggleInvitationPermission(permission: Permission, event: Event): void {
+    this.invitationPermissionsValue.set(
+      this.updatePermissionSelection(
+        this.invitationPermissions(),
+        permission,
+        this.isChecked(event),
+      ),
+    );
+  }
+
   protected startPermissionEdit(relationship: PatientCarerAccessResponse): void {
     this.clearMessages();
-
-    const canEdit = this.hasPermission(relationship, this.patientRecordEditPermission);
-
-    this.permissionForm.reset({
-      canViewPatientRecord:
-        canEdit || this.hasPermission(relationship, this.patientRecordViewPermission),
-      canEditPatientRecord: canEdit,
-    });
-
+    this.editingPermissionsValue.set(new Set(relationship.permissions));
     this.editingAccessId.set(relationship.id);
+  }
+
+  protected toggleEditingPermission(permission: Permission, event: Event): void {
+    this.editingPermissionsValue.set(
+      this.updatePermissionSelection(
+        this.editingPermissions(),
+        permission,
+        this.isChecked(event),
+      ),
+    );
   }
 
   protected cancelPermissionEdit(): void {
     this.editingAccessId.set(null);
+    this.editingPermissionsValue.set(new Set());
   }
 
   protected savePermissions(): void {
@@ -160,14 +177,11 @@ export class CareNetwork implements OnInit {
     }
 
     this.clearMessages();
-
-    const value = this.permissionForm.getRawValue();
-
     this.busyAccessId.set(accessId);
 
     this.accessState
       .updatePermissions(accessId, {
-        permissions: this.buildPermissions(value.canViewPatientRecord, value.canEditPatientRecord),
+        permissions: [...this.editingPermissions()],
       })
       .pipe(
         finalize(() => {
@@ -177,7 +191,7 @@ export class CareNetwork implements OnInit {
       .subscribe({
         next: () => {
           this.editingAccessId.set(null);
-
+          this.editingPermissionsValue.set(new Set());
           this.successMessage.set('Carer permissions have been updated.');
         },
         error: (error: unknown) => {
@@ -267,18 +281,23 @@ export class CareNetwork implements OnInit {
     return this.busyAccessId() === accessId;
   }
 
-  private buildPermissions(canView: boolean, canEdit: boolean): Permission[] {
-    const permissions: Permission[] = [];
-
-    if (canView || canEdit) {
-      permissions.push(this.patientRecordViewPermission);
+  private updatePermissionSelection(
+    selectedPermissions: ReadonlySet<Permission>,
+    permission: Permission,
+    checked: boolean,
+  ): ReadonlySet<Permission> {
+    if (checked) {
+      return addPermissionWithDependencies(selectedPermissions, permission);
     }
 
-    if (canEdit) {
-      permissions.push(this.patientRecordEditPermission);
-    }
+    const permissions = new Set(selectedPermissions);
+    permissions.delete(permission);
 
     return permissions;
+  }
+
+  private isChecked(event: Event): boolean {
+    return (event.target as HTMLInputElement).checked;
   }
 
   private clearMessages(): void {

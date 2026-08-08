@@ -86,10 +86,7 @@
         </p>
       } @else {
         <div class="space-y-4">
-          @for (
-            relationship of pendingRelationships();
-            track relationship.id
-            ) {
+          @for (relationship of pendingRelationships(); track relationship.id) {
             <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5">
               <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>
@@ -109,26 +106,14 @@
               </div>
 
               <div class="mt-4 flex flex-wrap gap-2">
-                @if (
-                  hasPermission(
-                    relationship,
-                    patientRecordViewPermission
-                  )
-                  ) {
-                  <span class="rounded-full bg-brand-pink px-3 py-1 text-sm text-brand-plum">
-                    View patient record
-                  </span>
-                }
-
-                @if (
-                  hasPermission(
-                    relationship,
-                    patientRecordEditPermission
-                  )
-                  ) {
-                  <span class="rounded-full bg-brand-pink px-3 py-1 text-sm text-brand-plum">
-                    Edit patient record
-                  </span>
+                @for (group of permissionGroups; track group.label) {
+                  @for (option of group.permissions; track option.permission) {
+                    @if (hasPermission(relationship, option.permission)) {
+                      <span class="rounded-full bg-brand-pink px-3 py-1 text-sm text-brand-plum">
+                        {{ option.label }}
+                      </span>
+                    }
+                  }
                 }
 
                 @if (relationship.permissions.length === 0) {
@@ -145,11 +130,7 @@
                   [disabled]="busyAccessId() !== null"
                   (click)="acceptInvitation(relationship)"
                 >
-                  {{
-                    isBusy(relationship.id)
-                      ? 'Accepting...'
-                      : 'Accept invitation'
-                  }}
+                  {{ isBusy(relationship.id) ? 'Accepting...' : 'Accept invitation' }}
                 </button>
 
                 <button
@@ -158,11 +139,7 @@
                   [disabled]="busyAccessId() !== null"
                   (click)="declineInvitation(relationship)"
                 >
-                  {{
-                    isBusy(relationship.id)
-                      ? 'Declining...'
-                      : 'Decline invitation'
-                  }}
+                  {{ isBusy(relationship.id) ? 'Declining...' : 'Decline invitation' }}
                 </button>
               </div>
             </article>
@@ -182,10 +159,7 @@
         </p>
       } @else {
         <div class="space-y-4">
-          @for (
-            relationship of activeRelationships();
-            track relationship.id
-            ) {
+          @for (relationship of activeRelationships(); track relationship.id) {
             <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5">
               <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>
@@ -205,26 +179,14 @@
               </div>
 
               <div class="mt-4 flex flex-wrap gap-2">
-                @if (
-                  hasPermission(
-                    relationship,
-                    patientRecordViewPermission
-                  )
-                  ) {
-                  <span class="rounded-full bg-brand-pink px-3 py-1 text-sm text-brand-plum">
-                    View patient record
-                  </span>
-                }
-
-                @if (
-                  hasPermission(
-                    relationship,
-                    patientRecordEditPermission
-                  )
-                  ) {
-                  <span class="rounded-full bg-brand-pink px-3 py-1 text-sm text-brand-plum">
-                    Edit patient record
-                  </span>
+                @for (group of permissionGroups; track group.label) {
+                  @for (option of group.permissions; track option.permission) {
+                    @if (hasPermission(relationship, option.permission)) {
+                      <span class="rounded-full bg-brand-pink px-3 py-1 text-sm text-brand-plum">
+                        {{ option.label }}
+                      </span>
+                    }
+                  }
                 }
 
                 @if (relationship.permissions.length === 0) {
@@ -272,10 +234,7 @@
         </p>
       } @else {
         <div class="space-y-4">
-          @for (
-            relationship of inactiveRelationships();
-            track relationship.id
-            ) {
+          @for (relationship of inactiveRelationships(); track relationship.id) {
             <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5">
               <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>

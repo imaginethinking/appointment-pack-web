@@ -56,7 +56,7 @@
       </h2>
 
       <form
-        class="mt-5 space-y-5"
+        class="mt-5 space-y-6"
         [formGroup]="invitationForm"
         novalidate
         (ngSubmit)="inviteCarer()"
@@ -101,60 +101,49 @@
           }
         </div>
 
-        <fieldset>
-          <legend class="font-semibold text-brand-plum">
-            Patient-record permissions
-          </legend>
+        <div class="space-y-5">
+          @for (group of permissionGroups; track group.label) {
+            <fieldset>
+              <legend class="font-semibold text-brand-plum">
+                {{ group.label }} permissions
+              </legend>
 
-          <div class="mt-3 space-y-3">
-            <label class="flex items-start gap-3">
-              <input
-                type="checkbox"
-                class="mt-1"
-                formControlName="canViewPatientRecord"
-              />
+              <div class="mt-3 space-y-3">
+                @for (option of group.permissions; track option.permission) {
+                  <label class="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      class="mt-1"
+                      [checked]="invitationPermissions().has(option.permission)"
+                      (change)="toggleInvitationPermission(option.permission, $event)"
+                    />
 
-              <span>
-                <span class="block font-medium text-brand-plum">
-                  View patient record
-                </span>
+                    <span>
+                      <span class="block font-medium text-brand-plum">
+                        {{ option.label }}
+                      </span>
 
-                <span class="text-sm text-brand-plum/70">
-                  Allows the carer to view patient-record details.
-                </span>
-              </span>
-            </label>
+                      <span class="text-sm text-brand-plum/70">
+                        {{ option.description }}
+                      </span>
+                    </span>
+                  </label>
+                }
+              </div>
+            </fieldset>
+          }
+        </div>
 
-            <label class="flex items-start gap-3">
-              <input
-                type="checkbox"
-                class="mt-1"
-                formControlName="canEditPatientRecord"
-              />
-
-              <span>
-                <span class="block font-medium text-brand-plum">
-                  Edit patient record
-                </span>
-
-                <span class="text-sm text-brand-plum/70">
-                  Edit access automatically includes view access.
-                </span>
-              </span>
-            </label>
-          </div>
-        </fieldset>
+        <p class="text-sm text-brand-plum/70">
+          Required prerequisite permissions are selected automatically. The server validates the final permission set.
+        </p>
 
         <button
           type="submit"
           class="btn btn-primary"
           [disabled]="isInviting()"
         >
-          {{
-            isInviting()
-              ? 'Sending invitation...'
-              : 'Invite carer'
-          }}
+          {{ isInviting() ? 'Sending invitation...' : 'Invite carer' }}
         </button>
       </form>
     </div>
@@ -196,10 +185,7 @@
           </p>
         } @else {
           <div class="space-y-4">
-            @for (
-              relationship of pendingRelationships();
-              track relationship.id
-              ) {
+            @for (relationship of pendingRelationships(); track relationship.id) {
               <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5">
                 <div class="flex flex-wrap items-start justify-between gap-3">
                   <div>
@@ -223,26 +209,14 @@
                 </p>
 
                 <div class="mt-3 flex flex-wrap gap-2">
-                  @if (
-                    hasPermission(
-                      relationship,
-                      patientRecordViewPermission
-                    )
-                    ) {
-                    <span class="rounded-full bg-brand-pink px-3 py-1 text-sm text-brand-plum">
-                      View patient record
-                    </span>
-                  }
-
-                  @if (
-                    hasPermission(
-                      relationship,
-                      patientRecordEditPermission
-                    )
-                    ) {
-                    <span class="rounded-full bg-brand-pink px-3 py-1 text-sm text-brand-plum">
-                      Edit patient record
-                    </span>
+                  @for (group of permissionGroups; track group.label) {
+                    @for (option of group.permissions; track option.permission) {
+                      @if (hasPermission(relationship, option.permission)) {
+                        <span class="rounded-full bg-brand-pink px-3 py-1 text-sm text-brand-plum">
+                          {{ option.label }}
+                        </span>
+                      }
+                    }
                   }
 
                   @if (relationship.permissions.length === 0) {
@@ -254,39 +228,36 @@
 
                 @if (editingAccessId() === relationship.id) {
                   <form
-                    class="mt-5 space-y-4 border-t border-brand-plum/20 pt-4"
-                    [formGroup]="permissionForm"
+                    class="mt-5 space-y-5 border-t border-brand-plum/20 pt-4"
                     (ngSubmit)="savePermissions()"
                   >
-                    <fieldset>
-                      <legend class="font-semibold text-brand-plum">
-                        Edit permissions
-                      </legend>
+                    @for (group of permissionGroups; track group.label) {
+                      <fieldset>
+                        <legend class="font-semibold text-brand-plum">
+                          {{ group.label }} permissions
+                        </legend>
 
-                      <div class="mt-3 space-y-3">
-                        <label class="flex items-center gap-3">
-                          <input
-                            type="checkbox"
-                            formControlName="canViewPatientRecord"
-                          />
+                        <div class="mt-3 space-y-3">
+                          @for (option of group.permissions; track option.permission) {
+                            <label class="flex items-center gap-3">
+                              <input
+                                type="checkbox"
+                                [checked]="editingPermissions().has(option.permission)"
+                                (change)="toggleEditingPermission(option.permission, $event)"
+                              />
 
-                          <span class="text-brand-plum">
-                            View patient record
-                          </span>
-                        </label>
+                              <span class="text-brand-plum">
+                                {{ option.label }}
+                              </span>
+                            </label>
+                          }
+                        </div>
+                      </fieldset>
+                    }
 
-                        <label class="flex items-center gap-3">
-                          <input
-                            type="checkbox"
-                            formControlName="canEditPatientRecord"
-                          />
-
-                          <span class="text-brand-plum">
-                            Edit patient record
-                          </span>
-                        </label>
-                      </div>
-                    </fieldset>
+                    <p class="text-sm text-brand-plum/70">
+                      Required prerequisite permissions are selected automatically. The server validates the final permission set.
+                    </p>
 
                     <div class="flex flex-wrap gap-3">
                       <button
@@ -294,11 +265,7 @@
                         class="btn btn-primary"
                         [disabled]="isBusy(relationship.id)"
                       >
-                        {{
-                          isBusy(relationship.id)
-                            ? 'Saving...'
-                            : 'Save permissions'
-                        }}
+                        {{ isBusy(relationship.id) ? 'Saving...' : 'Save permissions' }}
                       </button>
 
                       <button
@@ -328,11 +295,7 @@
                       [disabled]="busyAccessId() !== null"
                       (click)="cancelInvitation(relationship)"
                     >
-                      {{
-                        isBusy(relationship.id)
-                          ? 'Cancelling...'
-                          : 'Cancel invitation'
-                      }}
+                      {{ isBusy(relationship.id) ? 'Cancelling...' : 'Cancel invitation' }}
                     </button>
                   </div>
                 }
@@ -353,10 +316,7 @@
           </p>
         } @else {
           <div class="space-y-4">
-            @for (
-              relationship of activeRelationships();
-              track relationship.id
-              ) {
+            @for (relationship of activeRelationships(); track relationship.id) {
               <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5">
                 <div class="flex flex-wrap items-start justify-between gap-3">
                   <div>
@@ -375,26 +335,14 @@
                 </div>
 
                 <div class="mt-3 flex flex-wrap gap-2">
-                  @if (
-                    hasPermission(
-                      relationship,
-                      patientRecordViewPermission
-                    )
-                    ) {
-                    <span class="rounded-full bg-brand-pink px-3 py-1 text-sm text-brand-plum">
-                      View patient record
-                    </span>
-                  }
-
-                  @if (
-                    hasPermission(
-                      relationship,
-                      patientRecordEditPermission
-                    )
-                    ) {
-                    <span class="rounded-full bg-brand-pink px-3 py-1 text-sm text-brand-plum">
-                      Edit patient record
-                    </span>
+                  @for (group of permissionGroups; track group.label) {
+                    @for (option of group.permissions; track option.permission) {
+                      @if (hasPermission(relationship, option.permission)) {
+                        <span class="rounded-full bg-brand-pink px-3 py-1 text-sm text-brand-plum">
+                          {{ option.label }}
+                        </span>
+                      }
+                    }
                   }
 
                   @if (relationship.permissions.length === 0) {
@@ -406,39 +354,36 @@
 
                 @if (editingAccessId() === relationship.id) {
                   <form
-                    class="mt-5 space-y-4 border-t border-brand-plum/20 pt-4"
-                    [formGroup]="permissionForm"
+                    class="mt-5 space-y-5 border-t border-brand-plum/20 pt-4"
                     (ngSubmit)="savePermissions()"
                   >
-                    <fieldset>
-                      <legend class="font-semibold text-brand-plum">
-                        Edit permissions
-                      </legend>
+                    @for (group of permissionGroups; track group.label) {
+                      <fieldset>
+                        <legend class="font-semibold text-brand-plum">
+                          {{ group.label }} permissions
+                        </legend>
 
-                      <div class="mt-3 space-y-3">
-                        <label class="flex items-center gap-3">
-                          <input
-                            type="checkbox"
-                            formControlName="canViewPatientRecord"
-                          />
+                        <div class="mt-3 space-y-3">
+                          @for (option of group.permissions; track option.permission) {
+                            <label class="flex items-center gap-3">
+                              <input
+                                type="checkbox"
+                                [checked]="editingPermissions().has(option.permission)"
+                                (change)="toggleEditingPermission(option.permission, $event)"
+                              />
 
-                          <span class="text-brand-plum">
-                            View patient record
-                          </span>
-                        </label>
+                              <span class="text-brand-plum">
+                                {{ option.label }}
+                              </span>
+                            </label>
+                          }
+                        </div>
+                      </fieldset>
+                    }
 
-                        <label class="flex items-center gap-3">
-                          <input
-                            type="checkbox"
-                            formControlName="canEditPatientRecord"
-                          />
-
-                          <span class="text-brand-plum">
-                            Edit patient record
-                          </span>
-                        </label>
-                      </div>
-                    </fieldset>
+                    <p class="text-sm text-brand-plum/70">
+                      Required prerequisite permissions are selected automatically. The server validates the final permission set.
+                    </p>
 
                     <div class="flex flex-wrap gap-3">
                       <button
@@ -446,11 +391,7 @@
                         class="btn btn-primary"
                         [disabled]="isBusy(relationship.id)"
                       >
-                        {{
-                          isBusy(relationship.id)
-                            ? 'Saving...'
-                            : 'Save permissions'
-                        }}
+                        {{ isBusy(relationship.id) ? 'Saving...' : 'Save permissions' }}
                       </button>
 
                       <button
@@ -480,11 +421,7 @@
                       [disabled]="busyAccessId() !== null"
                       (click)="revokeAccess(relationship)"
                     >
-                      {{
-                        isBusy(relationship.id)
-                          ? 'Revoking...'
-                          : 'Revoke access'
-                      }}
+                      {{ isBusy(relationship.id) ? 'Revoking...' : 'Revoke access' }}
                     </button>
                   </div>
                 }
@@ -505,10 +442,7 @@
           </p>
         } @else {
           <div class="space-y-4">
-            @for (
-              relationship of inactiveRelationships();
-              track relationship.id
-              ) {
+            @for (relationship of inactiveRelationships(); track relationship.id) {
               <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5">
                 <div class="flex flex-wrap items-start justify-between gap-3">
                   <div>

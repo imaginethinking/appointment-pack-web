@@ -7,7 +7,10 @@ import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
 import { Permission } from '../../../../core/models/permission-model';
 import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
 import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import { PatientCarerAccessResponse } from '../../models/patient-carer-access-model';
+import {
+  CARE_NETWORK_PERMISSION_GROUPS,
+  PatientCarerAccessResponse,
+} from '../../models/patient-carer-access-model';
 import { PatientCarerAccessState } from '../../services/patient-carer-access-state';
 
 @Component({
@@ -31,14 +34,12 @@ export class CarerAccess {
 
   protected readonly contextLoadFailed = this.contextCoordinator.loadFailed;
 
+  protected readonly permissionGroups = CARE_NETWORK_PERMISSION_GROUPS;
+
   protected readonly busyAccessId = signal<string | null>(null);
 
   protected readonly errorMessage = signal('');
   protected readonly successMessage = signal('');
-
-  protected readonly patientRecordViewPermission: Permission = 'patient-record:view';
-
-  protected readonly patientRecordEditPermission: Permission = 'patient-record:edit';
 
   protected readonly pendingRelationships = computed(() =>
     this.relationships().filter((relationship) => relationship.status === 'PENDING'),
@@ -71,7 +72,6 @@ export class CarerAccess {
       .subscribe({
         next: () => {
           this.selectedPatientState.revalidateSelection();
-
           this.successMessage.set(`Access to ${this.patientName(relationship)} has been accepted.`);
         },
         error: (error: unknown) => {
@@ -94,7 +94,6 @@ export class CarerAccess {
       .subscribe({
         next: () => {
           this.selectedPatientState.revalidateSelection();
-
           this.successMessage.set(
             `The invitation from ${this.patientName(relationship)} has been declined.`,
           );
@@ -112,7 +111,6 @@ export class CarerAccess {
 
     if (!selected) {
       this.errorMessage.set('You do not have permission to view this patient record.');
-
       return;
     }
 

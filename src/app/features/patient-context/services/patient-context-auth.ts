@@ -4,13 +4,10 @@ import {
   buildPermission,
   Permission,
   PermissionAction,
+  PERMISSION_DEPENDENCIES,
   PermissionResource,
 } from '../../../core/models/permission-model';
 import { SelectedPatientContext } from '../models/selected-patient-context';
-
-const PERMISSION_DEPENDENCIES: Partial<Record<Permission, readonly Permission[]>> = {
-  'patient-record:edit': ['patient-record:view'],
-};
 
 @Injectable({
   providedIn: 'root',
@@ -36,7 +33,11 @@ export class PatientContextAuthorisation {
     return permissions.some((permission) => this.has(context, permission));
   }
 
-  can<R extends PermissionResource>(context: SelectedPatientContext | null, resource: R, action: PermissionAction<R>,): boolean {
+  can<R extends PermissionResource>(
+    context: SelectedPatientContext | null,
+    resource: R,
+    action: PermissionAction<R>,
+  ): boolean {
     const permission = buildPermission(resource, action) as Permission;
 
     if (!this.has(context, permission)) {
