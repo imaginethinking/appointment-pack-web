@@ -9,6 +9,10 @@ import { MfaLogin } from './features/auth/pages/mfa-login/mfa-login';
 import { Register } from './features/auth/pages/register/register';
 import { CareNetwork } from './features/care-network/pages/care-network/care-network';
 import { CarerAccess } from './features/care-network/pages/carer-access/carer-access';
+import { DeidentificationReview } from './features/documents/pages/deidentification-review/deidentification-review';
+import { DocumentDetails } from './features/documents/pages/document-details/document-details';
+import { DocumentList } from './features/documents/pages/document-list/document-list';
+import { DocumentUpload } from './features/documents/pages/document-upload/document-upload';
 import { AccessDenied } from './features/errors/pages/access-denied/access-denied';
 import { Home } from './features/home/pages/home/home';
 import { PatientRecord } from './features/patient-record/pages/patient-record/patient-record';
@@ -73,6 +77,50 @@ export const routes: Routes = [
           permission: {
             resource: 'patient-record',
             action: 'edit',
+          },
+        },
+      },
+      {
+        path: 'documents',
+        component: DocumentList,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'document',
+            action: 'view',
+          },
+        },
+      },
+      {
+        path: 'documents/upload',
+        component: DocumentUpload,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'document',
+            action: 'upload',
+          },
+        },
+      },
+      {
+        path: 'documents/:documentId/deidentification-review',
+        component: DeidentificationReview,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'document',
+            action: 'edit',
+          },
+        },
+      },
+      {
+        path: 'documents/:documentId',
+        component: DocumentDetails,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'document',
+            action: 'view',
           },
         },
       },
