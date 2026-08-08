@@ -1,0 +1,248 @@
+<section class="mx-auto max-w-4xl">
+  <div class="mb-6">
+    <a
+      routerLink="/documents"
+      class="text-sm font-semibold text-brand-plum underline"
+    >
+      Back to documents
+    </a>
+
+    <h1 class="mt-4 text-3xl font-bold text-brand-plum">
+      Document details
+    </h1>
+  </div>
+
+  @if (status() === 'loading') {
+    <div
+      class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum"
+      role="status"
+    >
+      Loading document...
+    </div>
+  } @else if (status() === 'not-found') {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      role="alert"
+    >
+      <h2 class="font-semibold text-brand-plum">
+        Document unavailable
+      </h2>
+
+      <p class="mt-2 text-brand-plum/70">
+        This document could not be found or is no longer available.
+      </p>
+    </div>
+  } @else if (status() === 'forbidden') {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      role="alert"
+    >
+      <h2 class="font-semibold text-brand-plum">
+        Document access unavailable
+      </h2>
+
+      <p class="mt-2 text-brand-plum/70">
+        You do not have permission to view this document.
+      </p>
+    </div>
+  } @else if (status() === 'error') {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      role="alert"
+    >
+      <p class="text-brand-coral">
+        {{ errorMessage() }}
+      </p>
+
+      <button
+        type="button"
+        class="btn btn-secondary mt-4"
+        (click)="retryLoad()"
+      >
+        Try again
+      </button>
+    </div>
+  } @else if (!contextMatchesDocument()) {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      role="alert"
+    >
+      <h2 class="font-semibold text-brand-plum">
+        Different patient selected
+      </h2>
+
+      <p class="mt-2 text-brand-plum/70">
+        This document does not belong to the currently selected patient.
+      </p>
+
+      <a
+        routerLink="/documents"
+        class="btn btn-secondary mt-4"
+      >
+        Return to selected patient
+      </a>
+    </div>
+  } @else if (!canViewDocument()) {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      role="alert"
+    >
+      <h2 class="font-semibold text-brand-plum">
+        Document access unavailable
+      </h2>
+
+      <p class="mt-2 text-brand-plum/70">
+        You no longer have permission to view documents for this patient.
+      </p>
+    </div>
+  } @else if (document(); as currentDocument) {
+    <div class="space-y-6">
+      <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div class="min-w-0">
+            <h2 class="break-words text-xl font-semibold text-brand-plum">
+              {{ currentDocument.originalFileName }}
+            </h2>
+
+            <p class="mt-1 text-brand-plum/70">
+              {{ getDocumentTypeLabel(currentDocument.documentType) }}
+            </p>
+          </div>
+
+          <span class="w-fit rounded-full bg-brand-pink px-3 py-1 text-sm font-medium text-brand-plum">
+            {{ getDocumentStatusLabel(currentDocument.status) }}
+          </span>
+        </div>
+
+        <dl class="mt-6 grid gap-5 border-t border-brand-plum/20 pt-5 sm:grid-cols-2">
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">
+              Uploaded
+            </dt>
+
+            <dd class="mt-1 text-brand-plum">
+              {{ currentDocument.createdAt | date: 'd MMMM y, HH:mm' }}
+            </dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">
+              File size
+            </dt>
+
+            <dd class="mt-1 text-brand-plum">
+              {{ formatFileSize(currentDocument.fileSize) }}
+            </dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">
+              Content type
+            </dt>
+
+            <dd class="mt-1 text-brand-plum">
+              {{ currentDocument.contentType }}
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+        <h2 class="text-xl font-semibold text-brand-plum">
+          Workflow
+        </h2>
+
+        <p class="mt-2 text-brand-plum/70">
+          {{ workflowMessage() }}
+        </p>
+
+        @if (processing()?.processingWarning; as warning) {
+          <div
+            class="mt-4 rounded-md border border-brand-coral/50 bg-brand-peach/30 p-4"
+            role="status"
+          >
+            <p class="font-semibold text-brand-plum">
+              Processing warning
+            </p>
+
+            <p class="mt-1 text-sm text-brand-plum/80">
+              {{ warning }}
+            </p>
+          </div>
+        }
+
+        @if (processing()?.summarySource; as source) {
+          <p class="mt-4 text-sm text-brand-plum/70">
+            Summary source:
+            <span class="font-semibold text-brand-plum">
+              {{ getSummarySourceLabel(source) }}
+            </span>
+          </p>
+        }
+      </section>
+
+      @if (actionError()) {
+        <div
+          class="rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral"
+          role="alert"
+        >
+          {{ actionError() }}
+        </div>
+      }
+
+      <section class="flex flex-wrap gap-3">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          [disabled]="isDownloading()"
+          (click)="download()"
+        >
+          {{ isDownloading() ? 'Downloading...' : 'Download original' }}
+        </button>
+
+        @if (canExtract()) {
+          <button
+            type="button"
+            class="btn btn-primary"
+            [disabled]="isExtracting()"
+            (click)="extract()"
+          >
+            @if (currentDocument.status === 'EXTRACTION_FAILED') {
+              {{ isExtracting() ? 'Retrying...' : 'Retry extraction' }}
+            } @else {
+              {{ isExtracting() ? 'Processing...' : 'Start processing' }}
+            }
+          </button>
+        }
+
+        @if (
+          currentDocument.documentType === 'CONSULTATION_OUTCOME_LETTER' &&
+          currentDocument.status === 'READY_FOR_DEIDENTIFICATION_REVIEW' &&
+          canEditDocument()
+          ) {
+          <a
+            [routerLink]="[
+              '/documents',
+              currentDocument.id,
+              'deidentification-review'
+            ]"
+            class="btn btn-primary"
+          >
+            Review de-identified text
+          </a>
+        }
+
+        @if (canArchive()) {
+          <button
+            type="button"
+            class="btn btn-danger"
+            [disabled]="isArchiving()"
+            (click)="archive()"
+          >
+            {{ isArchiving() ? 'Archiving...' : 'Archive' }}
+          </button>
+        }
+      </section>
+    </div>
+  }
+</section>

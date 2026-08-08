@@ -1,0 +1,143 @@
+<section class="mx-auto max-w-6xl">
+  <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-brand-plum">
+        Documents
+      </h1>
+
+      @if (selectedPatient()) {
+        <p class="mt-1 text-brand-plum/70">
+          Documents for {{ selectedPatientName() }}.
+        </p>
+      }
+    </div>
+
+    @if (canUploadDocuments()) {
+      <a
+        routerLink="/documents/upload"
+        class="btn btn-primary"
+      >
+        Upload document
+      </a>
+    }
+  </div>
+
+  @if (status() === 'loading') {
+    <div
+      class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum"
+      role="status"
+    >
+      Loading documents...
+    </div>
+  } @else if (status() === 'no-selection') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <h2 class="font-semibold text-brand-plum">
+        No patient selected
+      </h2>
+
+      <p class="mt-2 text-brand-plum/70">
+        Select a patient before viewing documents.
+      </p>
+    </div>
+  } @else if (status() === 'forbidden') {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      role="alert"
+    >
+      <h2 class="font-semibold text-brand-plum">
+        Document access unavailable
+      </h2>
+
+      <p class="mt-2 text-brand-plum/70">
+        You no longer have permission to view documents for this patient.
+      </p>
+    </div>
+  } @else if (status() === 'not-found') {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      role="alert"
+    >
+      <h2 class="font-semibold text-brand-plum">
+        Patient record unavailable
+      </h2>
+
+      <p class="mt-2 text-brand-plum/70">
+        The selected patient record could not be found.
+      </p>
+    </div>
+  } @else if (status() === 'error') {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      role="alert"
+    >
+      <p class="text-brand-coral">
+        {{ errorMessage() }}
+      </p>
+
+      <button
+        type="button"
+        class="btn btn-secondary mt-4"
+        (click)="retry()"
+      >
+        Try again
+      </button>
+    </div>
+  } @else if (documents().length === 0) {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-8 text-center">
+      <h2 class="text-xl font-semibold text-brand-plum">
+        No documents
+      </h2>
+
+      <p class="mt-2 text-brand-plum/70">
+        No documents have been uploaded for this patient.
+      </p>
+    </div>
+  } @else {
+    <div class="space-y-4">
+      @for (document of documents(); track document.id) {
+        <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5">
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div class="min-w-0">
+              <a
+                [routerLink]="['/documents', document.id]"
+                class="break-words font-semibold text-brand-plum underline"
+              >
+                {{ document.originalFileName }}
+              </a>
+
+              <p class="mt-1 text-sm text-brand-plum/70">
+                {{ getDocumentTypeLabel(document.documentType) }}
+              </p>
+            </div>
+
+            <span class="w-fit rounded-full bg-brand-pink px-3 py-1 text-sm font-medium text-brand-plum">
+              {{ getDocumentStatusLabel(document.status) }}
+            </span>
+          </div>
+
+          <dl class="mt-5 grid gap-4 border-t border-brand-plum/20 pt-4 sm:grid-cols-2">
+            <div>
+              <dt class="text-sm font-semibold text-brand-plum/70">
+                Uploaded
+              </dt>
+
+              <dd class="mt-1 text-brand-plum">
+                {{ document.createdAt | date: 'd MMMM y, HH:mm' }}
+              </dd>
+            </div>
+
+            <div>
+              <dt class="text-sm font-semibold text-brand-plum/70">
+                File size
+              </dt>
+
+              <dd class="mt-1 text-brand-plum">
+                {{ formatFileSize(document.fileSize) }}
+              </dd>
+            </div>
+          </dl>
+        </article>
+      }
+    </div>
+  }
+</section>
