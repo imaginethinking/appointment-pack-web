@@ -20,8 +20,10 @@ export interface PermissionRequirement<R extends PermissionResource = Permission
 
 export const PERMISSION_DEPENDENCIES: Partial<Record<Permission, readonly Permission[]>> = {
   'patient-record:edit': ['patient-record:view'],
+  'document:view': ['patient-record:view'],
   'document:edit': ['document:view'],
   'document:upload': ['document:edit'],
+  'history:view': ['patient-record:view'],
   'history:edit': ['history:view'],
 };
 
