@@ -1,4 +1,4 @@
-import { Permission } from '../../../core/models/permission-model';
+import {Permission} from '../../../core/models/permission-model';
 
 export interface CareNetworkPermissionOption {
   permission: Permission;
@@ -44,6 +44,23 @@ export const CARE_NETWORK_PERMISSION_GROUPS = [
         permission: 'document:upload',
         label: 'Upload documents',
         description: 'Upload new documents for the patient.',
+      },
+    ],
+  },
+  {
+    label: 'Appointments',
+    permissions: [
+      {
+        permission: 'appointment:view',
+        label: 'View appointments',
+        description:
+          'View confirmed appointments for the patient.',
+      },
+      {
+        permission: 'appointment:edit',
+        label: 'Manage appointments',
+        description:
+          'Confirm and manage appointments for the patient.',
       },
     ],
   },

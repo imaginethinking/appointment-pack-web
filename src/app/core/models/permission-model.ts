@@ -2,6 +2,7 @@ export const PERMISSION_CATALOG = {
   'patient-record': ['view', 'edit'],
   'document': ['view', 'edit', 'upload'],
   'history': ['view', 'edit'],
+  'appointment': ['view', 'edit']
 } as const;
 
 export type PermissionResource = keyof typeof PERMISSION_CATALOG;
@@ -25,6 +26,8 @@ export const PERMISSION_DEPENDENCIES: Partial<Record<Permission, readonly Permis
   'document:upload': ['document:edit'],
   'history:view': ['patient-record:view'],
   'history:edit': ['history:view'],
+  'appointment:view': ['patient-record:view'],
+  'appointment:edit': ['appointment:view'],
 };
 
 export function buildPermission<R extends PermissionResource>(
