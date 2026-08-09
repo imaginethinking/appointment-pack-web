@@ -12,7 +12,7 @@
     </h1>
 
     <p class="mt-1 text-brand-plum/70">
-      Update your personal details.
+      Update your personal details and home address.
     </p>
   </div>
 
@@ -25,155 +25,345 @@
     </div>
   } @else {
     <form
-      class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6"
+      class="space-y-6"
       [formGroup]="form"
       novalidate
       (ngSubmit)="save()"
     >
-      <div>
-        <label
-          class="mb-1 block font-semibold text-brand-plum"
-          for="firstName"
-        >
-          First name
+      <section class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+        <h2 class="text-xl font-semibold text-brand-plum">
+          Personal details
+        </h2>
+
+        <div>
+          <label
+            class="mb-1 block font-semibold text-brand-plum"
+            for="firstName"
+          >
+            First name
+          </label>
+
+          <input
+            id="firstName"
+            type="text"
+            autocomplete="given-name"
+            class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+            formControlName="firstName"
+          />
+
+          @if (
+            form.controls.firstName.touched &&
+            form.controls.firstName.hasError('required')
+            ) {
+            <p class="mt-1 text-sm text-brand-coral">
+              First name is required.
+            </p>
+          } @else if (
+            form.controls.firstName.touched &&
+            form.controls.firstName.hasError('maxlength')
+            ) {
+            <p class="mt-1 text-sm text-brand-coral">
+              First name must not exceed 100 characters.
+            </p>
+          } @else if (
+            form.controls.firstName.errors?.['server'];
+            as message
+            ) {
+            <p class="mt-1 text-sm text-brand-coral">
+              {{ message }}
+            </p>
+          }
+        </div>
+
+        <div>
+          <label
+            class="mb-1 block font-semibold text-brand-plum"
+            for="lastName"
+          >
+            Last name
+          </label>
+
+          <input
+            id="lastName"
+            type="text"
+            autocomplete="family-name"
+            class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+            formControlName="lastName"
+          />
+
+          @if (
+            form.controls.lastName.touched &&
+            form.controls.lastName.hasError('required')
+            ) {
+            <p class="mt-1 text-sm text-brand-coral">
+              Last name is required.
+            </p>
+          } @else if (
+            form.controls.lastName.touched &&
+            form.controls.lastName.hasError('maxlength')
+            ) {
+            <p class="mt-1 text-sm text-brand-coral">
+              Last name must not exceed 100 characters.
+            </p>
+          } @else if (
+            form.controls.lastName.errors?.['server'];
+            as message
+            ) {
+            <p class="mt-1 text-sm text-brand-coral">
+              {{ message }}
+            </p>
+          }
+        </div>
+
+        <div>
+          <label
+            class="mb-1 block font-semibold text-brand-plum"
+            for="dateOfBirth"
+          >
+            Date of birth
+          </label>
+
+          <input
+            id="dateOfBirth"
+            type="date"
+            autocomplete="bday"
+            class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+            formControlName="dateOfBirth"
+          />
+
+          @if (
+            form.controls.dateOfBirth.touched &&
+            form.controls.dateOfBirth.hasError('required')
+            ) {
+            <p class="mt-1 text-sm text-brand-coral">
+              Date of birth is required.
+            </p>
+          } @else if (
+            form.controls.dateOfBirth.errors?.['server'];
+            as message
+            ) {
+            <p class="mt-1 text-sm text-brand-coral">
+              {{ message }}
+            </p>
+          }
+        </div>
+
+        <div>
+          <label
+            class="mb-1 block font-semibold text-brand-plum"
+            for="gender"
+          >
+            Gender
+          </label>
+
+          <input
+            id="gender"
+            type="text"
+            class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+            formControlName="gender"
+          />
+
+          @if (
+            form.controls.gender.touched &&
+            form.controls.gender.hasError('maxlength')
+            ) {
+            <p class="mt-1 text-sm text-brand-coral">
+              Gender must not exceed 50 characters.
+            </p>
+          } @else if (
+            form.controls.gender.errors?.['server'];
+            as message
+            ) {
+            <p class="mt-1 text-sm text-brand-coral">
+              {{ message }}
+            </p>
+          }
+        </div>
+      </section>
+
+      <section
+        class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6"
+      >
+        <h2 class="text-xl font-semibold text-brand-plum">
+          Home address
+        </h2>
+
+        <p class="mt-1 text-sm text-brand-plum/70">
+          Your home address can also be used locally when de-identifying consultation documents.
+        </p>
+
+        <label class="mt-4 flex items-start gap-3">
+          <input
+            type="checkbox"
+            class="mt-1"
+            [checked]="form.controls.hasAddress.value"
+            (change)="toggleAddress($event)"
+          />
+
+          <span class="text-brand-plum">
+            Store a home address on my profile
+          </span>
         </label>
 
-        <input
-          id="firstName"
-          type="text"
-          autocomplete="given-name"
-          class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
-          formControlName="firstName"
-        />
+        @if (form.controls.hasAddress.value) {
+          <div
+            class="mt-5 space-y-5"
+            formGroupName="address"
+          >
+            <div>
+              <label
+                class="mb-1 block font-semibold text-brand-plum"
+                for="addressLine1"
+              >
+                Address line 1
+              </label>
 
-        @if (
-          form.controls.firstName.touched &&
-          form.controls.firstName.hasError('required')
-          ) {
-          <p class="mt-1 text-sm text-brand-coral">
-            First name is required.
-          </p>
-        } @else if (
-          form.controls.firstName.touched &&
-          form.controls.firstName.hasError('maxlength')
-          ) {
-          <p class="mt-1 text-sm text-brand-coral">
-            First name must not exceed 100 characters.
-          </p>
-        } @else if (
-          form.controls.firstName.errors?.['server'];
-          as message
-          ) {
-          <p class="mt-1 text-sm text-brand-coral">
-            {{ message }}
-          </p>
+              <input
+                id="addressLine1"
+                type="text"
+                autocomplete="address-line1"
+                class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+                formControlName="addressLine1"
+              />
+
+              @if (
+                form.controls.address.controls.addressLine1.touched &&
+                form.controls.address.controls.addressLine1.hasError('required')
+                ) {
+                <p class="mt-1 text-sm text-brand-coral">
+                  Address line 1 is required.
+                </p>
+              } @else if (
+                form.controls.address.controls.addressLine1.touched &&
+                form.controls.address.controls.addressLine1.hasError('maxlength')
+                ) {
+                <p class="mt-1 text-sm text-brand-coral">
+                  Address line 1 must not exceed 150 characters.
+                </p>
+              } @else if (
+                form.controls.address.controls.addressLine1.errors?.['server'];
+                as message
+                ) {
+                <p class="mt-1 text-sm text-brand-coral">
+                  {{ message }}
+                </p>
+              }
+            </div>
+
+            <div>
+              <label
+                class="mb-1 block font-semibold text-brand-plum"
+                for="addressLine2"
+              >
+                Address line 2
+              </label>
+
+              <input
+                id="addressLine2"
+                type="text"
+                autocomplete="address-line2"
+                class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+                formControlName="addressLine2"
+              />
+            </div>
+
+            <div>
+              <label
+                class="mb-1 block font-semibold text-brand-plum"
+                for="townCity"
+              >
+                Town or city
+              </label>
+
+              <input
+                id="townCity"
+                type="text"
+                autocomplete="address-level2"
+                class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+                formControlName="townCity"
+              />
+
+              @if (
+                form.controls.address.controls.townCity.touched &&
+                form.controls.address.controls.townCity.hasError('required')
+                ) {
+                <p class="mt-1 text-sm text-brand-coral">
+                  Town or city is required.
+                </p>
+              }
+            </div>
+
+            <div>
+              <label
+                class="mb-1 block font-semibold text-brand-plum"
+                for="county"
+              >
+                County
+              </label>
+
+              <input
+                id="county"
+                type="text"
+                autocomplete="address-level1"
+                class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+                formControlName="county"
+              />
+            </div>
+
+            <div>
+              <label
+                class="mb-1 block font-semibold text-brand-plum"
+                for="postcode"
+              >
+                Postcode
+              </label>
+
+              <input
+                id="postcode"
+                type="text"
+                autocomplete="postal-code"
+                class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+                formControlName="postcode"
+              />
+
+              @if (
+                form.controls.address.controls.postcode.touched &&
+                form.controls.address.controls.postcode.hasError('required')
+                ) {
+                <p class="mt-1 text-sm text-brand-coral">
+                  Postcode is required.
+                </p>
+              }
+            </div>
+
+            <div>
+              <label
+                class="mb-1 block font-semibold text-brand-plum"
+                for="country"
+              >
+                Country
+              </label>
+
+              <input
+                id="country"
+                type="text"
+                autocomplete="country-name"
+                class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+                formControlName="country"
+              />
+
+              @if (
+                form.controls.address.controls.country.touched &&
+                form.controls.address.controls.country.hasError('required')
+                ) {
+                <p class="mt-1 text-sm text-brand-coral">
+                  Country is required.
+                </p>
+              }
+            </div>
+          </div>
         }
-      </div>
-
-      <div>
-        <label
-          class="mb-1 block font-semibold text-brand-plum"
-          for="lastName"
-        >
-          Last name
-        </label>
-
-        <input
-          id="lastName"
-          type="text"
-          autocomplete="family-name"
-          class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
-          formControlName="lastName"
-        />
-
-        @if (
-          form.controls.lastName.touched &&
-          form.controls.lastName.hasError('required')
-          ) {
-          <p class="mt-1 text-sm text-brand-coral">
-            Last name is required.
-          </p>
-        } @else if (
-          form.controls.lastName.touched &&
-          form.controls.lastName.hasError('maxlength')
-          ) {
-          <p class="mt-1 text-sm text-brand-coral">
-            Last name must not exceed 100 characters.
-          </p>
-        } @else if (
-          form.controls.lastName.errors?.['server'];
-          as message
-          ) {
-          <p class="mt-1 text-sm text-brand-coral">
-            {{ message }}
-          </p>
-        }
-      </div>
-
-      <div>
-        <label
-          class="mb-1 block font-semibold text-brand-plum"
-          for="dateOfBirth"
-        >
-          Date of birth
-        </label>
-
-        <input
-          id="dateOfBirth"
-          type="date"
-          autocomplete="bday"
-          class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
-          formControlName="dateOfBirth"
-        />
-
-        @if (
-          form.controls.dateOfBirth.touched &&
-          form.controls.dateOfBirth.hasError('required')
-          ) {
-          <p class="mt-1 text-sm text-brand-coral">
-            Date of birth is required.
-          </p>
-        } @else if (
-          form.controls.dateOfBirth.errors?.['server'];
-          as message
-          ) {
-          <p class="mt-1 text-sm text-brand-coral">
-            {{ message }}
-          </p>
-        }
-      </div>
-
-      <div>
-        <label
-          class="mb-1 block font-semibold text-brand-plum"
-          for="gender"
-        >
-          Gender
-        </label>
-
-        <input
-          id="gender"
-          type="text"
-          class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
-          formControlName="gender"
-        />
-
-        @if (
-          form.controls.gender.touched &&
-          form.controls.gender.hasError('maxlength')
-          ) {
-          <p class="mt-1 text-sm text-brand-coral">
-            Gender must not exceed 50 characters.
-          </p>
-        } @else if (
-          form.controls.gender.errors?.['server'];
-          as message
-          ) {
-          <p class="mt-1 text-sm text-brand-coral">
-            {{ message }}
-          </p>
-        }
-      </div>
+      </section>
 
       @if (errorMessage()) {
         <p

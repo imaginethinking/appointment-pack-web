@@ -45,46 +45,92 @@
       </button>
     </div>
   } @else if (profile(); as currentProfile) {
-    <dl class="grid gap-4 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 sm:grid-cols-2">
-      <div>
-        <dt class="text-sm font-semibold text-brand-plum/70">
-          First name
-        </dt>
+    <div class="space-y-6">
+      <section
+        class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6"
+      >
+        <h2 class="text-xl font-semibold text-brand-plum">
+          Personal details
+        </h2>
 
-        <dd class="mt-1 text-brand-plum">
-          {{ currentProfile.firstName }}
-        </dd>
-      </div>
+        <dl class="mt-5 grid gap-4 sm:grid-cols-2">
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">
+              First name
+            </dt>
 
-      <div>
-        <dt class="text-sm font-semibold text-brand-plum/70">
-          Last name
-        </dt>
+            <dd class="mt-1 text-brand-plum">
+              {{ currentProfile.firstName }}
+            </dd>
+          </div>
 
-        <dd class="mt-1 text-brand-plum">
-          {{ currentProfile.lastName }}
-        </dd>
-      </div>
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">
+              Last name
+            </dt>
 
-      <div>
-        <dt class="text-sm font-semibold text-brand-plum/70">
-          Date of birth
-        </dt>
+            <dd class="mt-1 text-brand-plum">
+              {{ currentProfile.lastName }}
+            </dd>
+          </div>
 
-        <dd class="mt-1 text-brand-plum">
-          {{ currentProfile.dateOfBirth | date: 'd MMMM y' }}
-        </dd>
-      </div>
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">
+              Date of birth
+            </dt>
 
-      <div>
-        <dt class="text-sm font-semibold text-brand-plum/70">
-          Gender
-        </dt>
+            <dd class="mt-1 text-brand-plum">
+              {{ currentProfile.dateOfBirth | date: 'd MMMM y' }}
+            </dd>
+          </div>
 
-        <dd class="mt-1 text-brand-plum">
-          {{ currentProfile.gender || 'Not provided' }}
-        </dd>
-      </div>
-    </dl>
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">
+              Gender
+            </dt>
+
+            <dd class="mt-1 text-brand-plum">
+              {{ currentProfile.gender || 'Not provided' }}
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <section
+        class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6"
+      >
+        <h2 class="text-xl font-semibold text-brand-plum">
+          Home address
+        </h2>
+
+        @if (currentProfile.address; as address) {
+          <address class="mt-4 not-italic text-brand-plum">
+            <div>{{ address.addressLine1 }}</div>
+
+            @if (address.addressLine2) {
+              <div>{{ address.addressLine2 }}</div>
+            }
+
+            <div>{{ address.townCity }}</div>
+
+            @if (address.county) {
+              <div>{{ address.county }}</div>
+            }
+
+            <div>{{ address.postcode }}</div>
+
+            <div>{{ address.country }}</div>
+          </address>
+
+          <p class="mt-4 text-sm text-brand-plum/70">
+            This address may be used locally when removing known patient identifiers from consultation documents.
+          </p>
+        } @else {
+          <p class="mt-3 text-brand-plum/70">
+            No home address has been provided.
+          </p>
+        }
+      </section>
+    </div>
   }
 </section>

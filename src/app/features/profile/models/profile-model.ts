@@ -1,4 +1,20 @@
-export type AddressResponse = Record<string, unknown>;
+export interface AddressResponse {
+  addressLine1: string;
+  addressLine2: string | null;
+  townCity: string;
+  county: string | null;
+  postcode: string;
+  country: string;
+}
+
+export interface AddressRequest {
+  addressLine1: string;
+  addressLine2: string | null;
+  townCity: string;
+  county: string | null;
+  postcode: string;
+  country: string;
+}
 
 export interface ProfileResponse {
   id: string;
@@ -15,4 +31,5 @@ export interface UpdateProfileRequest {
   lastName: string;
   dateOfBirth: string;
   gender: string | null;
+  address: AddressRequest | null;
 }
