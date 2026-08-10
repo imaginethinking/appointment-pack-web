@@ -1,0 +1,315 @@
+<section class="mx-auto max-w-5xl">
+  <div class="mb-6">
+    @if (document(); as currentDocument) {
+      <a
+        [routerLink]="['/documents', currentDocument.id]"
+        class="text-sm font-semibold text-brand-plum underline"
+      >
+        Back to document
+      </a>
+    } @else {
+      <a
+        routerLink="/documents"
+        class="text-sm font-semibold text-brand-plum underline"
+      >
+        Back to documents
+      </a>
+    }
+
+    <h1 class="mt-4 text-3xl font-bold text-brand-plum">
+      Review summary
+    </h1>
+
+    @if (document(); as currentDocument) {
+      <p class="mt-1 break-words text-brand-plum/70">
+        {{ currentDocument.originalFileName }}
+        ·
+        {{ getDocumentTypeLabel(currentDocument.documentType) }}
+      </p>
+    }
+  </div>
+
+  @if (status() === 'loading') {
+    <div
+      class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum"
+      role="status"
+    >
+      Loading summary...
+    </div>
+  } @else if (status() === 'not-found') {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      role="alert"
+    >
+      <p class="text-brand-plum">
+        The document could not be found.
+      </p>
+    </div>
+  } @else if (status() === 'forbidden') {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      role="alert"
+    >
+      <p class="text-brand-plum">
+        You do not have permission to review this summary.
+      </p>
+    </div>
+  } @else if (status() === 'error') {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      role="alert"
+    >
+      <p class="text-brand-coral">
+        {{ errorMessage() }}
+      </p>
+
+      <button
+        type="button"
+        class="btn btn-secondary mt-4"
+        (click)="retryLoad()"
+      >
+        Try again
+      </button>
+    </div>
+  } @else if (status() === 'invalid') {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      role="alert"
+    >
+      <p class="text-brand-plum">
+        {{ errorMessage() }}
+      </p>
+
+      @if (document(); as currentDocument) {
+        <a
+          [routerLink]="['/documents', currentDocument.id]"
+          class="btn btn-secondary mt-4"
+        >
+          Return to document details
+        </a>
+      }
+    </div>
+  } @else if (processing(); as currentProcessing) {
+    <form
+      class="space-y-6"
+      [formGroup]="form"
+      novalidate
+      (ngSubmit)="accept()"
+    >
+      <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-semibold text-brand-plum">
+              Generated summary
+            </h2>
+
+            <p class="mt-1 text-sm text-brand-plum/70">
+              Review the generated summary before accepting or rejecting it.
+            </p>
+          </div>
+
+          @if (currentProcessing.summarySource; as source) {
+            <span class="rounded-full bg-brand-pink px-3 py-1 text-sm font-medium text-brand-plum">
+              {{ getSummarySourceLabel(source) }}
+            </span>
+          }
+        </div>
+
+        <div class="mt-4 whitespace-pre-wrap rounded-md border border-brand-plum/20 bg-white p-4 text-brand-plum">
+          {{ currentProcessing.generatedSummary }}
+        </div>
+
+        @if (currentProcessing.processingWarning; as warning) {
+          <div class="mt-4 rounded-md border border-brand-coral/50 bg-brand-peach/30 p-4">
+            <p class="font-semibold text-brand-plum">
+              Processing warning
+            </p>
+
+            <p class="mt-1 text-sm text-brand-plum/80">
+              {{ warning }}
+            </p>
+          </div>
+        }
+      </section>
+
+      <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+        <h2 class="text-xl font-semibold text-brand-plum">
+          Reviewed summary
+        </h2>
+
+        <p class="mt-1 text-sm text-brand-plum/70">
+          Edit the summary as needed. This reviewed version will be stored in medical history if accepted.
+        </p>
+
+        <label
+          for="reviewedSummary"
+          class="mt-5 block font-semibold text-brand-plum"
+        >
+          Final summary
+        </label>
+
+        <textarea
+          id="reviewedSummary"
+          rows="12"
+          class="mt-2 w-full rounded-md border border-brand-plum/30 bg-white p-3 text-brand-plum"
+          formControlName="reviewedSummary"
+        ></textarea>
+
+        @if (
+          form.controls.reviewedSummary.touched &&
+          form.controls.reviewedSummary.hasError('required')
+          ) {
+          <p class="mt-1 text-sm text-brand-coral">
+            Reviewed summary is required.
+          </p>
+        } @else if (
+          form.controls.reviewedSummary.errors?.['server'];
+          as message
+          ) {
+          <p class="mt-1 text-sm text-brand-coral">
+            {{ message }}
+          </p>
+        }
+      </section>
+
+      <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+        <h2 class="text-xl font-semibold text-brand-plum">
+          Medical history
+        </h2>
+
+        <p class="mt-1 text-sm text-brand-plum/70">
+          Choose how this accepted summary should appear in the patient’s medical history.
+        </p>
+
+        <div class="mt-5">
+          <label
+            for="historyTitle"
+            class="mb-1 block font-semibold text-brand-plum"
+          >
+            History title
+          </label>
+
+          <input
+            id="historyTitle"
+            type="text"
+            maxlength="200"
+            class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+            formControlName="historyTitle"
+          />
+
+          @if (
+            form.controls.historyTitle.touched &&
+            form.controls.historyTitle.hasError('required')
+            ) {
+            <p class="mt-1 text-sm text-brand-coral">
+              History title is required.
+            </p>
+          } @else if (
+            form.controls.historyTitle.touched &&
+            form.controls.historyTitle.hasError('maxlength')
+            ) {
+            <p class="mt-1 text-sm text-brand-coral">
+              History title must not exceed 200 characters.
+            </p>
+          } @else if (
+            form.controls.historyTitle.errors?.['server'];
+            as message
+            ) {
+            <p class="mt-1 text-sm text-brand-coral">
+              {{ message }}
+            </p>
+          }
+        </div>
+
+        <div class="mt-5">
+          <label
+            for="historyDate"
+            class="mb-1 block font-semibold text-brand-plum"
+          >
+            Clinical history date
+          </label>
+
+          <input
+            id="historyDate"
+            type="date"
+            class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum sm:w-auto"
+            formControlName="historyDate"
+          />
+
+          <p class="mt-2 text-sm text-brand-plum/70">
+            Select the date the clinical event occurred. This is not automatically taken from the upload date or letter date.
+          </p>
+
+          @if (
+            form.controls.historyDate.touched &&
+            form.controls.historyDate.hasError('required')
+            ) {
+            <p class="mt-1 text-sm text-brand-coral">
+              Clinical history date is required.
+            </p>
+          } @else if (
+            form.controls.historyDate.errors?.['server'];
+            as message
+            ) {
+            <p class="mt-1 text-sm text-brand-coral">
+              {{ message }}
+            </p>
+          }
+        </div>
+      </section>
+
+      @if (!canAccept()) {
+        <div class="rounded-lg border border-brand-coral/50 bg-brand-peach/30 p-4">
+          <p class="text-sm text-brand-plum">
+            You can review or reject this summary, but you do not have permission to add it to the patient’s medical history.
+          </p>
+        </div>
+      }
+
+      @if (actionError()) {
+        <div
+          class="rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral"
+          role="alert"
+        >
+          {{ actionError() }}
+        </div>
+      }
+
+      <div class="flex flex-wrap gap-3">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="
+            isAccepting() ||
+            isRejecting() ||
+            !canAccept()
+          "
+        >
+          {{ isAccepting() ? 'Accepting...' : 'Accept into medical history' }}
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-danger"
+          [disabled]="
+            isAccepting() ||
+            isRejecting() ||
+            !canReject()
+          "
+          (click)="reject()"
+        >
+          {{ isRejecting() ? 'Rejecting...' : 'Reject summary' }}
+        </button>
+
+        @if (document(); as currentDocument) {
+          <a
+            [routerLink]="['/documents', currentDocument.id]"
+            class="btn btn-secondary"
+          >
+            Cancel
+          </a>
+        }
+      </div>
+    </form>
+  }
+</section>

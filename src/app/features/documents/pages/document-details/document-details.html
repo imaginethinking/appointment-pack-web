@@ -232,6 +232,22 @@
           </a>
         }
 
+        @if (
+          currentDocument.status === 'READY_FOR_SUMMARY_REVIEW' &&
+          canEditDocument()
+          ) {
+          <a
+            [routerLink]="[
+              '/documents',
+              currentDocument.id,
+              'summary-review'
+            ]"
+            class="btn btn-primary"
+          >
+            Review summary
+          </a>
+        }
+
         @if (canArchive()) {
           <button
             type="button"

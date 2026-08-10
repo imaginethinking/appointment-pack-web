@@ -13,6 +13,7 @@ import { DeidentificationReview } from './features/documents/pages/deidentificat
 import { DocumentDetails } from './features/documents/pages/document-details/document-details';
 import { DocumentList } from './features/documents/pages/document-list/document-list';
 import { DocumentUpload } from './features/documents/pages/document-upload/document-upload';
+import { SummaryReview } from './features/documents/pages/summary-review/summary-review';
 import { AccessDenied } from './features/errors/pages/access-denied/access-denied';
 import { Home } from './features/home/pages/home/home';
 import { PatientRecord } from './features/patient-record/pages/patient-record/patient-record';
@@ -105,6 +106,17 @@ export const routes: Routes = [
       {
         path: 'documents/:documentId/deidentification-review',
         component: DeidentificationReview,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'document',
+            action: 'edit',
+          },
+        },
+      },
+      {
+        path: 'documents/:documentId/summary-review',
+        component: SummaryReview,
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
