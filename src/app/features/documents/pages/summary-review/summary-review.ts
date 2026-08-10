@@ -17,13 +17,7 @@ import {
 } from '../../models/document-model';
 import { DocumentApiService } from '../../services/document-api-service';
 
-type SummaryReviewStatus =
-  | 'loading'
-  | 'ready'
-  | 'invalid'
-  | 'not-found'
-  | 'forbidden'
-  | 'error';
+type SummaryReviewStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 
 @Component({
   selector: 'app-summary-review',
@@ -32,69 +26,43 @@ type SummaryReviewStatus =
 })
 export class SummaryReview implements OnInit {
   private readonly route = inject(ActivatedRoute);
-
   private readonly router = inject(Router);
-
   private readonly formBuilder = inject(FormBuilder);
-
   private readonly documentApi = inject(DocumentApiService);
-
   private readonly selectedPatientState = inject(SelectedPatientState);
-
   private readonly authorisation = inject(PatientContextAuthorisation);
-
   private readonly patientContextCoordinator = inject(PatientContextCoordinator);
 
   protected readonly document = signal<DocumentResponse | null>(null);
-
   protected readonly processing = signal<DocumentProcessingResultResponse | null>(null);
-
   protected readonly status = signal<SummaryReviewStatus>('loading');
-
   protected readonly errorMessage = signal('');
-
   protected readonly actionError = signal('');
-
   protected readonly isAccepting = signal(false);
-
   protected readonly isRejecting = signal(false);
 
   protected readonly canAccept = computed(() => {
     const selectedPatient = this.selectedPatientState.selectedPatient();
 
     return (
-      this.authorisation.can(
-        selectedPatient,
-        'document',
-        'edit',
-      ) &&
-      this.authorisation.can(
-        selectedPatient,
-        'history',
-        'edit',
-      )
+      this.authorisation.can(selectedPatient, 'document', 'edit') &&
+      this.authorisation.can(selectedPatient, 'history', 'edit')
     );
   });
 
   protected readonly canReject = computed(() =>
-    this.authorisation.can(
-      this.selectedPatientState.selectedPatient(),
-      'document',
-      'edit',
-    ),
+    this.authorisation.can(this.selectedPatientState.selectedPatient(), 'document', 'edit'),
   );
 
   protected readonly form = this.formBuilder.group({
-    reviewedSummary: this.formBuilder.nonNullable.control('', [
-      Validators.required,
-    ]),
+    reviewedSummary: this.formBuilder.nonNullable.control('', Validators.required),
+
     historyTitle: this.formBuilder.nonNullable.control('', [
       Validators.required,
       Validators.maxLength(200),
     ]),
-    historyDate: this.formBuilder.nonNullable.control('', [
-      Validators.required,
-    ]),
+
+    historyDate: this.formBuilder.nonNullable.control('', Validators.required),
   });
 
   protected readonly getDocumentTypeLabel = getDocumentTypeLabel;
@@ -117,11 +85,7 @@ export class SummaryReview implements OnInit {
 
     const document = this.document();
 
-    if (
-      document === null ||
-      this.status() !== 'ready' ||
-      !this.canAccept()
-    ) {
+    if (document === null || this.status() !== 'ready' || !this.canAccept()) {
       return;
     }
 
@@ -137,10 +101,7 @@ export class SummaryReview implements OnInit {
     this.isAccepting.set(true);
 
     this.documentApi
-      .acceptDocumentSummary(
-        document.id,
-        request,
-      )
+      .acceptDocumentSummary(document.id, request)
       .pipe(
         finalize(() => {
           this.isAccepting.set(false);
@@ -148,10 +109,7 @@ export class SummaryReview implements OnInit {
       )
       .subscribe({
         next: () => {
-          void this.router.navigate([
-            '/documents',
-            document.id,
-          ]);
+          void this.router.navigate(['/documents', document.id]);
         },
         error: (error: unknown) => {
           this.handleAcceptError(error);
@@ -164,11 +122,7 @@ export class SummaryReview implements OnInit {
 
     const document = this.document();
 
-    if (
-      document === null ||
-      this.status() !== 'ready' ||
-      !this.canReject()
-    ) {
+    if (document === null || this.status() !== 'ready' || !this.canReject()) {
       return;
     }
 
@@ -191,10 +145,7 @@ export class SummaryReview implements OnInit {
       )
       .subscribe({
         next: () => {
-          void this.router.navigate([
-            '/documents',
-            document.id,
-          ]);
+          void this.router.navigate(['/documents', document.id]);
         },
         error: (error: unknown) => {
           this.handleRejectError(error);
@@ -223,13 +174,11 @@ export class SummaryReview implements OnInit {
         switchMap((document) => {
           this.document.set(document);
 
-          const selectedPatient =
-            this.selectedPatientState.selectedPatient();
+          const selectedPatient = this.selectedPatientState.selectedPatient();
 
           if (
             selectedPatient === null ||
-            selectedPatient.patientRecordId !==
-            document.patientRecordId
+            selectedPatient.patientRecordId !== document.patientRecordId
           ) {
             this.status.set('invalid');
 
@@ -241,21 +190,17 @@ export class SummaryReview implements OnInit {
           }
 
           if (
-            document.status !==
-            'READY_FOR_SUMMARY_REVIEW'
+            document.documentType !== 'CONSULTATION_OUTCOME_LETTER' ||
+            document.status !== 'READY_FOR_SUMMARY_REVIEW'
           ) {
             this.status.set('invalid');
 
-            this.errorMessage.set(
-              'This document is not awaiting summary review.',
-            );
+            this.errorMessage.set('This consultation document is not awaiting summary review.');
 
             return EMPTY;
           }
 
-          return this.documentApi.getDocumentProcessing(
-            document.id,
-          );
+          return this.documentApi.getDocumentProcessing(document.id);
         }),
       )
       .subscribe({
@@ -266,9 +211,7 @@ export class SummaryReview implements OnInit {
           ) {
             this.status.set('error');
 
-            this.errorMessage.set(
-              'The processing result does not contain a generated summary.',
-            );
+            this.errorMessage.set('The processing result does not contain a generated summary.');
 
             return;
           }
@@ -276,8 +219,8 @@ export class SummaryReview implements OnInit {
           this.processing.set(processing);
 
           this.form.reset({
-            reviewedSummary:
-            processing.generatedSummary,
+            reviewedSummary: processing.generatedSummary,
+
             historyTitle: '',
             historyDate: '',
           });
@@ -291,21 +234,13 @@ export class SummaryReview implements OnInit {
   }
 
   private validateNonBlankFields(): void {
-    if (
-      this.form.controls.reviewedSummary.value
-        .trim()
-        .length === 0
-    ) {
+    if (this.form.controls.reviewedSummary.value.trim().length === 0) {
       this.form.controls.reviewedSummary.setErrors({
         required: true,
       });
     }
 
-    if (
-      this.form.controls.historyTitle.value
-        .trim()
-        .length === 0
-    ) {
+    if (this.form.controls.historyTitle.value.trim().length === 0) {
       this.form.controls.historyTitle.setErrors({
         required: true,
       });
@@ -327,12 +262,7 @@ export class SummaryReview implements OnInit {
 
     this.status.set('error');
 
-    this.errorMessage.set(
-      getHttpErrorMessage(
-        error,
-        'Unable to load the summary review.',
-      ),
-    );
+    this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the summary review.'));
   }
 
   private handleAcceptError(error: unknown): void {
@@ -342,10 +272,7 @@ export class SummaryReview implements OnInit {
 
     if (hasHttpStatus(error, 400)) {
       this.actionError.set(
-        getHttpErrorMessage(
-          error,
-          'The summary acceptance details are invalid.',
-        ),
+        getHttpErrorMessage(error, 'The summary acceptance details are invalid.'),
       );
 
       return;
@@ -371,12 +298,7 @@ export class SummaryReview implements OnInit {
       return;
     }
 
-    this.actionError.set(
-      getHttpErrorMessage(
-        error,
-        'Unable to accept the summary.',
-      ),
-    );
+    this.actionError.set(getHttpErrorMessage(error, 'Unable to accept the summary.'));
   }
 
   private handleRejectError(error: unknown): void {
@@ -400,41 +322,20 @@ export class SummaryReview implements OnInit {
       return;
     }
 
-    this.actionError.set(
-      getHttpErrorMessage(
-        error,
-        'Unable to reject the summary.',
-      ),
-    );
+    this.actionError.set(getHttpErrorMessage(error, 'Unable to reject the summary.'));
   }
 
-  private refreshPatientContext(
-    acceptanceAttempt: boolean,
-  ): void {
+  private refreshPatientContext(acceptanceAttempt: boolean): void {
     this.patientContextCoordinator.load().subscribe({
       next: () => {
-        const selectedPatient =
-          this.selectedPatientState.selectedPatient();
+        const selectedPatient = this.selectedPatientState.selectedPatient();
 
-        if (
-          !this.authorisation.can(
-            selectedPatient,
-            'document',
-            'edit',
-          )
-        ) {
+        if (!this.authorisation.can(selectedPatient, 'document', 'edit')) {
           this.status.set('forbidden');
           return;
         }
 
-        if (
-          acceptanceAttempt &&
-          !this.authorisation.can(
-            selectedPatient,
-            'history',
-            'edit',
-          )
-        ) {
+        if (acceptanceAttempt && !this.authorisation.can(selectedPatient, 'history', 'edit')) {
           this.actionError.set(
             'You no longer have permission to add entries to this patient’s medical history.',
           );
@@ -442,18 +343,13 @@ export class SummaryReview implements OnInit {
           return;
         }
 
-        this.actionError.set(
-          'Your patient access changed. Reload the document before continuing.',
-        );
+        this.actionError.set('Your patient access changed. Reload the document before continuing.');
       },
       error: (refreshError: unknown) => {
         this.status.set('error');
 
         this.errorMessage.set(
-          getHttpErrorMessage(
-            refreshError,
-            'Unable to refresh your patient access.',
-          ),
+          getHttpErrorMessage(refreshError, 'Unable to refresh your patient access.'),
         );
       },
     });

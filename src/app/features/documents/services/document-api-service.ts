@@ -7,6 +7,10 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import {
+  AppointmentConfirmationRequest,
+  AppointmentResponse,
+} from '../../appointments/models/appointment-model';
+import {
   DocumentProcessingResultResponse,
   DocumentResponse,
   DocumentSummarisationRequest,
@@ -69,6 +73,25 @@ export class DocumentApiService {
   ): Observable<DocumentProcessingResultResponse> {
     return this.http.post<DocumentProcessingResultResponse>(
       `${this.documentsUrl}/${documentId}/extract`,
+      null,
+    );
+  }
+
+  confirmAppointment(
+    documentId: string,
+    request: AppointmentConfirmationRequest,
+  ): Observable<AppointmentResponse> {
+    return this.http.post<AppointmentResponse>(
+      `${this.documentsUrl}/${documentId}/appointment/confirm`,
+      request,
+    );
+  }
+
+  rejectAppointment(
+    documentId: string,
+  ): Observable<DocumentProcessingResultResponse> {
+    return this.http.post<DocumentProcessingResultResponse>(
+      `${this.documentsUrl}/${documentId}/appointment/reject`,
       null,
     );
   }

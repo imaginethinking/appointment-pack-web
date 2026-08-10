@@ -1,0 +1,498 @@
+<section class="mx-auto max-w-6xl">
+  <div class="mb-6">
+    @if (document(); as currentDocument) {
+      <a
+        [routerLink]="['/documents', currentDocument.id]"
+        class="text-sm font-semibold text-brand-plum underline"
+      >
+        Back to document
+      </a>
+    } @else {
+      <a
+        routerLink="/documents"
+        class="text-sm font-semibold text-brand-plum underline"
+      >
+        Back to documents
+      </a>
+    }
+
+    <h1 class="mt-4 text-3xl font-bold text-brand-plum">
+      Review appointment details
+    </h1>
+
+    <p class="mt-1 text-brand-plum/70">
+      Check the extracted information against the original document before confirming the appointment.
+    </p>
+  </div>
+
+  @if (status() === 'loading') {
+    <div
+      class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum"
+      role="status"
+    >
+      Loading appointment details...
+    </div>
+  } @else if (status() === 'not-found') {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      role="alert"
+    >
+      <p class="text-brand-plum">
+        The document could not be found.
+      </p>
+    </div>
+  } @else if (status() === 'forbidden') {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      role="alert"
+    >
+      <p class="text-brand-plum">
+        You do not have permission to review this document.
+      </p>
+    </div>
+  } @else if (status() === 'error') {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      role="alert"
+    >
+      <p class="text-brand-coral">
+        {{ errorMessage() }}
+      </p>
+
+      <button
+        type="button"
+        class="btn btn-secondary mt-4"
+        (click)="retryLoad()"
+      >
+        Try again
+      </button>
+    </div>
+  } @else if (status() === 'invalid') {
+    <div
+      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
+      role="alert"
+    >
+      <p class="text-brand-plum">
+        {{ errorMessage() }}
+      </p>
+
+      @if (document(); as currentDocument) {
+        <a
+          [routerLink]="['/documents', currentDocument.id]"
+          class="btn btn-secondary mt-4"
+        >
+          Return to document details
+        </a>
+      }
+    </div>
+  } @else if (processing(); as currentProcessing) {
+    <div class="grid gap-6 lg:grid-cols-2">
+      <section
+        class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6"
+      >
+        <h2 class="text-xl font-semibold text-brand-plum">
+          Extracted document text
+        </h2>
+
+        <p class="mt-1 text-sm text-brand-plum/70">
+          Use the original extracted text to verify the suggested appointment details.
+        </p>
+
+        <div
+          class="mt-4 max-h-[48rem] overflow-y-auto whitespace-pre-wrap rounded-md border border-brand-plum/20 bg-white p-4 text-sm text-brand-plum"
+        >
+          {{ currentProcessing.extractedText }}
+        </div>
+
+        @if (currentProcessing.processingWarning; as warning) {
+          <div
+            class="mt-4 rounded-md border border-brand-coral/50 bg-brand-peach/30 p-4"
+          >
+            <p class="font-semibold text-brand-plum">
+              Extraction warning
+            </p>
+
+            <p class="mt-1 text-sm text-brand-plum/80">
+              {{ warning }}
+            </p>
+          </div>
+        }
+      </section>
+
+      <form
+        class="space-y-6"
+        [formGroup]="form"
+        novalidate
+        (ngSubmit)="confirm()"
+      >
+        <section
+          class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6"
+        >
+          <div>
+            <h2 class="text-xl font-semibold text-brand-plum">
+              Appointment
+            </h2>
+
+            <p class="mt-1 text-sm text-brand-plum/70">
+              These values were extracted automatically and may be edited before confirmation.
+            </p>
+          </div>
+
+          <div class="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label
+                for="appointmentDate"
+                class="mb-1 block font-semibold text-brand-plum"
+              >
+                Date
+              </label>
+
+              <input
+                id="appointmentDate"
+                type="date"
+                class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+                formControlName="date"
+              />
+
+              @if (
+                form.controls.date.touched &&
+                form.controls.date.hasError('required')
+                ) {
+                <p class="mt-1 text-sm text-brand-coral">
+                  Appointment date is required.
+                </p>
+              }
+            </div>
+
+            <div>
+              <label
+                for="startTime"
+                class="mb-1 block font-semibold text-brand-plum"
+              >
+                Start time
+              </label>
+
+              <input
+                id="startTime"
+                type="time"
+                class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+                formControlName="startTime"
+              />
+
+              @if (
+                form.controls.startTime.touched &&
+                form.controls.startTime.hasError('required')
+                ) {
+                <p class="mt-1 text-sm text-brand-coral">
+                  Start time is required.
+                </p>
+              }
+            </div>
+
+            <div>
+              <label
+                for="endTime"
+                class="mb-1 block font-semibold text-brand-plum"
+              >
+                End time
+              </label>
+
+              <input
+                id="endTime"
+                type="time"
+                class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+                formControlName="endTime"
+              />
+
+              @if (
+                form.controls.endTime.touched &&
+                form.controls.endTime.hasError('afterStart')
+                ) {
+                <p class="mt-1 text-sm text-brand-coral">
+                  End time must be after the start time.
+                </p>
+              }
+            </div>
+
+            <div>
+              <label
+                for="appointmentType"
+                class="mb-1 block font-semibold text-brand-plum"
+              >
+                Appointment type
+              </label>
+
+              <input
+                id="appointmentType"
+                type="text"
+                maxlength="250"
+                class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+                formControlName="appointmentType"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              for="service"
+              class="mb-1 block font-semibold text-brand-plum"
+            >
+              Service
+            </label>
+
+            <input
+              id="service"
+              type="text"
+              maxlength="250"
+              class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+              formControlName="service"
+            />
+          </div>
+
+          <div>
+            <label
+              for="clinicianOrTeam"
+              class="mb-1 block font-semibold text-brand-plum"
+            >
+              With
+            </label>
+
+            <input
+              id="clinicianOrTeam"
+              type="text"
+              maxlength="250"
+              class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+              formControlName="clinicianOrTeam"
+            />
+
+            <p class="mt-1 text-sm text-brand-plum/60">
+              Clinician, consultant or clinical team.
+            </p>
+          </div>
+
+          <div>
+            <label
+              for="locationName"
+              class="mb-1 block font-semibold text-brand-plum"
+            >
+              Location
+            </label>
+
+            <input
+              id="locationName"
+              type="text"
+              maxlength="250"
+              class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+              formControlName="locationName"
+            />
+          </div>
+        </section>
+
+        <section
+          class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6"
+          formGroupName="address"
+        >
+          <div>
+            <h2 class="text-xl font-semibold text-brand-plum">
+              Location address
+            </h2>
+
+            <p class="mt-1 text-sm text-brand-plum/70">
+              Complete as much of the appointment location as the document provides.
+            </p>
+          </div>
+
+          <div>
+            <label
+              for="addressLine1"
+              class="mb-1 block font-semibold text-brand-plum"
+            >
+              Address line 1
+            </label>
+
+            <input
+              id="addressLine1"
+              type="text"
+              maxlength="150"
+              class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+              formControlName="addressLine1"
+            />
+          </div>
+
+          <div>
+            <label
+              for="addressLine2"
+              class="mb-1 block font-semibold text-brand-plum"
+            >
+              Address line 2
+            </label>
+
+            <input
+              id="addressLine2"
+              type="text"
+              maxlength="150"
+              class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+              formControlName="addressLine2"
+            />
+          </div>
+
+          <div class="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label
+                for="townCity"
+                class="mb-1 block font-semibold text-brand-plum"
+              >
+                Town or city
+              </label>
+
+              <input
+                id="townCity"
+                type="text"
+                maxlength="100"
+                class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+                formControlName="townCity"
+              />
+            </div>
+
+            <div>
+              <label
+                for="county"
+                class="mb-1 block font-semibold text-brand-plum"
+              >
+                County
+              </label>
+
+              <input
+                id="county"
+                type="text"
+                maxlength="100"
+                class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+                formControlName="county"
+              />
+            </div>
+
+            <div>
+              <label
+                for="postcode"
+                class="mb-1 block font-semibold text-brand-plum"
+              >
+                Postcode
+              </label>
+
+              <input
+                id="postcode"
+                type="text"
+                maxlength="20"
+                class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+                formControlName="postcode"
+              />
+            </div>
+
+            <div>
+              <label
+                for="country"
+                class="mb-1 block font-semibold text-brand-plum"
+              >
+                Country
+              </label>
+
+              <input
+                id="country"
+                type="text"
+                maxlength="100"
+                class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+                formControlName="country"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section
+          class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6"
+        >
+          <label
+            for="notes"
+            class="block text-xl font-semibold text-brand-plum"
+          >
+            Notes
+          </label>
+
+          <p class="mt-1 text-sm text-brand-plum/70">
+            Optional additional appointment information.
+          </p>
+
+          <textarea
+            id="notes"
+            rows="5"
+            maxlength="2000"
+            class="mt-4 w-full rounded-md border border-brand-plum/30 bg-white p-3 text-brand-plum"
+            formControlName="notes"
+          ></textarea>
+        </section>
+
+        @if (!canConfirm()) {
+          <div
+            class="rounded-lg border border-brand-coral/50 bg-brand-peach/30 p-4"
+          >
+            <p class="text-sm text-brand-plum">
+              You may review or reject these details, but you do not have permission to create appointments for this patient.
+            </p>
+          </div>
+        }
+
+        @if (actionError()) {
+          <div
+            class="rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral"
+            role="alert"
+          >
+            {{ actionError() }}
+          </div>
+        }
+
+        <div class="flex flex-wrap gap-3">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="
+              isConfirming() ||
+              isRejecting() ||
+              !canConfirm()
+            "
+          >
+            {{
+              isConfirming()
+                ? 'Confirming...'
+                : 'Confirm appointment'
+            }}
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-danger"
+            [disabled]="
+              isConfirming() ||
+              isRejecting() ||
+              !canReject()
+            "
+            (click)="reject()"
+          >
+            {{
+              isRejecting()
+                ? 'Rejecting...'
+                : 'Reject details'
+            }}
+          </button>
+
+          @if (document(); as currentDocument) {
+            <a
+              [routerLink]="['/documents', currentDocument.id]"
+              class="btn btn-secondary"
+            >
+              Cancel
+            </a>
+          }
+        </div>
+      </form>
+    </div>
+  }
+</section>

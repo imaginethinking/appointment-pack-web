@@ -22,6 +22,7 @@ import { PatientRecordEdit } from './features/patient-record/pages/patient-recor
 import { MfaSettings } from './features/profile/pages/mfa-settings/mfa-settings';
 import { Profile } from './features/profile/pages/profile/profile';
 import { ProfileEdit } from './features/profile/pages/profile-edit/profile-edit';
+import { AppointmentReview } from './features/documents/pages/appointment-review/appointment-review';
 
 export const routes: Routes = [
   {
@@ -100,6 +101,17 @@ export const routes: Routes = [
           permission: {
             resource: 'document',
             action: 'upload',
+          },
+        },
+      },
+      {
+        path: 'documents/:documentId/appointment-review',
+        component: AppointmentReview,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'document',
+            action: 'edit',
           },
         },
       },

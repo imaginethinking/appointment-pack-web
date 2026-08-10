@@ -97,10 +97,16 @@
     </div>
   } @else if (document(); as currentDocument) {
     <div class="space-y-6">
-      <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <section
+        class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6"
+      >
+        <div
+          class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"
+        >
           <div class="min-w-0">
-            <h2 class="break-words text-xl font-semibold text-brand-plum">
+            <h2
+              class="break-words text-xl font-semibold text-brand-plum"
+            >
               {{ currentDocument.originalFileName }}
             </h2>
 
@@ -109,34 +115,51 @@
             </p>
           </div>
 
-          <span class="w-fit rounded-full bg-brand-pink px-3 py-1 text-sm font-medium text-brand-plum">
+          <span
+            class="w-fit rounded-full bg-brand-pink px-3 py-1 text-sm font-medium text-brand-plum"
+          >
             {{ getDocumentStatusLabel(currentDocument.status) }}
           </span>
         </div>
 
-        <dl class="mt-6 grid gap-5 border-t border-brand-plum/20 pt-5 sm:grid-cols-2">
+        <dl
+          class="mt-6 grid gap-5 border-t border-brand-plum/20 pt-5 sm:grid-cols-2"
+        >
           <div>
-            <dt class="text-sm font-semibold text-brand-plum/70">
+            <dt
+              class="text-sm font-semibold text-brand-plum/70"
+            >
               Uploaded
             </dt>
 
             <dd class="mt-1 text-brand-plum">
-              {{ currentDocument.createdAt | date: 'd MMMM y, HH:mm' }}
+              {{
+                currentDocument.createdAt
+                  | date: 'd MMMM y, HH:mm'
+              }}
             </dd>
           </div>
 
           <div>
-            <dt class="text-sm font-semibold text-brand-plum/70">
+            <dt
+              class="text-sm font-semibold text-brand-plum/70"
+            >
               File size
             </dt>
 
             <dd class="mt-1 text-brand-plum">
-              {{ formatFileSize(currentDocument.fileSize) }}
+              {{
+                formatFileSize(
+                  currentDocument.fileSize
+                )
+              }}
             </dd>
           </div>
 
           <div>
-            <dt class="text-sm font-semibold text-brand-plum/70">
+            <dt
+              class="text-sm font-semibold text-brand-plum/70"
+            >
               Content type
             </dt>
 
@@ -147,7 +170,9 @@
         </dl>
       </section>
 
-      <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <section
+        class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6"
+      >
         <h2 class="text-xl font-semibold text-brand-plum">
           Workflow
         </h2>
@@ -171,9 +196,14 @@
           </div>
         }
 
-        @if (processing()?.summarySource; as source) {
+        @if (
+          currentDocument.documentType === 'CONSULTATION_OUTCOME_LETTER' &&
+          processing()?.summarySource;
+          as source
+          ) {
           <p class="mt-4 text-sm text-brand-plum/70">
             Summary source:
+
             <span class="font-semibold text-brand-plum">
               {{ getSummarySourceLabel(source) }}
             </span>
@@ -197,7 +227,11 @@
           [disabled]="isDownloading()"
           (click)="download()"
         >
-          {{ isDownloading() ? 'Downloading...' : 'Download original' }}
+          {{
+            isDownloading()
+              ? 'Downloading...'
+              : 'Download original'
+          }}
         </button>
 
         @if (canExtract()) {
@@ -207,12 +241,40 @@
             [disabled]="isExtracting()"
             (click)="extract()"
           >
-            @if (currentDocument.status === 'EXTRACTION_FAILED') {
-              {{ isExtracting() ? 'Retrying...' : 'Retry extraction' }}
+            @if (
+              currentDocument.status ===
+              'EXTRACTION_FAILED'
+              ) {
+              {{
+                isExtracting()
+                  ? 'Retrying...'
+                  : 'Retry extraction'
+              }}
             } @else {
-              {{ isExtracting() ? 'Processing...' : 'Start processing' }}
+              {{
+                isExtracting()
+                  ? 'Processing...'
+                  : 'Start processing'
+              }}
             }
           </button>
+        }
+
+        @if (
+          currentDocument.documentType === 'APPOINTMENT_LETTER' &&
+          currentDocument.status === 'READY_FOR_APPOINTMENT_REVIEW' &&
+          canEditDocument()
+          ) {
+          <a
+            [routerLink]="[
+              '/documents',
+              currentDocument.id,
+              'appointment-review'
+            ]"
+            class="btn btn-primary"
+          >
+            Review appointment
+          </a>
         }
 
         @if (
@@ -233,6 +295,7 @@
         }
 
         @if (
+          currentDocument.documentType === 'CONSULTATION_OUTCOME_LETTER' &&
           currentDocument.status === 'READY_FOR_SUMMARY_REVIEW' &&
           canEditDocument()
           ) {
@@ -255,7 +318,11 @@
             [disabled]="isArchiving()"
             (click)="archive()"
           >
-            {{ isArchiving() ? 'Archiving...' : 'Archive' }}
+            {{
+              isArchiving()
+                ? 'Archiving...'
+                : 'Archive'
+            }}
           </button>
         }
       </section>
