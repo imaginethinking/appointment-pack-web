@@ -1,18 +1,16 @@
-import { DatePipe } from '@angular/common';
-import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { map, of, Subscription, switchMap } from 'rxjs';
+import {DatePipe} from '@angular/common';
+import {Component, computed, inject, OnDestroy, OnInit, signal} from '@angular/core';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {map, of, Subscription, switchMap} from 'rxjs';
 
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
-import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {hasHttpStatus} from '../../../../core/http/http-problem-detail';
+import {PatientContextAuthorisation} from '../../../patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../../patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../patient-context/services/selected-patient-state';
 import {
   canArchiveDocument,
   canExtractDocument,
-  canReviewAppointment,
-  canReviewDeidentifiedText,
   documentHasProcessingResult,
   DocumentProcessingResultResponse,
   DocumentResponse,
@@ -20,7 +18,7 @@ import {
   getDocumentTypeLabel,
   getSummarySourceLabel,
 } from '../../models/document-model';
-import { DocumentApiService } from '../../services/document-api-service';
+import {DocumentApiService} from '../../services/document-api-service';
 
 type DocumentDetailsStatus = 'loading' | 'ready' | 'not-found' | 'forbidden' | 'error';
 
@@ -36,6 +34,7 @@ export class DocumentDetails implements OnInit, OnDestroy {
   private readonly selectedPatientState = inject(SelectedPatientState);
   private readonly authorisation = inject(PatientContextAuthorisation);
   private readonly patientContextCoordinator = inject(PatientContextCoordinator);
+
   private routeSubscription: Subscription | null = null;
 
   protected readonly document = signal<DocumentResponse | null>(null);
@@ -49,7 +48,6 @@ export class DocumentDetails implements OnInit, OnDestroy {
 
   protected readonly contextMatchesDocument = computed(() => {
     const document = this.document();
-
     const selectedPatient = this.selectedPatientState.selectedPatient();
 
     return (
@@ -64,7 +62,11 @@ export class DocumentDetails implements OnInit, OnDestroy {
       return false;
     }
 
-    return this.authorisation.can(this.selectedPatientState.selectedPatient(), 'document', 'view');
+    return this.authorisation.can(
+      this.selectedPatientState.selectedPatient(),
+      'document',
+      'view',
+    );
   });
 
   protected readonly canEditDocument = computed(() => {
@@ -72,48 +74,49 @@ export class DocumentDetails implements OnInit, OnDestroy {
       return false;
     }
 
-    return this.authorisation.can(this.selectedPatientState.selectedPatient(), 'document', 'edit');
+    return this.authorisation.can(
+      this.selectedPatientState.selectedPatient(),
+      'document',
+      'edit',
+    );
   });
 
   protected readonly canExtract = computed(() => {
     const document = this.document();
 
-    return document !== null && this.canEditDocument() && canExtractDocument(document.status);
+    return (
+      document !== null &&
+      this.canEditDocument() &&
+      canExtractDocument(document.status)
+    );
   });
 
   protected readonly canArchive = computed(() => {
     const document = this.document();
 
-    return document !== null && this.canEditDocument() && canArchiveDocument(document.status);
+    return (
+      document !== null &&
+      this.canEditDocument() &&
+      canArchiveDocument(document.status)
+    );
   });
 
-  protected readonly canReviewAppointment = computed(() => {
-    const document = this.document();
-
-    return document !== null && this.canEditDocument() && canReviewAppointment(document);
-  });
-
-  protected readonly canReviewDeidentification = computed(() => {
-    const document = this.document();
-
-    return document !== null && this.canEditDocument() && canReviewDeidentifiedText(document);
-  });
-
-  protected readonly canReviewSummary = computed(() => {
+  protected readonly canOpenSummaryReview = computed(() => {
     const document = this.document();
 
     return (
       document !== null &&
       document.documentType === 'CONSULTATION_OUTCOME_LETTER' &&
-      document.status === 'READY_FOR_SUMMARY_REVIEW' &&
+      (
+        document.status === 'READY_FOR_SUMMARY_REVIEW' ||
+        document.status === 'SUMMARISATION_FAILED'
+      ) &&
       this.canEditDocument()
     );
   });
 
   protected readonly getDocumentTypeLabel = getDocumentTypeLabel;
-
   protected readonly getDocumentStatusLabel = getDocumentStatusLabel;
-
   protected readonly getSummarySourceLabel = getSummarySourceLabel;
 
   ngOnInit(): void {
@@ -163,17 +166,15 @@ export class DocumentDetails implements OnInit, OnDestroy {
           currentDocument === null
             ? null
             : {
-                ...currentDocument,
-                status: processing.status,
-              },
+              ...currentDocument,
+              status: processing.status,
+            },
         );
 
         this.isExtracting.set(false);
       },
-
       error: (error: unknown) => {
         this.isExtracting.set(false);
-
         this.handleExtractionError(error, document.id);
       },
     });
@@ -188,7 +189,9 @@ export class DocumentDetails implements OnInit, OnDestroy {
       return;
     }
 
-    const confirmed = window.confirm('Archive this document? It will no longer appear in the normal document list.',);
+    const confirmed = window.confirm(
+      'Archive this document? It will no longer appear in the normal document list.',
+    );
 
     if (!confirmed) {
       return;
@@ -199,36 +202,31 @@ export class DocumentDetails implements OnInit, OnDestroy {
     this.documentApi.archiveDocument(document.id).subscribe({
       next: () => {
         this.isArchiving.set(false);
-
         void this.router.navigate(['/documents']);
       },
-
       error: (error: unknown) => {
         this.isArchiving.set(false);
 
         if (hasHttpStatus(error, 403)) {
           this.status.set('forbidden');
-
           this.refreshPatientContext();
-
           return;
         }
 
         if (hasHttpStatus(error, 404)) {
           this.status.set('not-found');
-
           return;
         }
 
         if (hasHttpStatus(error, 409)) {
           this.actionError.set('This document cannot be archived in its current state.');
-
           this.loadDocument(document.id, true);
-
           return;
         }
 
-        this.actionError.set(getHttpErrorMessage(error, 'Unable to archive the document.'));
+        this.actionError.set(
+          getHttpErrorMessage(error, 'Unable to archive the document.'),
+        );
       },
     });
   }
@@ -250,7 +248,6 @@ export class DocumentDetails implements OnInit, OnDestroy {
 
         if (response.body === null) {
           this.actionError.set('The downloaded file was empty.');
-
           return;
         }
 
@@ -259,30 +256,27 @@ export class DocumentDetails implements OnInit, OnDestroy {
 
         anchor.href = url;
         anchor.download = document.originalFileName;
-
         anchor.click();
 
         URL.revokeObjectURL(url);
       },
-
       error: (error: unknown) => {
         this.isDownloading.set(false);
 
         if (hasHttpStatus(error, 403)) {
           this.status.set('forbidden');
-
           this.refreshPatientContext();
-
           return;
         }
 
         if (hasHttpStatus(error, 404)) {
           this.status.set('not-found');
-
           return;
         }
 
-        this.actionError.set(getHttpErrorMessage(error, 'Unable to download the document.'));
+        this.actionError.set(
+          getHttpErrorMessage(error, 'Unable to download the document.'),
+        );
       },
     });
   }
@@ -317,7 +311,7 @@ export class DocumentDetails implements OnInit, OnDestroy {
         return 'Text extraction did not complete successfully. You can retry without uploading the document again.';
 
       case 'SUMMARISATION_FAILED':
-        return 'External summarisation did not complete successfully. The approved de-identified text has been retained.';
+        return 'External summarisation did not complete successfully. The approved de-identified text has been retained. You can retry summarisation or enter a manual summary.';
 
       case 'ACCEPTED':
         return document.documentType === 'APPOINTMENT_LETTER'
@@ -389,21 +383,21 @@ export class DocumentDetails implements OnInit, OnDestroy {
             });
           }
 
-          return this.documentApi.getDocumentProcessing(document.id).pipe(
-            map((processing) => ({
-              document,
-              processing,
-            })),
-          );
+          return this.documentApi
+            .getDocumentProcessing(document.id)
+            .pipe(
+              map((processing) => ({
+                document,
+                processing,
+              })),
+            );
         }),
       )
       .subscribe({
-        next: ({ processing }) => {
+        next: ({processing}) => {
           this.processing.set(processing);
-
           this.status.set('ready');
         },
-
         error: (error: unknown) => {
           this.handleLoadError(error);
         },
@@ -413,20 +407,19 @@ export class DocumentDetails implements OnInit, OnDestroy {
   private handleExtractionError(error: unknown, documentId: string): void {
     if (hasHttpStatus(error, 403)) {
       this.status.set('forbidden');
-
       this.refreshPatientContext();
-
       return;
     }
 
     if (hasHttpStatus(error, 404)) {
       this.status.set('not-found');
-
       return;
     }
 
     if (hasHttpStatus(error, 409)) {
-      this.actionError.set('The document state changed before extraction could begin.');
+      this.actionError.set(
+        'The document state changed before extraction could begin.',
+      );
     } else if (hasHttpStatus(error, 413)) {
       this.actionError.set('The document is too large to process.');
     } else if (hasHttpStatus(error, 415)) {
@@ -434,13 +427,17 @@ export class DocumentDetails implements OnInit, OnDestroy {
     } else if (hasHttpStatus(error, 422)) {
       this.actionError.set('Text could not be extracted from the document.');
     } else if (hasHttpStatus(error, 502)) {
-      this.actionError.set('The document-processing service returned an invalid response.');
+      this.actionError.set(
+        'The document-processing service returned an invalid response.',
+      );
     } else if (hasHttpStatus(error, 503)) {
       this.actionError.set('Document processing is currently unavailable.');
     } else if (hasHttpStatus(error, 504)) {
       this.actionError.set('Document processing timed out.');
     } else {
-      this.actionError.set(getHttpErrorMessage(error, 'Document processing failed.'));
+      this.actionError.set(
+        getHttpErrorMessage(error, 'Document processing failed.'),
+      );
     }
 
     this.loadDocument(documentId, true);
@@ -449,29 +446,28 @@ export class DocumentDetails implements OnInit, OnDestroy {
   private handleLoadError(error: unknown): void {
     if (hasHttpStatus(error, 404)) {
       this.status.set('not-found');
-
       return;
     }
 
     if (hasHttpStatus(error, 403)) {
       this.status.set('forbidden');
-
       this.refreshPatientContext();
-
       return;
     }
 
     this.status.set('error');
-
-    this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the document.'));
+    this.errorMessage.set(
+      getHttpErrorMessage(error, 'Unable to load the document.'),
+    );
   }
 
   private refreshPatientContext(): void {
     this.patientContextCoordinator.load().subscribe({
       error: (error: unknown) => {
         this.status.set('error');
-
-        this.errorMessage.set(getHttpErrorMessage(error, 'Unable to refresh your patient access.'));
+        this.errorMessage.set(
+          getHttpErrorMessage(error, 'Unable to refresh your patient access.'),
+        );
       },
     });
   }
