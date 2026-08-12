@@ -10,11 +10,13 @@
       </a>
 
       @if (isAuthenticated()) {
-        <div class="col-start-2 hidden items-center gap-1 justify-self-center lg:flex">
+        <div class="col-start-2 hidden items-center gap-1 justify-self-center xl:flex">
           <a
             routerLink="/home"
             routerLinkActive="bg-brand-pink text-brand-plum"
-            [routerLinkActiveOptions]="{ exact: true }"
+            [routerLinkActiveOptions]="{
+              exact: true
+            }"
             class="btn btn-ghost"
           >
             Dashboard
@@ -28,14 +30,36 @@
             >
               Patient Record
             </a>
-          } @else {
-            <span
+          }
+
+          @if (canViewDocuments()) {
+            <a
+              routerLink="/documents"
+              routerLinkActive="bg-brand-pink text-brand-plum"
               class="btn btn-ghost"
-              aria-disabled="true"
-              title="Select a patient with patient-record viewing permission."
             >
-              Patient Record
-            </span>
+              Documents
+            </a>
+          }
+
+          @if (canViewAppointments()) {
+            <a
+              routerLink="/appointments"
+              routerLinkActive="bg-brand-pink text-brand-plum"
+              class="btn btn-ghost"
+            >
+              Appointments
+            </a>
+          }
+
+          @if (canViewMedicalHistory()) {
+            <a
+              routerLink="/medical-history"
+              routerLinkActive="bg-brand-pink text-brand-plum"
+              class="btn btn-ghost"
+            >
+              Medical History
+            </a>
           }
 
           <a
@@ -45,7 +69,6 @@
           >
             Care Network
           </a>
-
         </div>
       }
 
@@ -90,7 +113,11 @@
                     [value]="context.patientRecordId"
                     [disabled]="!canSelectPatient(context)"
                   >
-                    {{ patientContextLabel(context) }}{{ canSelectPatient(context) ? '' : ' — View unavailable' }}
+                    {{ patientContextLabel(context) }}{{
+                      canSelectPatient(context)
+                        ? ''
+                        : ' — View unavailable'
+                    }}
                   </option>
                 }
               }
@@ -99,7 +126,7 @@
 
           <button
             type="button"
-            class="btn btn-ghost h-10 w-10 p-0 lg:hidden"
+            class="btn btn-ghost h-10 w-10 p-0 xl:hidden"
             aria-label="Toggle navigation menu"
             aria-controls="mobile-navigation"
             [attr.aria-expanded]="mobileMenuOpen"
@@ -222,10 +249,13 @@
       </div>
     </div>
 
-    @if (isAuthenticated() && mobileMenuOpen) {
+    @if (
+      isAuthenticated() &&
+      mobileMenuOpen
+      ) {
       <div
         id="mobile-navigation"
-        class="border-t border-brand-peach/30 py-3 lg:hidden"
+        class="border-t border-brand-peach/30 py-3 xl:hidden"
       >
         <div class="mb-3 md:hidden">
           <label
@@ -266,7 +296,11 @@
                   [value]="context.patientRecordId"
                   [disabled]="!canSelectPatient(context)"
                 >
-                  {{ patientContextLabel(context) }}{{ canSelectPatient(context) ? '' : ' — View unavailable' }}
+                  {{ patientContextLabel(context) }}{{
+                    canSelectPatient(context)
+                      ? ''
+                      : ' — View unavailable'
+                  }}
                 </option>
               }
             }
@@ -277,7 +311,9 @@
           <a
             routerLink="/home"
             routerLinkActive="bg-brand-pink text-brand-plum"
-            [routerLinkActiveOptions]="{ exact: true }"
+            [routerLinkActiveOptions]="{
+              exact: true
+            }"
             class="btn btn-ghost w-full justify-start"
             (click)="closeMenus()"
           >
@@ -293,14 +329,39 @@
             >
               Patient Record
             </a>
-          } @else {
-            <span
+          }
+
+          @if (canViewDocuments()) {
+            <a
+              routerLink="/documents"
+              routerLinkActive="bg-brand-pink text-brand-plum"
               class="btn btn-ghost w-full justify-start"
-              aria-disabled="true"
-              title="Select a patient with patient-record viewing permission."
+              (click)="closeMenus()"
             >
-              Patient Record
-            </span>
+              Documents
+            </a>
+          }
+
+          @if (canViewAppointments()) {
+            <a
+              routerLink="/appointments"
+              routerLinkActive="bg-brand-pink text-brand-plum"
+              class="btn btn-ghost w-full justify-start"
+              (click)="closeMenus()"
+            >
+              Appointments
+            </a>
+          }
+
+          @if (canViewMedicalHistory()) {
+            <a
+              routerLink="/medical-history"
+              routerLinkActive="bg-brand-pink text-brand-plum"
+              class="btn btn-ghost w-full justify-start"
+              (click)="closeMenus()"
+            >
+              Medical History
+            </a>
           }
 
           <a

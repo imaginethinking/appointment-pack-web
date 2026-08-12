@@ -1,53 +1,75 @@
-import { Component, inject } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import {Component, inject,} from '@angular/core';
+import {Router, RouterLink, RouterLinkActive,} from '@angular/router';
 
-import { AuthService } from '../../../core/services/auth-service';
+import {AuthService,} from '../../../core/services/auth-service';
 import {
-  SelectedPatientContext,
   getPatientContextName,
+  SelectedPatientContext,
 } from '../../../features/patient-context/models/selected-patient-context';
-import { PatientContextAuthorisation } from '../../../features/patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../../features/patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../features/patient-context/services/selected-patient-state';
+import {PatientContextAuthorisation,} from '../../../features/patient-context/services/patient-context-auth';
+import {PatientContextCoordinator,} from '../../../features/patient-context/services/patient-context-coordinator';
+import {SelectedPatientState,} from '../../../features/patient-context/services/selected-patient-state';
 
 @Component({
   selector: 'app-navbar',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [
+    RouterLink,
+    RouterLinkActive,
+  ],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
 export class Navbar {
   private readonly authService = inject(AuthService);
-
   private readonly router = inject(Router);
-
   private readonly selectedPatientState = inject(SelectedPatientState);
-
   private readonly authorisation = inject(PatientContextAuthorisation);
-
   private readonly patientContextCoordinator = inject(PatientContextCoordinator);
 
   protected readonly isAuthenticated = this.authService.authenticated;
-
   protected readonly patientContexts = this.selectedPatientState.contexts;
-
   protected readonly selectedPatient = this.selectedPatientState.selectedPatient;
-
   protected readonly selectedPatientRecordId = this.selectedPatientState.selectedPatientRecordId;
-
   protected readonly isPatientContextLoading = this.patientContextCoordinator.isLoading;
-
   protected readonly patientContextLoadFailed = this.patientContextCoordinator.loadFailed;
 
   protected mobileMenuOpen = false;
   protected profileMenuOpen = false;
 
   protected canViewPatientRecord(): boolean {
-    return this.authorisation.can(this.selectedPatient(), 'patient-record', 'view');
+    return this.authorisation.can(
+      this.selectedPatient(),
+      'patient-record',
+      'view'
+    );
+  }
+
+  protected canViewDocuments(): boolean {
+    return this.authorisation.can(
+      this.selectedPatient(),
+      'document',
+      'view'
+    );
+  }
+
+  protected canViewAppointments(): boolean {
+    return this.authorisation.can(
+      this.selectedPatient(),
+      'appointment',
+      'view'
+    );
+  }
+
+  protected canViewMedicalHistory(): boolean {
+    return this.authorisation.can(
+      this.selectedPatient(),
+      'history',
+      'view'
+    );
   }
 
   protected canSelectPatient(context: SelectedPatientContext): boolean {
-    return this.selectedPatientState.canSelect(context);
+    return this.selectedPatientState.canSelect(context,);
   }
 
   protected patientContextLabel(context: SelectedPatientContext): string {
