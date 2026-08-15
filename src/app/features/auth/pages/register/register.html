@@ -1,205 +1,104 @@
 <section class="mx-auto max-w-md p-8">
-  <h1 class="mb-6 text-2xl font-bold">Register</h1>
+  <h1 class="mb-2 text-2xl font-bold text-brand-plum">Register</h1>
 
-  <form
-    #registerForm="ngForm"
-    class="space-y-4"
-    novalidate
-    (ngSubmit)="register(registerForm)"
-  >
+  <p class="mb-6 text-brand-plum/70">
+    After registration, you will need to verify your email address before logging in.
+  </p>
+
+  <form class="space-y-4" [formGroup]="form" novalidate (ngSubmit)="register()">
     <div>
-      <label
-        class="mb-1 block font-medium"
-        for="firstName"
-      >
-        First name
-      </label>
+      <label class="mb-1 block font-medium text-brand-plum" for="firstName">First name</label>
 
-      <input
-        #firstNameModel="ngModel"
-        id="firstName"
-        name="firstName"
-        class="w-full rounded border p-2"
-        type="text"
-        autocomplete="given-name"
-        required
-        [(ngModel)]="firstName"
-      />
+      <input id="firstName" class="w-full rounded border border-brand-plum/30 p-2" type="text" autocomplete="given-name" maxlength="100" formControlName="firstName" />
 
-      @if (
-        firstNameModel.invalid &&
-        firstNameModel.touched
-        ) {
-        <p class="mt-1 text-sm text-red-700">
-          First name is required.
-        </p>
+      @if (form.controls.firstName.touched && form.controls.firstName.hasError('required')) {
+        <p class="mt-1 text-sm text-brand-coral">First name is required.</p>
+      } @else if (form.controls.firstName.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
       }
     </div>
 
     <div>
-      <label
-        class="mb-1 block font-medium"
-        for="lastName"
-      >
-        Last name
-      </label>
+      <label class="mb-1 block font-medium text-brand-plum" for="lastName">Last name</label>
 
-      <input
-        #lastNameModel="ngModel"
-        id="lastName"
-        name="lastName"
-        class="w-full rounded border p-2"
-        type="text"
-        autocomplete="family-name"
-        required
-        [(ngModel)]="lastName"
-      />
+      <input id="lastName" class="w-full rounded border border-brand-plum/30 p-2" type="text" autocomplete="family-name" maxlength="100" formControlName="lastName" />
 
-      @if (
-        lastNameModel.invalid &&
-        lastNameModel.touched
-        ) {
-        <p class="mt-1 text-sm text-red-700">
-          Last name is required.
-        </p>
+      @if (form.controls.lastName.touched && form.controls.lastName.hasError('required')) {
+        <p class="mt-1 text-sm text-brand-coral">Last name is required.</p>
+      } @else if (form.controls.lastName.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
       }
     </div>
 
     <div>
-      <label
-        class="mb-1 block font-medium"
-        for="email"
-      >
-        Email
-      </label>
+      <label class="mb-1 block font-medium text-brand-plum" for="email">Email</label>
 
-      <input
-        #emailModel="ngModel"
-        id="email"
-        name="email"
-        class="w-full rounded border p-2"
-        type="email"
-        autocomplete="email"
-        required
-        email
-        [(ngModel)]="email"
-      />
+      <input id="email" class="w-full rounded border border-brand-plum/30 p-2" type="email" autocomplete="email" maxlength="254" formControlName="email" />
 
-      @if (emailModel.invalid && emailModel.touched) {
-        <p class="mt-1 text-sm text-red-700">
-          Enter a valid email address.
-        </p>
+      @if (form.controls.email.touched && (form.controls.email.hasError('required') || form.controls.email.hasError('email'))) {
+        <p class="mt-1 text-sm text-brand-coral">Enter a valid email address.</p>
+      } @else if (form.controls.email.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
       }
     </div>
 
     <div>
-      <label
-        class="mb-1 block font-medium"
-        for="dateOfBirth"
-      >
-        Date of birth
-      </label>
+      <label class="mb-1 block font-medium text-brand-plum" for="dateOfBirth">Date of birth</label>
 
-      <input
-        #dateOfBirthModel="ngModel"
-        id="dateOfBirth"
-        name="dateOfBirth"
-        class="w-full rounded border p-2"
-        type="date"
-        autocomplete="bday"
-        required
-        [(ngModel)]="dateOfBirth"
-      />
+      <input id="dateOfBirth" class="w-full rounded border border-brand-plum/30 p-2" type="date" autocomplete="bday" formControlName="dateOfBirth" />
 
-      @if (
-        dateOfBirthModel.invalid &&
-        dateOfBirthModel.touched
-        ) {
-        <p class="mt-1 text-sm text-red-700">
-          Date of birth is required.
-        </p>
+      @if (form.controls.dateOfBirth.touched && form.controls.dateOfBirth.hasError('required')) {
+        <p class="mt-1 text-sm text-brand-coral">Date of birth is required.</p>
+      } @else if (form.controls.dateOfBirth.touched && form.controls.dateOfBirth.hasError('pastDate')) {
+        <p class="mt-1 text-sm text-brand-coral">Date of birth must be in the past.</p>
+      } @else if (form.controls.dateOfBirth.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
       }
     </div>
 
     <div>
-      <label
-        class="mb-1 block font-medium"
-        for="password"
-      >
-        Password
-      </label>
+      <label class="mb-1 block font-medium text-brand-plum" for="password">Password</label>
 
-      <input
-        #passwordModel="ngModel"
-        id="password"
-        name="password"
-        class="w-full rounded border p-2"
-        type="password"
-        autocomplete="new-password"
-        required
-        minlength="8"
-        [(ngModel)]="password"
-      />
+      <input id="password" class="w-full rounded border border-brand-plum/30 p-2" type="password" autocomplete="new-password" maxlength="128" formControlName="password" />
 
-      @if (
-        passwordModel.invalid &&
-        passwordModel.touched
-        ) {
-        <p class="mt-1 text-sm text-red-700">
-          Password must contain at least 8 characters.
-        </p>
+      <p class="mt-1 text-sm text-brand-plum/70">
+        Use 8–128 characters with an uppercase letter, lowercase letter, number and symbol.
+      </p>
+
+      @if (form.controls.password.touched && form.controls.password.hasError('required')) {
+        <p class="mt-1 text-sm text-brand-coral">Password is required.</p>
+      } @else if (form.controls.password.touched && form.controls.password.hasError('strongPassword')) {
+        <p class="mt-1 text-sm text-brand-coral">Password does not meet the required complexity.</p>
+      } @else if (form.controls.password.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
       }
     </div>
 
     <div>
-      <label
-        class="mb-1 block font-medium"
-        for="confirmPassword"
-      >
-        Confirm password
-      </label>
+      <label class="mb-1 block font-medium text-brand-plum" for="confirmPassword">Confirm password</label>
 
-      <input
-        #confirmPasswordModel="ngModel"
-        id="confirmPassword"
-        name="confirmPassword"
-        class="w-full rounded border p-2"
-        type="password"
-        autocomplete="new-password"
-        required
-        minlength="8"
-        [(ngModel)]="confirmPassword"
-      />
+      <input id="confirmPassword" class="w-full rounded border border-brand-plum/30 p-2" type="password" autocomplete="new-password" maxlength="128" formControlName="confirmPassword" />
 
-      @if (
-        confirmPasswordModel.touched &&
-        confirmPassword !== password
-        ) {
-        <p class="mt-1 text-sm text-red-700">
-          Passwords do not match.
-        </p>
+      @if (form.controls.confirmPassword.touched && form.controls.confirmPassword.hasError('required')) {
+        <p class="mt-1 text-sm text-brand-coral">Password confirmation is required.</p>
+      } @else if (form.hasError('passwordMismatch') && form.controls.confirmPassword.touched) {
+        <p class="mt-1 text-sm text-brand-coral">Passwords do not match.</p>
+      } @else if (form.controls.confirmPassword.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
       }
     </div>
 
-    <button
-      class="btn btn-primary w-full"
-      type="submit"
-      [disabled]="
-        registerForm.invalid ||
-        password !== confirmPassword ||
-        isSubmitting
-      "
-    >
+    <button class="btn btn-primary w-full" type="submit" [disabled]="isSubmitting">
       {{ isSubmitting ? 'Registering...' : 'Register' }}
     </button>
 
     @if (errorMessage) {
-      <p
-        class="text-red-700"
-        role="alert"
-      >
-        {{ errorMessage }}
-      </p>
+      <p class="text-brand-coral" role="alert">{{ errorMessage }}</p>
     }
+
+    <p class="text-center text-brand-plum">
+      Already registered?
+      <a class="font-medium underline" routerLink="/login">Login</a>
+    </p>
   </form>
 </section>

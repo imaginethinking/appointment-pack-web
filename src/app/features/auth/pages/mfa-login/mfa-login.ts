@@ -1,57 +1,50 @@
 import { Component, inject } from '@angular/core';
-import { FormsModule, NgForm} from '@angular/forms';
-import { ActivatedRoute, Router} from '@angular/router';
-import { finalize} from 'rxjs';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { finalize } from 'rxjs';
 
 import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
 import { AuthService } from '../../../../core/services/auth-service';
 
 @Component({
   selector: 'app-mfa-login',
-  imports: [FormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './mfa-login.html',
 })
 export class MfaLogin {
+  private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
-  protected code = '';
   protected errorMessage = '';
   protected isSubmitting = false;
 
+  protected readonly form = this.formBuilder.group({
+    code: this.formBuilder.nonNullable.control('', [
+      Validators.required,
+      Validators.pattern(/^\d{6}$/),
+    ]),
+  });
 
-  protected completeLogin(form: NgForm): void {
+  protected completeLogin(): void {
     this.errorMessage = '';
 
-    if (form.invalid) {
-      form.control.markAllAsTouched();
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
-    const normalizedCode = this.code.trim();
-
     this.isSubmitting = true;
 
-    this.authService.completeMfaLogin(normalizedCode)
-      .pipe(
-        finalize(() => {
-          this.isSubmitting = false;
-        })
-      )
-      .subscribe({
-        next: () => {
-          void this.router.navigateByUrl(
-            this.getReturnUrl()
-          );
-        },
-        error: (error: unknown) => {
-          this.errorMessage = getHttpErrorMessage(
-            error,
-            'MFA verification failed.',
-          );
-        },
-      });
+    this.authService.completeMfaLogin(this.form.controls.code.value.trim()).pipe(
+      finalize(() => this.isSubmitting = false),
+    ).subscribe({
+      next: () => void this.router.navigateByUrl(this.getReturnUrl()),
+      error: (error: unknown) => {
+        this.errorMessage = getHttpErrorMessage(error, 'MFA verification failed.');
+      },
+    });
   }
 
   protected cancel(): void {
@@ -61,13 +54,6 @@ export class MfaLogin {
 
   private getReturnUrl(): string {
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-
-    if (returnUrl === null || !returnUrl.startsWith('/')) {
-      return '/home';
-    }
-
-    return returnUrl;
+    return returnUrl !== null && returnUrl.startsWith('/') ? returnUrl : '/home';
   }
-
-
 }

@@ -8,6 +8,14 @@ export function getHttpErrorMessage(error: unknown, fallbackMessage = 'An unexpe
       return 'Unable to connect to the server.';
     }
 
+    if (error.status === 429) {
+      const retryAfter = getRetryAfterSeconds(error);
+
+      return retryAfter === null
+        ? 'Too many requests have been made. Please wait and try again.'
+        : `Too many requests have been made. Please try again in approximately ${retryAfter} seconds.`;
+    }
+
     if (typeof error.error === 'string' && error.error.trim().length > 0) {
       return error.error;
     }
@@ -40,6 +48,16 @@ export function getHttpErrorMessage(error: unknown, fallbackMessage = 'An unexpe
   }
 
   return fallbackMessage;
+}
+
+function getRetryAfterSeconds(error: HttpErrorResponse): number | null {
+  const value = error.headers.get('Retry-After');
+
+  if (value === null || !/^\d+$/.test(value)) {
+    return null;
+  }
+
+  return Number(value);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

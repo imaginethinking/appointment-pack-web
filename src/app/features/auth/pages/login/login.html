@@ -1,102 +1,67 @@
 <section class="mx-auto max-w-md p-8">
-  <h1 class="mb-6 text-2xl font-bold">Login</h1>
+  <h1 class="mb-6 text-2xl font-bold text-brand-plum">Login</h1>
 
-  @if (registrationSuccessful) {
-    <p
-      class="mb-4 rounded border border-green-700 p-3 text-green-800"
-      role="status"
-    >
-      Registration successful. You can now log in.
+  @if (passwordResetSuccessful) {
+    <p class="mb-4 rounded border border-brand-mint bg-brand-off-white p-3 text-brand-plum" role="status">
+      Your password has been reset. You can now log in with your new password.
     </p>
   }
 
-  <form
-    #loginForm="ngForm"
-    class="space-y-4"
-    novalidate
-    (ngSubmit)="login(loginForm)"
-  >
+  <form class="space-y-4" [formGroup]="form" novalidate (ngSubmit)="login()">
     <div>
-      <label
-        class="mb-1 block font-medium"
-        for="email"
-      >
-        Email
-      </label>
+      <label class="mb-1 block font-medium text-brand-plum" for="email">Email</label>
 
       <input
-        #emailModel="ngModel"
         id="email"
-        name="email"
-        class="w-full rounded border p-2"
+        class="w-full rounded border border-brand-plum/30 p-2"
         type="email"
         autocomplete="email"
-        required
-        email
-        [(ngModel)]="email"
+        maxlength="254"
+        formControlName="email"
       />
 
-      @if (emailModel.invalid && emailModel.touched) {
-        <p class="mt-1 text-sm text-red-700">
-          Enter a valid email address.
-        </p>
+      @if (form.controls.email.touched && (form.controls.email.hasError('required') || form.controls.email.hasError('email'))) {
+        <p class="mt-1 text-sm text-brand-coral">Enter a valid email address.</p>
+      } @else if (form.controls.email.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
       }
     </div>
 
     <div>
-      <label
-        class="mb-1 block font-medium"
-        for="password"
-      >
-        Password
-      </label>
+      <label class="mb-1 block font-medium text-brand-plum" for="password">Password</label>
 
       <input
-        #passwordModel="ngModel"
         id="password"
-        name="password"
-        class="w-full rounded border p-2"
+        class="w-full rounded border border-brand-plum/30 p-2"
         type="password"
         autocomplete="current-password"
-        required
-        [(ngModel)]="password"
+        formControlName="password"
       />
 
-      @if (
-        passwordModel.invalid &&
-        passwordModel.touched
-        ) {
-        <p class="mt-1 text-sm text-red-700">
-          Password is required.
-        </p>
+      @if (form.controls.password.touched && form.controls.password.hasError('required')) {
+        <p class="mt-1 text-sm text-brand-coral">Password is required.</p>
+      } @else if (form.controls.password.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
       }
     </div>
 
-    <button
-      class="btn btn-primary w-full"
-      type="submit"
-      [disabled]="loginForm.invalid || isSubmitting"
-    >
+    <div class="text-right">
+      <a class="text-sm font-medium text-brand-plum underline" routerLink="/forgot-password">
+        Forgot password?
+      </a>
+    </div>
+
+    <button class="btn btn-primary w-full" type="submit" [disabled]="isSubmitting">
       {{ isSubmitting ? 'Logging in...' : 'Login' }}
     </button>
 
     @if (errorMessage) {
-      <p
-        class="text-red-700"
-        role="alert"
-      >
-        {{ errorMessage }}
-      </p>
+      <p class="text-brand-coral" role="alert">{{ errorMessage }}</p>
     }
 
-    <p class="text-center">
+    <p class="text-center text-brand-plum">
       Do not have an account?
-      <a
-        class="underline"
-        routerLink="/register"
-      >
-        Register
-      </a>
+      <a class="font-medium underline" routerLink="/register">Register</a>
     </p>
   </form>
 </section>

@@ -1,76 +1,39 @@
 <section class="mx-auto max-w-md p-8">
-  <h1 class="mb-3 text-2xl font-bold">
-    Multi Factor Authentication
-  </h1>
+  <h1 class="mb-3 text-2xl font-bold text-brand-plum">Multi-factor authentication</h1>
 
-  <p class="mb-6">
-    Enter the six digit code from authenticator.
+  <p class="mb-6 text-brand-plum/70">
+    Enter the six-digit code from your authenticator application.
   </p>
 
-  <form
-    #mfaForm="ngForm"
-    class="space-y-4"
-    novalidate
-    (ngSubmit)="completeLogin(mfaForm)"
-  >
+  <form class="space-y-4" [formGroup]="form" novalidate (ngSubmit)="completeLogin()">
     <div>
-      <label
-        class="mb-1 block font-medium"
-        for="code"
-      >
-        Authentication code
-      </label>
+      <label class="mb-1 block font-medium text-brand-plum" for="code">Authentication code</label>
 
       <input
-        #codeModel="ngModel"
         id="code"
-        name="code"
-        class="w-full rounded border p-2 tracking-widest"
+        class="w-full rounded border border-brand-plum/30 p-2 tracking-widest"
         type="text"
         inputmode="numeric"
         autocomplete="one-time-code"
-        required
-        minlength="6"
         maxlength="6"
-        pattern="[0-9]{6}"
-        [(ngModel)]="code"
+        formControlName="code"
       />
 
-      @if (codeModel.invalid && codeModel.touched) {
-        <p class="mt-1 text-sm text-red-700">
-          Enter a six digit numeric code.
-        </p>
+      @if (form.controls.code.invalid && form.controls.code.touched) {
+        <p class="mt-1 text-sm text-brand-coral">Enter a six-digit numeric code.</p>
       }
     </div>
 
-    <button
-      class="w-full rounded bg-black p-2 text-white disabled:cursor-not-allowed disabled:opacity-50"
-      type="submit"
-      [disabled]="mfaForm.invalid || isSubmitting"
-    >
-      {{
-        isSubmitting
-          ? 'Verifying...'
-          : 'Verify and login'
-      }}
+    <button class="btn btn-primary w-full" type="submit" [disabled]="isSubmitting">
+      {{ isSubmitting ? 'Verifying...' : 'Verify and login' }}
     </button>
 
-    <button
-      class="w-full rounded border p-2"
-      type="button"
-      [disabled]="isSubmitting"
-      (click)="cancel()"
-    >
+    <button class="btn btn-secondary w-full" type="button" [disabled]="isSubmitting" (click)="cancel()">
       Cancel
     </button>
 
     @if (errorMessage) {
-      <p
-        class="text-red-700"
-        role="alert"
-      >
-        {{ errorMessage }}
-      </p>
+      <p class="text-brand-coral" role="alert">{{ errorMessage }}</p>
     }
   </form>
 </section>

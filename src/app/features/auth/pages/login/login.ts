@@ -1,90 +1,91 @@
 import { Component, inject } from '@angular/core';
-import {FormsModule, NgForm } from '@angular/forms';
-import {
-  ActivatedRoute,
-  Router,
-  RouterLink
-} from '@angular/router';
-
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
+import { clearServerFieldErrors, applyServerFieldErrors } from '../../../../core/forms/server-field-errors';
 import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import {AuthService} from '../../../../core/services/auth-service';
-import {LoginRequest} from '../../../../core/models/auth-model';
-
+import { LoginRequest } from '../../../../core/models/auth-model';
+import { AuthService } from '../../../../core/services/auth-service';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
 })
 export class Login {
+  private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
-  protected email = '';
-  protected password = '';
-
+  protected readonly passwordResetSuccessful = this.route.snapshot.queryParamMap.get('passwordReset') === 'true';
   protected errorMessage = '';
   protected isSubmitting = false;
 
-  protected readonly registrationSuccessful = this.route.snapshot.queryParamMap.get('registered') === 'true';
+  protected readonly form = this.formBuilder.group({
+    email: this.formBuilder.nonNullable.control('', [Validators.required, Validators.email, Validators.maxLength(254)]),
+    password: this.formBuilder.nonNullable.control('', Validators.required),
+  });
 
-  protected login(form: NgForm): void {
+  protected login(): void {
     this.errorMessage = '';
+    clearServerFieldErrors(this.form);
 
-    if (form.invalid) {
-      form.control.markAllAsTouched();
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
+    const value = this.form.getRawValue();
     const request: LoginRequest = {
-      email: this.email.trim(),
-      password: this.password
+      email: value.email.trim(),
+      password: value.password,
     };
 
     this.isSubmitting = true;
 
-    this.authService.login(request)
-      .pipe(
-        finalize(() => {
-          this.isSubmitting = false;
-        })
-      )
-      .subscribe({
-        next: (response) => {
-          const returnUrl = this.getReturnUrl();
+    this.authService.login(request).pipe(
+      finalize(() => this.isSubmitting = false),
+    ).subscribe({
+      next: (response) => {
+        const returnUrl = this.getReturnUrl();
 
-          if (response.mfaRequired) {
+        switch (response.status) {
+          case 'AUTHENTICATED':
+            void this.router.navigateByUrl(returnUrl);
+            return;
+
+          case 'EMAIL_VERIFICATION_REQUIRED':
+            void this.router.navigate(['/verify-email'], {
+              queryParams: {
+                email: request.email,
+                returnUrl,
+              },
+            });
+            return;
+
+          case 'MFA_REQUIRED':
             void this.router.navigate(['/login/mfa'], {
               queryParams: {
-                returnUrl
-              }
+                returnUrl,
+              },
             });
-
             return;
-          }
-
-          void this.router.navigateByUrl(returnUrl);
-        },
-        error: (error: unknown) => {
-          this.errorMessage = getHttpErrorMessage(
-            error,
-            'Login failed.'
-          );
         }
-      });
+      },
+      error: (error: unknown) => {
+        if (applyServerFieldErrors(this.form, error)) {
+          return;
+        }
+
+        this.errorMessage = getHttpErrorMessage(error, 'Login failed.');
+      },
+    });
   }
 
   private getReturnUrl(): string {
-    const returnUrl =
-      this.route.snapshot.queryParamMap.get('returnUrl');
-
-    if (returnUrl === null || !returnUrl.startsWith('/')) {
-      return '/home';
-    }
-
-    return returnUrl;
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    return returnUrl !== null && returnUrl.startsWith('/') ? returnUrl : '/home';
   }
 }
