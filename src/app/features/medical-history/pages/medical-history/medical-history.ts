@@ -1,44 +1,16 @@
-import {
-  DatePipe,
-} from '@angular/common';
-import {
-  Component,
-  effect,
-  inject,
-  signal,
-} from '@angular/core';
-import {
-  RouterLink,
-} from '@angular/router';
+import {DatePipe} from '@angular/common';
+import {Component, effect, inject, signal,} from '@angular/core';
+import {RouterLink} from '@angular/router';
 
-import {
-  getHttpErrorMessage,
-} from '../../../../core/http/http-error-message';
-import {
-  hasHttpStatus,
-} from '../../../../core/http/http-problem-detail';
-import {
-  getDocumentTypeLabel,
-} from '../../../documents/models/document-model';
-import {
-  getPatientContextName,
-} from '../../../patient-context/models/selected-patient-context';
-import {
-  PatientContextAuthorisation,
-} from '../../../patient-context/services/patient-context-auth';
-import {
-  PatientContextCoordinator,
-} from '../../../patient-context/services/patient-context-coordinator';
-import {
-  SelectedPatientState,
-} from '../../../patient-context/services/selected-patient-state';
-import {
-  getMedicalHistorySourceLabel,
-  MedicalHistoryEntryResponse,
-} from '../../models/medical-history-model';
-import {
-  MedicalHistoryApiService,
-} from '../../services/medical-history-api-service';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {hasHttpStatus} from '../../../../core/http/http-problem-detail';
+import {getDocumentTypeLabel} from '../../../documents/models/document-model';
+import {getPatientContextName} from '../../../patient-context/models/selected-patient-context';
+import {PatientContextAuthorisation} from '../../../patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../../patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../patient-context/services/selected-patient-state';
+import {getMedicalHistorySourceLabel, MedicalHistoryEntryResponse,} from '../../models/medical-history-model';
+import {MedicalHistoryApiService} from '../../services/medical-history-api-service';
 
 type MedicalHistoryStatus =
   | 'loading'
@@ -59,22 +31,23 @@ export class MedicalHistory {
   private readonly medicalHistoryApi = inject(MedicalHistoryApiService);
   private readonly selectedPatientState = inject(SelectedPatientState);
   private readonly authorisation = inject(PatientContextAuthorisation);
-  private readonly patientContextCoordinator = inject(PatientContextCoordinator);
+  private readonly patientContextCoordinator = inject(PatientContextCoordinator,);
 
+  private readonly reloadVersion = signal(0);
   protected readonly entries = signal<readonly MedicalHistoryEntryResponse[]>([]);
   protected readonly status = signal<MedicalHistoryStatus>('loading');
   protected readonly errorMessage = signal('');
-
   protected readonly selectedPatient = this.selectedPatientState.selectedPatient;
-  protected readonly getPatientContextName = getPatientContextName;
 
+  protected readonly getPatientContextName = getPatientContextName;
   protected readonly getMedicalHistorySourceLabel = getMedicalHistorySourceLabel;
   protected readonly getDocumentTypeLabel = getDocumentTypeLabel;
 
   constructor() {
     effect((onCleanup) => {
-      const selectedPatient =
-        this.selectedPatient();
+      this.reloadVersion();
+
+      const selectedPatient = this.selectedPatient();
 
       this.entries.set([]);
       this.errorMessage.set('');
@@ -100,16 +73,13 @@ export class MedicalHistory {
       this.status.set('loading');
 
       const subscription = this.medicalHistoryApi
-        .getMedicalHistory(
-          selectedPatient.patientRecordId,
-        )
+        .getMedicalHistory(selectedPatient.patientRecordId)
         .subscribe({
           next: (entries) => {
-            this.entries.set(entries,);
+            this.entries.set(entries);
 
             this.status.set('ready');
           },
-
           error: (error: unknown) => {
             this.handleLoadError(error);
           },
@@ -122,44 +92,26 @@ export class MedicalHistory {
   }
 
   protected retry(): void {
-    this.patientContextCoordinator
-      .load()
-      .subscribe({
-        error: (error: unknown) => {
-          this.errorMessage.set(
-            getHttpErrorMessage(
-              error,
-              'Unable to refresh patient access.',
-            ),
-          );
-        },
-      });
+    this.reloadVersion.update((version) => version + 1);
   }
 
-  private handleLoadError(error: unknown,): void {
-    if (
-      hasHttpStatus(
-        error,
-        403,
-      )
-    ) {
+  private handleLoadError(error: unknown): void {
+    if (hasHttpStatus(error, 403)) {
       this.status.set('forbidden');
 
-      this.refreshPatientContext();
+      this.refreshPatientAccess();
 
       return;
     }
 
-    if (hasHttpStatus(
-        error,
-        404,
-      )
-    ) {
-      this.status.set('error',);
+    if (hasHttpStatus(error, 404)) {
+      this.status.set('error');
 
-      this.errorMessage.set('The selected patient record is no longer available.');
+      this.errorMessage.set(
+        'The selected patient record is no longer available.',
+      );
 
-      this.refreshPatientContext();
+      this.refreshPatientAccess();
 
       return;
     }
@@ -174,9 +126,9 @@ export class MedicalHistory {
     );
   }
 
-  private refreshPatientContext(): void {
+  private refreshPatientAccess(): void {
     this.patientContextCoordinator
-      .load()
+      .refreshSelectedPatientAccess()
       .subscribe({
         error: (error: unknown) => {
           this.status.set('error');

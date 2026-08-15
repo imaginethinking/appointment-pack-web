@@ -1,28 +1,23 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import {computed, inject, Injectable, signal} from '@angular/core';
 
-import { Permission } from '../../../core/models/permission-model';
-import { PatientCarerAccessState } from '../../care-network/services/patient-carer-access-state';
-import { PersonalPatientRecordState } from '../../patient-record/services/personal-patient-record-state';
-import { ProfileState } from '../../profile/services/profile-state';
-import { SelectedPatientContext } from '../models/selected-patient-context';
-import { PatientContextAuthorisation } from './patient-context-auth';
+import {Permission} from '../../../core/models/permission-model';
+import {PatientCarerAccessState} from '../../care-network/services/patient-carer-access-state';
+import {PersonalPatientRecordState} from '../../patient-record/services/personal-patient-record-state';
+import {ProfileState} from '../../profile/services/profile-state';
+import {SelectedPatientContext} from '../models/selected-patient-context';
+import {PatientContextAuthorisation} from './patient-context-auth';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SelectedPatientState {
   private readonly profileState = inject(ProfileState);
-
-  private readonly personalPatientRecordState = inject(PersonalPatientRecordState);
-
+  private readonly personalPatientRecordState = inject(PersonalPatientRecordState,);
   private readonly patientCarerAccessState = inject(PatientCarerAccessState);
-
   private readonly authorisation = inject(PatientContextAuthorisation);
-
   private readonly selectedPatientRecordIdKey = 'appointmentPack.selectedPatientRecordId';
 
   private readonly selectedPatientRecordIdValue = signal<string | null>(null);
-
   readonly selectedPatientRecordId = this.selectedPatientRecordIdValue.asReadonly();
 
   readonly contexts = computed<readonly SelectedPatientContext[]>(() => {
@@ -63,17 +58,26 @@ export class SelectedPatientState {
     return contexts;
   });
 
-  readonly selectedPatient = computed(() => {
-    const selectedPatientRecordId = this.selectedPatientRecordIdValue();
+  readonly selectedPatient = computed<SelectedPatientContext | null>(
+    () => {
+      const selectedPatientRecordId =
+        this.selectedPatientRecordIdValue();
 
-    if (selectedPatientRecordId === null) {
-      return null;
-    }
+      if (selectedPatientRecordId === null) {
+        return null;
+      }
 
-    return (
-      this.contexts().find((context) => context.patientRecordId === selectedPatientRecordId) ?? null
-    );
-  });
+      return (
+        this.contexts().find(
+          (context) =>
+            context.patientRecordId === selectedPatientRecordId,
+        ) ?? null
+      );
+    },
+    {
+      equal: selectedPatientContextEqual,
+    },
+  );
 
   selectPatient(patientRecordId: string): boolean {
     const context = this.contexts().find(
@@ -86,22 +90,33 @@ export class SelectedPatientState {
 
     this.selectedPatientRecordIdValue.set(patientRecordId);
 
-    sessionStorage.setItem(this.selectedPatientRecordIdKey, patientRecordId);
+    sessionStorage.setItem(
+      this.selectedPatientRecordIdKey,
+      patientRecordId,
+    );
 
     return true;
   }
 
   canSelect(context: SelectedPatientContext): boolean {
-    return this.authorisation.can(context, 'patient-record', 'view');
+    return this.authorisation.can(
+      context,
+      'patient-record',
+      'view',
+    );
   }
 
   revalidateSelection(): void {
     const contexts = this.contexts();
 
-    const storedPatientRecordId = sessionStorage.getItem(this.selectedPatientRecordIdKey);
+    const storedPatientRecordId = sessionStorage.getItem(
+      this.selectedPatientRecordIdKey,
+    );
 
     const storedContext = contexts.find(
-      (context) => context.patientRecordId === storedPatientRecordId && this.canSelect(context),
+      (context) =>
+        context.patientRecordId === storedPatientRecordId &&
+        this.canSelect(context),
     );
 
     if (storedContext !== undefined) {
@@ -111,7 +126,9 @@ export class SelectedPatientState {
     }
 
     const selfContext = contexts.find(
-      (context) => context.contextType === 'SELF' && this.canSelect(context),
+      (context) =>
+        context.contextType === 'SELF' &&
+        this.canSelect(context),
     );
 
     if (selfContext !== undefined) {
@@ -120,7 +137,9 @@ export class SelectedPatientState {
       return;
     }
 
-    const firstAccessibleContext = contexts.find((context) => this.canSelect(context));
+    const firstAccessibleContext = contexts.find((context) =>
+      this.canSelect(context),
+    );
 
     if (firstAccessibleContext !== undefined) {
       this.selectPatient(firstAccessibleContext.patientRecordId);
@@ -140,4 +159,44 @@ export class SelectedPatientState {
 
     sessionStorage.removeItem(this.selectedPatientRecordIdKey);
   }
+}
+
+function selectedPatientContextEqual(
+  previous: SelectedPatientContext | null,
+  current: SelectedPatientContext | null,
+): boolean {
+  if (previous === current) {
+    return true;
+  }
+
+  if (previous === null || current === null) {
+    return false;
+  }
+
+  return (
+    previous.patientRecordId === current.patientRecordId &&
+    previous.profileId === current.profileId &&
+    previous.userId === current.userId &&
+    previous.firstName === current.firstName &&
+    previous.lastName === current.lastName &&
+    previous.contextType === current.contextType &&
+    permissionSetsEqual(previous.permissions, current.permissions)
+  );
+}
+
+function permissionSetsEqual(
+  previous: ReadonlySet<Permission>,
+  current: ReadonlySet<Permission>,
+): boolean {
+  if (previous.size !== current.size) {
+    return false;
+  }
+
+  for (const permission of previous) {
+    if (!current.has(permission)) {
+      return false;
+    }
+  }
+
+  return true;
 }
