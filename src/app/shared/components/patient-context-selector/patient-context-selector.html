@@ -1,0 +1,34 @@
+<label
+  [for]="selectId()"
+  [class.sr-only]="!showLabel()"
+  [class.mb-1]="showLabel()"
+  [class.block]="showLabel()"
+  [class.text-sm]="showLabel()"
+  [class.font-semibold]="showLabel()"
+>
+  Patient context
+</label>
+
+<select
+  [id]="selectId()"
+  class="rounded-md border border-brand-peach bg-brand-off-white px-3 py-2 text-sm font-medium text-brand-plum disabled:cursor-not-allowed disabled:opacity-60"
+  [class.w-full]="fullWidth()"
+  [class.max-w-64]="!fullWidth()"
+  [value]="selectedPatientRecordId() ?? ''"
+  [disabled]="isLoading() || loadFailed()"
+  (change)="selectPatient($event)"
+>
+  @if (isLoading()) {
+    <option value="">Loading patients...</option>
+  } @else if (loadFailed()) {
+    <option value="">Unable to load patients</option>
+  } @else if (patientContexts().length === 0) {
+    <option value="">No patient access</option>
+  } @else {
+    @for (context of patientContexts(); track context.patientRecordId) {
+      <option [value]="context.patientRecordId" [disabled]="!canSelectPatient(context)">
+        {{ patientContextLabel(context) }}{{ canSelectPatient(context) ? '' : ' — View unavailable' }}
+      </option>
+    }
+  }
+</select>

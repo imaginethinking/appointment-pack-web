@@ -11,117 +11,25 @@
 
       @if (isAuthenticated()) {
         <div class="col-start-2 hidden items-center gap-1 justify-self-center xl:flex">
-          <a
-            routerLink="/home"
-            routerLinkActive="bg-brand-pink text-brand-plum"
-            [routerLinkActiveOptions]="{
-              exact: true
-            }"
-            class="btn btn-ghost"
-          >
-            Dashboard
-          </a>
-
-          @if (canViewPatientRecord()) {
-            <a
-              routerLink="/patient"
-              routerLinkActive="bg-brand-pink text-brand-plum"
-              class="btn btn-ghost"
-            >
-              Patient Record
-            </a>
+          @for (item of navigationItems; track item.route) {
+            @if (canViewNavigationItem(item)) {
+              <a
+                [routerLink]="item.route"
+                routerLinkActive="bg-brand-pink text-brand-plum"
+                [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+                class="btn btn-ghost"
+              >
+                {{ item.label }}
+              </a>
+            }
           }
-
-          @if (canViewDocuments()) {
-            <a
-              routerLink="/documents"
-              routerLinkActive="bg-brand-pink text-brand-plum"
-              class="btn btn-ghost"
-            >
-              Documents
-            </a>
-          }
-
-          @if (canViewAppointments()) {
-            <a
-              routerLink="/appointments"
-              routerLinkActive="bg-brand-pink text-brand-plum"
-              class="btn btn-ghost"
-            >
-              Appointments
-            </a>
-          }
-
-          @if (canViewMedicalHistory()) {
-            <a
-              routerLink="/medical-history"
-              routerLinkActive="bg-brand-pink text-brand-plum"
-              class="btn btn-ghost"
-            >
-              Medical History
-            </a>
-          }
-
-          <a
-            routerLink="/care-network"
-            routerLinkActive="bg-brand-pink text-brand-plum"
-            class="btn btn-ghost"
-          >
-            Care Network
-          </a>
         </div>
       }
 
       <div class="col-start-3 flex items-center gap-2 justify-self-end">
         @if (isAuthenticated()) {
           <div class="hidden md:block">
-            <label
-              class="sr-only"
-              for="desktopPatientContext"
-            >
-              Patient context
-            </label>
-
-            <select
-              id="desktopPatientContext"
-              class="max-w-64 rounded-md border border-brand-peach bg-brand-off-white px-3 py-2 text-sm font-medium text-brand-plum disabled:cursor-not-allowed disabled:opacity-60"
-              [value]="selectedPatientRecordId() ?? ''"
-              [disabled]="
-                isPatientContextLoading() ||
-                patientContextLoadFailed()
-              "
-              (change)="selectPatient($event)"
-            >
-              @if (isPatientContextLoading()) {
-                <option value="">
-                  Loading patients...
-                </option>
-              } @else if (patientContextLoadFailed()) {
-                <option value="">
-                  Unable to load patients
-                </option>
-              } @else if (patientContexts().length === 0) {
-                <option value="">
-                  No patient access
-                </option>
-              } @else {
-                @for (
-                  context of patientContexts();
-                  track context.patientRecordId
-                  ) {
-                  <option
-                    [value]="context.patientRecordId"
-                    [disabled]="!canSelectPatient(context)"
-                  >
-                    {{ patientContextLabel(context) }}{{
-                      canSelectPatient(context)
-                        ? ''
-                        : ' — View unavailable'
-                    }}
-                  </option>
-                }
-              }
-            </select>
+            <app-patient-context-selector selectId="desktopPatientContext" />
           </div>
 
           <button
@@ -133,34 +41,12 @@
             (click)="toggleMobileMenu()"
           >
             @if (mobileMenuOpen) {
-              <svg
-                class="h-6 w-6"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18 18 6M6 6l12 12"
-                />
+              <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
               </svg>
             } @else {
-              <svg
-                class="h-6 w-6"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
+              <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             }
           </button>
@@ -173,17 +59,8 @@
               [attr.aria-expanded]="profileMenuOpen"
               (click)="toggleProfileMenu()"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                class="h-7 w-7"
-                aria-hidden="true"
-              >
-                <path
-                  d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"
-                />
-
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-7 w-7" aria-hidden="true">
+                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
                 <path
                   fill-rule="evenodd"
                   d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"
@@ -192,37 +69,21 @@
             </button>
 
             @if (profileMenuOpen) {
-              <div
-                class="absolute right-0 z-50 mt-2 w-56 rounded-md border border-brand-peach bg-brand-off-white py-2 text-brand-plum shadow-lg"
-              >
+              <div class="absolute right-0 z-50 mt-2 w-56 rounded-md border border-brand-peach bg-brand-off-white py-2 text-brand-plum shadow-lg">
                 <div class="border-b border-brand-peach px-4 py-3">
-                  <p class="text-sm font-semibold">
-                    Account
-                  </p>
+                  <p class="text-sm font-semibold">Account</p>
                 </div>
 
-                <a
-                  routerLink="/profile"
-                  class="block px-4 py-2 text-sm hover:bg-brand-pink"
-                  (click)="closeMenus()"
-                >
+                <a routerLink="/profile" class="block px-4 py-2 text-sm hover:bg-brand-pink" (click)="closeMenus()">
                   Profile
                 </a>
 
-                <a
-                  routerLink="/profile/settings/mfa"
-                  class="block px-4 py-2 text-sm hover:bg-brand-pink"
-                  (click)="closeMenus()"
-                >
+                <a routerLink="/profile/settings/mfa" class="block px-4 py-2 text-sm hover:bg-brand-pink" (click)="closeMenus()">
                   Security and MFA
                 </a>
 
                 <div class="mt-2 border-t border-brand-peach px-2 pt-2">
-                  <button
-                    type="button"
-                    class="btn btn-danger w-full"
-                    (click)="logout()"
-                  >
+                  <button type="button" class="btn btn-danger w-full" (click)="logout()">
                     Log out
                   </button>
                 </div>
@@ -230,148 +91,37 @@
             }
           </div>
         } @else {
-          <a
-            routerLink="/login"
-            routerLinkActive="bg-brand-pink text-brand-plum"
-            class="btn btn-secondary"
-          >
+          <a routerLink="/login" routerLinkActive="bg-brand-pink text-brand-plum" class="btn btn-secondary">
             Login
           </a>
 
-          <a
-            routerLink="/register"
-            routerLinkActive="bg-brand-pink text-brand-plum"
-            class="btn btn-secondary"
-          >
+          <a routerLink="/register" routerLinkActive="bg-brand-pink text-brand-plum" class="btn btn-secondary">
             Register
           </a>
         }
       </div>
     </div>
 
-    @if (
-      isAuthenticated() &&
-      mobileMenuOpen
-      ) {
-      <div
-        id="mobile-navigation"
-        class="border-t border-brand-peach/30 py-3 xl:hidden"
-      >
+    @if (isAuthenticated() && mobileMenuOpen) {
+      <div id="mobile-navigation" class="border-t border-brand-peach/30 py-3 xl:hidden">
         <div class="mb-3 md:hidden">
-          <label
-            class="mb-1 block text-sm font-semibold"
-            for="mobilePatientContext"
-          >
-            Patient context
-          </label>
-
-          <select
-            id="mobilePatientContext"
-            class="w-full rounded-md border border-brand-peach bg-brand-off-white px-3 py-2 text-sm font-medium text-brand-plum disabled:cursor-not-allowed disabled:opacity-60"
-            [value]="selectedPatientRecordId() ?? ''"
-            [disabled]="
-              isPatientContextLoading() ||
-              patientContextLoadFailed()
-            "
-            (change)="selectPatient($event)"
-          >
-            @if (isPatientContextLoading()) {
-              <option value="">
-                Loading patients...
-              </option>
-            } @else if (patientContextLoadFailed()) {
-              <option value="">
-                Unable to load patients
-              </option>
-            } @else if (patientContexts().length === 0) {
-              <option value="">
-                No patient access
-              </option>
-            } @else {
-              @for (
-                context of patientContexts();
-                track context.patientRecordId
-                ) {
-                <option
-                  [value]="context.patientRecordId"
-                  [disabled]="!canSelectPatient(context)"
-                >
-                  {{ patientContextLabel(context) }}{{
-                    canSelectPatient(context)
-                      ? ''
-                      : ' — View unavailable'
-                  }}
-                </option>
-              }
-            }
-          </select>
+          <app-patient-context-selector selectId="mobilePatientContext" [showLabel]="true" [fullWidth]="true" />
         </div>
 
         <div class="flex flex-col gap-1">
-          <a
-            routerLink="/home"
-            routerLinkActive="bg-brand-pink text-brand-plum"
-            [routerLinkActiveOptions]="{
-              exact: true
-            }"
-            class="btn btn-ghost w-full justify-start"
-            (click)="closeMenus()"
-          >
-            Dashboard
-          </a>
-
-          @if (canViewPatientRecord()) {
-            <a
-              routerLink="/patient"
-              routerLinkActive="bg-brand-pink text-brand-plum"
-              class="btn btn-ghost w-full justify-start"
-              (click)="closeMenus()"
-            >
-              Patient Record
-            </a>
+          @for (item of navigationItems; track item.route) {
+            @if (canViewNavigationItem(item)) {
+              <a
+                [routerLink]="item.route"
+                routerLinkActive="bg-brand-pink text-brand-plum"
+                [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+                class="btn btn-ghost w-full justify-start"
+                (click)="closeMenus()"
+              >
+                {{ item.label }}
+              </a>
+            }
           }
-
-          @if (canViewDocuments()) {
-            <a
-              routerLink="/documents"
-              routerLinkActive="bg-brand-pink text-brand-plum"
-              class="btn btn-ghost w-full justify-start"
-              (click)="closeMenus()"
-            >
-              Documents
-            </a>
-          }
-
-          @if (canViewAppointments()) {
-            <a
-              routerLink="/appointments"
-              routerLinkActive="bg-brand-pink text-brand-plum"
-              class="btn btn-ghost w-full justify-start"
-              (click)="closeMenus()"
-            >
-              Appointments
-            </a>
-          }
-
-          @if (canViewMedicalHistory()) {
-            <a
-              routerLink="/medical-history"
-              routerLinkActive="bg-brand-pink text-brand-plum"
-              class="btn btn-ghost w-full justify-start"
-              (click)="closeMenus()"
-            >
-              Medical History
-            </a>
-          }
-
-          <a
-            routerLink="/care-network"
-            routerLinkActive="bg-brand-pink text-brand-plum"
-            class="btn btn-ghost w-full justify-start"
-            (click)="closeMenus()"
-          >
-            Care Network
-          </a>
         </div>
       </div>
     }

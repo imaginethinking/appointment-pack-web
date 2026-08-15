@@ -1,91 +1,70 @@
-import {Component, inject,} from '@angular/core';
-import {Router, RouterLink, RouterLinkActive,} from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
-import {AuthService,} from '../../../core/services/auth-service';
-import {
-  getPatientContextName,
-  SelectedPatientContext,
-} from '../../../features/patient-context/models/selected-patient-context';
-import {PatientContextAuthorisation,} from '../../../features/patient-context/services/patient-context-auth';
-import {PatientContextCoordinator,} from '../../../features/patient-context/services/patient-context-coordinator';
-import {SelectedPatientState,} from '../../../features/patient-context/services/selected-patient-state';
+import { Permission } from '../../../core/models/permission-model';
+import { AuthService } from '../../../core/services/auth-service';
+import { PatientContextAuthorisation } from '../../../features/patient-context/services/patient-context-auth';
+import { SelectedPatientState } from '../../../features/patient-context/services/selected-patient-state';
+import { PatientContextSelector } from '../patient-context-selector/patient-context-selector';
+
+interface NavigationItem {
+  label: string;
+  route: string;
+  permission?: Permission;
+  exact?: boolean;
+}
+
+const NAVIGATION_ITEMS: readonly NavigationItem[] = [
+  {
+    label: 'Dashboard',
+    route: '/home',
+    exact: true,
+  },
+  {
+    label: 'Patient Record',
+    route: '/patient',
+    permission: 'patient-record:view',
+  },
+  {
+    label: 'Documents',
+    route: '/documents',
+    permission: 'document:view',
+  },
+  {
+    label: 'Appointments',
+    route: '/appointments',
+    permission: 'appointment:view',
+  },
+  {
+    label: 'Medical History',
+    route: '/medical-history',
+    permission: 'history:view',
+  },
+  {
+    label: 'Care Network',
+    route: '/care-network',
+  },
+];
 
 @Component({
   selector: 'app-navbar',
-  imports: [
-    RouterLink,
-    RouterLinkActive,
-  ],
+  imports: [RouterLink, RouterLinkActive, PatientContextSelector],
   templateUrl: './navbar.html',
-  styleUrl: './navbar.css',
 })
 export class Navbar {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly selectedPatientState = inject(SelectedPatientState);
   private readonly authorisation = inject(PatientContextAuthorisation);
-  private readonly patientContextCoordinator = inject(PatientContextCoordinator);
 
   protected readonly isAuthenticated = this.authService.authenticated;
-  protected readonly patientContexts = this.selectedPatientState.contexts;
-  protected readonly selectedPatient = this.selectedPatientState.selectedPatient;
-  protected readonly selectedPatientRecordId = this.selectedPatientState.selectedPatientRecordId;
-  protected readonly isPatientContextLoading = this.patientContextCoordinator.isLoading;
-  protected readonly patientContextLoadFailed = this.patientContextCoordinator.loadFailed;
+  protected readonly navigationItems = NAVIGATION_ITEMS;
 
   protected mobileMenuOpen = false;
   protected profileMenuOpen = false;
 
-  protected canViewPatientRecord(): boolean {
-    return this.authorisation.can(
-      this.selectedPatient(),
-      'patient-record',
-      'view'
-    );
-  }
-
-  protected canViewDocuments(): boolean {
-    return this.authorisation.can(
-      this.selectedPatient(),
-      'document',
-      'view'
-    );
-  }
-
-  protected canViewAppointments(): boolean {
-    return this.authorisation.can(
-      this.selectedPatient(),
-      'appointment',
-      'view'
-    );
-  }
-
-  protected canViewMedicalHistory(): boolean {
-    return this.authorisation.can(
-      this.selectedPatient(),
-      'history',
-      'view'
-    );
-  }
-
-  protected canSelectPatient(context: SelectedPatientContext): boolean {
-    return this.selectedPatientState.canSelect(context,);
-  }
-
-  protected patientContextLabel(context: SelectedPatientContext): string {
-    const relationshipLabel = context.contextType === 'SELF' ? 'Your record' : 'Carer access';
-
-    return `${getPatientContextName(context)} — ${relationshipLabel}`;
-  }
-
-  protected selectPatient(event: Event): void {
-    const patientRecordId = (event.target as HTMLSelectElement).value;
-
-    if (patientRecordId.length === 0) {
-      return;
-    }
-
-    this.selectedPatientState.selectPatient(patientRecordId);
+  protected canViewNavigationItem(item: NavigationItem): boolean {
+    return item.permission === undefined || this.authorisation.has(this.selectedPatientState.selectedPatient(), item.permission);
   }
 
   protected toggleMobileMenu(): void {
@@ -106,7 +85,6 @@ export class Navbar {
   protected logout(): void {
     this.authService.logout();
     this.closeMenus();
-
     void this.router.navigate(['/login']);
   }
 }
