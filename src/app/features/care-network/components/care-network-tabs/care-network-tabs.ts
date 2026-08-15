@@ -5,6 +5,5 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   selector: 'app-care-network-tabs',
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './care-network-tabs.html',
-  styleUrl: './care-network-tabs.css',
 })
 export class CareNetworkTabs {}
