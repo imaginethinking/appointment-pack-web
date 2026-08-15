@@ -17,7 +17,11 @@ export class PatientCarerAccessApiService {
   private readonly accessUrl = `${environment.apiBaseUrl}/patient-carer-access`;
 
   inviteCarer(request: CreateCarerInvitationRequest): Observable<PatientCarerAccessResponse> {
-    return this.http.post<PatientCarerAccessResponse>(`${this.accessUrl}/invitation`, request);
+    return this.http.post<PatientCarerAccessResponse>(this.accessUrl, request);
+  }
+
+  getRelationship(accessId: string): Observable<PatientCarerAccessResponse> {
+    return this.http.get<PatientCarerAccessResponse>(`${this.accessUrl}/${accessId}`);
   }
 
   getAsPatient(): Observable<PatientCarerAccessResponse[]> {
@@ -44,8 +48,8 @@ export class PatientCarerAccessApiService {
     return this.patchStatus(accessId, 'revoke');
   }
 
-  updatePermissions(accessId: string, request: UpdatePatientCarerPermissionsRequest,): Observable<PatientCarerAccessResponse> {
-    return this.http.patch<PatientCarerAccessResponse>(`${this.accessUrl}/${accessId}/permissions`, request);
+  updatePermissions(accessId: string, request: UpdatePatientCarerPermissionsRequest): Observable<PatientCarerAccessResponse> {
+    return this.http.put<PatientCarerAccessResponse>(`${this.accessUrl}/${accessId}/permissions`, request);
   }
 
   private patchStatus(accessId: string, action: 'accept' | 'decline' | 'cancel' | 'revoke'): Observable<PatientCarerAccessResponse> {
