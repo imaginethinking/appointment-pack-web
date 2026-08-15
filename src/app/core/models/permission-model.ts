@@ -1,13 +1,13 @@
 export const PERMISSION_CATALOG = {
   'patient-record': ['view', 'edit'],
-  'document': ['view', 'edit', 'upload'],
-  'appointment': ['view', 'edit'],
-  'medication': ['view', 'edit'],
-  'contact': ['view', 'edit'],
+  document: ['view', 'edit', 'upload'],
+  appointment: ['view', 'edit'],
+  medication: ['view', 'edit'],
+  contact: ['view', 'edit'],
   'blood-result': ['view', 'edit'],
-  'history': ['view', 'edit'],
+  history: ['view', 'edit'],
   'appointment-pack': ['view', 'create'],
-  'audit': ['view'],
+  audit: ['view'],
 } as const;
 
 export type PermissionResource = keyof typeof PERMISSION_CATALOG;
@@ -111,6 +111,7 @@ export const PERMISSION_GROUPS: readonly PermissionGroup[] = [
 ];
 
 export const PERMISSION_DEPENDENCIES: Readonly<Partial<Record<Permission, readonly Permission[]>>> = buildPermissionDependencies();
+export const PERMISSION_DEPENDENTS: Readonly<Partial<Record<Permission, readonly Permission[]>>> = buildPermissionDependents();
 
 export function buildPermission<R extends PermissionResource>(resource: R, action: PermissionAction<R>): `${R}:${PermissionAction<R>}` {
   return `${resource}:${action}` as `${R}:${PermissionAction<R>}`;
@@ -119,6 +120,12 @@ export function buildPermission<R extends PermissionResource>(resource: R, actio
 export function addPermissionWithDependencies(selectedPermissions: ReadonlySet<Permission>, permission: Permission): ReadonlySet<Permission> {
   const permissions = new Set(selectedPermissions);
   addPermission(permissions, permission);
+  return permissions;
+}
+
+export function removePermissionWithDependents(selectedPermissions: ReadonlySet<Permission>, permission: Permission): ReadonlySet<Permission> {
+  const permissions = new Set(selectedPermissions);
+  removePermission(permissions, permission);
   return permissions;
 }
 
@@ -151,14 +158,32 @@ function buildPermissionDependencies(): Partial<Record<Permission, readonly Perm
   return dependencies;
 }
 
-function addPermission(permissions: Set<Permission>, permission: Permission): void {
-  if (permissions.has(permission)) {
-    return;
+function buildPermissionDependents(): Partial<Record<Permission, readonly Permission[]>> {
+  const dependents: Partial<Record<Permission, Permission[]>> = {};
+
+  for (const group of PERMISSION_GROUPS) {
+    for (const option of group.permissions) {
+      for (const dependency of option.dependencies) {
+        dependents[dependency] = [...(dependents[dependency] ?? []), option.permission];
+      }
+    }
   }
 
+  return dependents;
+}
+
+function addPermission(permissions: Set<Permission>, permission: Permission): void {
   permissions.add(permission);
 
   for (const dependency of PERMISSION_DEPENDENCIES[permission] ?? []) {
     addPermission(permissions, dependency);
   }
+}
+
+function removePermission(permissions: Set<Permission>, permission: Permission): void {
+  for (const dependent of PERMISSION_DEPENDENTS[permission] ?? []) {
+    removePermission(permissions, dependent);
+  }
+
+  permissions.delete(permission);
 }

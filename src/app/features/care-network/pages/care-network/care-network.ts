@@ -7,7 +7,11 @@ import { finalize } from 'rxjs';
 import { applyServerFieldErrors } from '../../../../core/forms/server-field-errors';
 import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
 import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
-import { addPermissionWithDependencies, Permission } from '../../../../core/models/permission-model';
+import {
+  addPermissionWithDependencies,
+  Permission,
+  removePermissionWithDependents,
+} from '../../../../core/models/permission-model';
 import { PersonalPatientRecordState } from '../../../patient-record/services/personal-patient-record-state';
 import { CareNetworkTabs } from '../../components/care-network-tabs/care-network-tabs';
 import { PermissionBadges } from '../../components/permission-badges/permission-badges';
@@ -196,13 +200,9 @@ export class CareNetwork implements OnInit {
   }
 
   private updatePermissionSelection(selectedPermissions: ReadonlySet<Permission>, permission: Permission, checked: boolean): ReadonlySet<Permission> {
-    if (checked) {
-      return addPermissionWithDependencies(selectedPermissions, permission);
-    }
-
-    const permissions = new Set(selectedPermissions);
-    permissions.delete(permission);
-    return permissions;
+    return checked
+      ? addPermissionWithDependencies(selectedPermissions, permission)
+      : removePermissionWithDependents(selectedPermissions, permission);
   }
 
   private clearMessages(): void {

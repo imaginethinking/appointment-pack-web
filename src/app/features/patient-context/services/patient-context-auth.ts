@@ -33,19 +33,24 @@ export class PatientContextAuthorisation {
     return permissions.some((permission) => this.has(context, permission));
   }
 
-  can<R extends PermissionResource>(
-    context: SelectedPatientContext | null,
-    resource: R,
-    action: PermissionAction<R>,
-  ): boolean {
+  can<R extends PermissionResource>(context: SelectedPatientContext | null, resource: R, action: PermissionAction<R>): boolean {
     const permission = buildPermission(resource, action) as Permission;
+    return this.hasWithDependencies(context, permission, new Set());
+  }
 
+  private hasWithDependencies(context: SelectedPatientContext | null, permission: Permission, visited: Set<Permission>): boolean {
     if (!this.has(context, permission)) {
       return false;
     }
 
-    const dependencies = PERMISSION_DEPENDENCIES[permission] ?? [];
+    if (visited.has(permission)) {
+      return true;
+    }
 
-    return this.hasAll(context, dependencies);
+    visited.add(permission);
+
+    return (PERMISSION_DEPENDENCIES[permission] ?? []).every(
+      (dependency) => this.hasWithDependencies(context, dependency, visited),
+    );
   }
 }
