@@ -1,0 +1,38 @@
+<div class="space-y-5">
+  @for (group of permissionGroups; track group.label) {
+    <fieldset>
+      <legend class="font-semibold text-brand-plum">
+        {{ group.label }} permissions
+      </legend>
+
+      <div class="mt-3 space-y-3">
+        @for (option of group.permissions; track option.permission) {
+          <label class="flex items-start gap-3">
+            <input
+              type="checkbox"
+              class="mt-1"
+              [checked]="selectedPermissions().has(option.permission)"
+              (change)="togglePermission(option.permission, $event)"
+            />
+
+            <span>
+              <span class="block font-medium text-brand-plum">
+                {{ option.label }}
+              </span>
+
+              @if (showDescriptions()) {
+                <span class="text-sm text-brand-plum/70">
+                  {{ option.description }}
+                </span>
+              }
+            </span>
+          </label>
+        }
+      </div>
+    </fieldset>
+  }
+</div>
+
+<p class="mt-5 text-sm text-brand-plum/70">
+  Required prerequisite permissions are selected automatically. The server validates the final permission set.
+</p>

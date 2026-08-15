@@ -1,0 +1,15 @@
+<div class="flex flex-wrap gap-2">
+  @for (option of permissionOptions; track option.permission) {
+    @if (hasPermission(option.permission)) {
+      <span class="rounded-full bg-brand-pink px-3 py-1 text-sm text-brand-plum">
+        {{ option.label }}
+      </span>
+    }
+  }
+
+  @if (permissions().length === 0) {
+    <span class="text-sm text-brand-plum/70">
+      No permissions granted
+    </span>
+  }
+</div>

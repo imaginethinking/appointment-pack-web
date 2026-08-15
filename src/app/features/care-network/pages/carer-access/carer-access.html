@@ -1,84 +1,42 @@
 <section class="mx-auto max-w-5xl">
   <div class="mb-6">
-    <h1 class="text-3xl font-bold text-brand-plum">
-      Care network
-    </h1>
-
+    <h1 class="text-3xl font-bold text-brand-plum">Care network</h1>
     <p class="mt-1 text-brand-plum/70">
       Manage your carers and review patients who have shared access with you.
     </p>
   </div>
 
-  <nav
-    class="mb-8 flex gap-6 border-b border-brand-plum/20"
-    aria-label="Care network"
-  >
-    <a
-      routerLink="/care-network/carers"
-      routerLinkActive="border-brand-plum text-brand-plum"
-      ariaCurrentWhenActive="page"
-      class="border-b-2 border-transparent px-1 pb-3 font-semibold text-brand-plum/60 hover:text-brand-plum"
-    >
-      Manage carers
-    </a>
-
-    <a
-      routerLink="/care-network/patients"
-      routerLinkActive="border-brand-plum text-brand-plum"
-      ariaCurrentWhenActive="page"
-      class="border-b-2 border-transparent px-1 pb-3 font-semibold text-brand-plum/60 hover:text-brand-plum"
-    >
-      Patient access
-    </a>
-  </nav>
+  <app-care-network-tabs />
 
   @if (successMessage()) {
-    <div
-      class="mb-6 rounded-lg border border-brand-mint bg-brand-off-white p-4 text-brand-plum"
-      role="status"
-    >
+    <div class="mb-6 rounded-lg border border-brand-mint bg-brand-off-white p-4 text-brand-plum" role="status">
       {{ successMessage() }}
     </div>
   }
 
   @if (errorMessage()) {
-    <div
-      class="mb-6 rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral"
-      role="alert"
-    >
+    <div class="mb-6 rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral" role="alert">
       {{ errorMessage() }}
     </div>
   }
 
   @if (contextLoadFailed()) {
-    <div
-      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
-      role="alert"
-    >
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
       <p class="text-brand-coral">
         Unable to load your patient invitations and access.
       </p>
 
-      <button
-        type="button"
-        class="btn btn-secondary mt-4"
-        (click)="retryLoad()"
-      >
+      <button type="button" class="btn btn-secondary mt-4" (click)="retryLoad()">
         Try again
       </button>
     </div>
   } @else if (isLoading()) {
-    <div
-      class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum"
-      role="status"
-    >
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">
       Loading your patient access...
     </div>
   } @else {
     <section class="mb-8">
-      <h2 class="mb-4 text-xl font-semibold text-brand-plum">
-        Pending invitations
-      </h2>
+      <h2 class="mb-4 text-xl font-semibold text-brand-plum">Pending invitations</h2>
 
       @if (pendingRelationships().length === 0) {
         <p class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5 text-brand-plum/70">
@@ -90,13 +48,9 @@
             <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5">
               <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <h3 class="font-semibold text-brand-plum">
-                    {{ patientName(relationship) }}
-                  </h3>
-
+                  <h3 class="font-semibold text-brand-plum">{{ patientName(relationship) }}</h3>
                   <p class="mt-1 text-sm text-brand-plum/70">
-                    Invited:
-                    {{ relationship.invitedAt | date: 'd MMMM y, HH:mm' }}
+                    Invited: {{ relationship.invitedAt | date: 'd MMMM y, HH:mm' }}
                   </p>
                 </div>
 
@@ -105,23 +59,7 @@
                 </span>
               </div>
 
-              <div class="mt-4 flex flex-wrap gap-2">
-                @for (group of permissionGroups; track group.label) {
-                  @for (option of group.permissions; track option.permission) {
-                    @if (hasPermission(relationship, option.permission)) {
-                      <span class="rounded-full bg-brand-pink px-3 py-1 text-sm text-brand-plum">
-                        {{ option.label }}
-                      </span>
-                    }
-                  }
-                }
-
-                @if (relationship.permissions.length === 0) {
-                  <span class="text-sm text-brand-plum/70">
-                    No permissions granted
-                  </span>
-                }
-              </div>
+              <app-permission-badges class="mt-4 block" [permissions]="relationship.permissions" />
 
               <div class="mt-5 flex flex-wrap gap-3">
                 <button
@@ -149,9 +87,7 @@
     </section>
 
     <section class="mb-8">
-      <h2 class="mb-4 text-xl font-semibold text-brand-plum">
-        Active patient access
-      </h2>
+      <h2 class="mb-4 text-xl font-semibold text-brand-plum">Active patient access</h2>
 
       @if (activeRelationships().length === 0) {
         <p class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5 text-brand-plum/70">
@@ -163,13 +99,9 @@
             <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5">
               <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <h3 class="font-semibold text-brand-plum">
-                    {{ patientName(relationship) }}
-                  </h3>
-
+                  <h3 class="font-semibold text-brand-plum">{{ patientName(relationship) }}</h3>
                   <p class="mt-1 text-sm text-brand-plum/70">
-                    Access updated:
-                    {{ relationship.statusChangedAt | date: 'd MMMM y, HH:mm' }}
+                    Access updated: {{ relationship.statusChangedAt | date: 'd MMMM y, HH:mm' }}
                   </p>
                 </div>
 
@@ -178,34 +110,14 @@
                 </span>
               </div>
 
-              <div class="mt-4 flex flex-wrap gap-2">
-                @for (group of permissionGroups; track group.label) {
-                  @for (option of group.permissions; track option.permission) {
-                    @if (hasPermission(relationship, option.permission)) {
-                      <span class="rounded-full bg-brand-pink px-3 py-1 text-sm text-brand-plum">
-                        {{ option.label }}
-                      </span>
-                    }
-                  }
-                }
-
-                @if (relationship.permissions.length === 0) {
-                  <span class="text-sm text-brand-plum/70">
-                    No permissions granted
-                  </span>
-                }
-              </div>
+              <app-permission-badges class="mt-4 block" [permissions]="relationship.permissions" />
 
               <div class="mt-5">
                 <button
                   type="button"
                   class="btn btn-primary"
                   [disabled]="!canOpenPatient(relationship)"
-                  [attr.title]="
-                    canOpenPatient(relationship)
-                      ? null
-                      : 'Patient-record viewing permission has not been granted.'
-                  "
+                  [attr.title]="canOpenPatient(relationship) ? null : 'Patient-record viewing permission has not been granted.'"
                   (click)="openPatient(relationship)"
                 >
                   Open patient record
@@ -224,9 +136,7 @@
     </section>
 
     <section>
-      <h2 class="mb-4 text-xl font-semibold text-brand-plum">
-        Relationship history
-      </h2>
+      <h2 class="mb-4 text-xl font-semibold text-brand-plum">Relationship history</h2>
 
       @if (inactiveRelationships().length === 0) {
         <p class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5 text-brand-plum/70">
@@ -238,13 +148,9 @@
             <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5">
               <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <h3 class="font-semibold text-brand-plum">
-                    {{ patientName(relationship) }}
-                  </h3>
-
+                  <h3 class="font-semibold text-brand-plum">{{ patientName(relationship) }}</h3>
                   <p class="mt-1 text-sm text-brand-plum/70">
-                    Status changed:
-                    {{ relationship.statusChangedAt | date: 'd MMMM y, HH:mm' }}
+                    Status changed: {{ relationship.statusChangedAt | date: 'd MMMM y, HH:mm' }}
                   </p>
                 </div>
 
