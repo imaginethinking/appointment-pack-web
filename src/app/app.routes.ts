@@ -1,31 +1,34 @@
-import {Routes} from '@angular/router';
+import { Routes } from '@angular/router';
 
-import {authGuard} from './core/guards/auth-guard';
-import {mfaLoginGuard} from './core/guards/mfa-login-guard';
-import {patientContextLoadGuard} from './core/guards/patient-context-load-guard';
-import {selectedPatientPermissionGuard} from './core/guards/selected-patient-permission-guard';
-import {AppointmentList} from './features/appointments/pages/appointment-list/appointment-list';
-import {Login} from './features/auth/pages/login/login';
-import {MfaLogin} from './features/auth/pages/mfa-login/mfa-login';
-import {Register} from './features/auth/pages/register/register';
-import {CareNetwork} from './features/care-network/pages/care-network/care-network';
-import {CarerAccess} from './features/care-network/pages/carer-access/carer-access';
-import {AppointmentReview} from './features/documents/pages/appointment-review/appointment-review';
-import {DeidentificationReview} from './features/documents/pages/deidentification-review/deidentification-review';
-import {DocumentDetails} from './features/documents/pages/document-details/document-details';
-import {DocumentList} from './features/documents/pages/document-list/document-list';
-import {DocumentUpload} from './features/documents/pages/document-upload/document-upload';
-import {SummaryReview} from './features/documents/pages/summary-review/summary-review';
-import {AccessDenied} from './features/errors/pages/access-denied/access-denied';
-import {NotFound} from './features/errors/pages/not-found/not-found';
-import {Home} from './features/home/pages/home/home';
-import {MedicalHistory} from './features/medical-history/pages/medical-history/medical-history';
-import {PatientRecord} from './features/patient-record/pages/patient-record/patient-record';
-import {PatientRecordCreate} from './features/patient-record/pages/patient-record-create/patient-record-create';
-import {PatientRecordEdit} from './features/patient-record/pages/patient-record-edit/patient-record-edit';
-import {MfaSettings} from './features/profile/pages/mfa-settings/mfa-settings';
-import {Profile} from './features/profile/pages/profile/profile';
-import {ProfileEdit} from './features/profile/pages/profile-edit/profile-edit';
+import { authGuard } from './core/guards/auth-guard';
+import { mfaLoginGuard } from './core/guards/mfa-login-guard';
+import { patientContextLoadGuard } from './core/guards/patient-context-load-guard';
+import { selectedPatientPermissionGuard } from './core/guards/selected-patient-permission-guard';
+import { AppointmentList } from './features/appointments/pages/appointment-list/appointment-list';
+import { ForgotPassword } from './features/auth/pages/forgot-password/forgot-password';
+import { Login } from './features/auth/pages/login/login';
+import { MfaLogin } from './features/auth/pages/mfa-login/mfa-login';
+import { Register } from './features/auth/pages/register/register';
+import { ResetPassword } from './features/auth/pages/reset-password/reset-password';
+import { VerifyEmail } from './features/auth/pages/verify-email/verify-email';
+import { CareNetwork } from './features/care-network/pages/care-network/care-network';
+import { CarerAccess } from './features/care-network/pages/carer-access/carer-access';
+import { AppointmentReview } from './features/documents/pages/appointment-review/appointment-review';
+import { DeidentificationReview } from './features/documents/pages/deidentification-review/deidentification-review';
+import { DocumentDetails } from './features/documents/pages/document-details/document-details';
+import { DocumentList } from './features/documents/pages/document-list/document-list';
+import { DocumentUpload } from './features/documents/pages/document-upload/document-upload';
+import { SummaryReview } from './features/documents/pages/summary-review/summary-review';
+import { AccessDenied } from './features/errors/pages/access-denied/access-denied';
+import { NotFound } from './features/errors/pages/not-found/not-found';
+import { Home } from './features/home/pages/home/home';
+import { MedicalHistory } from './features/medical-history/pages/medical-history/medical-history';
+import { PatientRecordCreate } from './features/patient-record/pages/patient-record-create/patient-record-create';
+import { PatientRecordEdit } from './features/patient-record/pages/patient-record-edit/patient-record-edit';
+import { PatientRecord } from './features/patient-record/pages/patient-record/patient-record';
+import { MfaSettings } from './features/profile/pages/mfa-settings/mfa-settings';
+import { ProfileEdit } from './features/profile/pages/profile-edit/profile-edit';
+import { Profile } from './features/profile/pages/profile/profile';
 
 export const routes: Routes = [
   {
@@ -45,6 +48,18 @@ export const routes: Routes = [
     path: 'login/mfa',
     component: MfaLogin,
     canActivate: [mfaLoginGuard],
+  },
+  {
+    path: 'verify-email',
+    component: VerifyEmail,
+  },
+  {
+    path: 'forgot-password',
+    component: ForgotPassword,
+  },
+  {
+    path: 'reset-password',
+    component: ResetPassword,
   },
   {
     path: '',
