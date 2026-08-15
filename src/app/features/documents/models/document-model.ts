@@ -1,3 +1,5 @@
+import { AddressResponse } from '../../../shared/models/address-model';
+
 export const DOCUMENT_TYPES = ['APPOINTMENT_LETTER', 'CONSULTATION_OUTCOME_LETTER'] as const;
 export type DocumentType = typeof DOCUMENT_TYPES[number];
 
@@ -15,6 +17,9 @@ export const DOCUMENT_STATUSES = [
   'ARCHIVED',
 ] as const;
 export type DocumentStatus = typeof DOCUMENT_STATUSES[number];
+
+export const DOCUMENT_CONTENT_TYPES = ['application/pdf', 'image/jpeg', 'image/png'] as const;
+export type DocumentContentType = typeof DOCUMENT_CONTENT_TYPES[number];
 
 export const SUMMARY_SOURCES = ['DETERMINISTIC', 'OPENAI', 'MANUAL'] as const;
 export type SummarySource = typeof SUMMARY_SOURCES[number];
@@ -48,25 +53,16 @@ export interface DocumentResponse {
   id: string;
   patientRecordId: string;
   documentType: DocumentType;
-  originalFileName: string;
-  contentType: string;
-  fileSize: number;
   status: DocumentStatus;
+  originalFileName: string;
+  contentType: DocumentContentType;
+  fileSize: number;
   createdAt: string;
 }
 
 export interface DocumentModelMetadata {
   name: string;
   promptVersion: string;
-}
-
-export interface AppointmentAddressDetails {
-  addressLine1: string | null;
-  addressLine2: string | null;
-  townCity: string | null;
-  county: string | null;
-  postcode: string | null;
-  country: string | null;
 }
 
 export interface AppointmentDetailsResponse {
@@ -77,14 +73,14 @@ export interface AppointmentDetailsResponse {
   appointmentType: string | null;
   clinicianOrTeam: string | null;
   locationName: string | null;
-  address: AppointmentAddressDetails | null;
+  address: AddressResponse | null;
 }
 
 export interface DocumentProcessingResultResponse {
   documentId: string;
   documentType: DocumentType;
   status: DocumentStatus;
-  extractedText: string;
+  extractedText: string | null;
   machineDeidentifiedText: string | null;
   approvedDeidentifiedText: string | null;
   appointmentDetails: AppointmentDetailsResponse | null;
@@ -92,7 +88,7 @@ export interface DocumentProcessingResultResponse {
   reviewedSummary: string | null;
   summarySource: SummarySource | null;
   processingWarning: string | null;
-  processorVersion: string;
+  processorVersion: string | null;
   model: DocumentModelMetadata | null;
   appointmentReviewedByUserId: string | null;
   appointmentReviewedAt: string | null;

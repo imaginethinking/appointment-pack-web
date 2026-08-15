@@ -1,13 +1,6 @@
-export interface AppointmentAddressInput {
-  addressLine1: string | null;
-  addressLine2: string | null;
-  townCity: string | null;
-  county: string | null;
-  postcode: string | null;
-  country: string | null;
-}
+import { AddressResponse, PartialAddressRequest } from '../../../shared/models/address-model';
 
-export interface AppointmentConfirmationRequest {
+export interface AppointmentRequest {
   date: string;
   startTime: string;
   endTime: string | null;
@@ -15,9 +8,13 @@ export interface AppointmentConfirmationRequest {
   appointmentType: string | null;
   clinicianOrTeam: string | null;
   locationName: string | null;
-  address: AppointmentAddressInput | null;
+  address: PartialAddressRequest | null;
   notes: string | null;
 }
+
+export type CreateAppointmentRequest = AppointmentRequest;
+export type UpdateAppointmentRequest = AppointmentRequest;
+export type AppointmentConfirmationRequest = AppointmentRequest;
 
 export interface AppointmentResponse {
   id: string;
@@ -29,7 +26,10 @@ export interface AppointmentResponse {
   appointmentType: string | null;
   clinicianOrTeam: string | null;
   locationName: string | null;
-  address: AppointmentAddressInput | null;
+  address: AddressResponse | null;
   notes: string | null;
   sourceDocumentId: string | null;
+  archivedAt: string | null;
 }
+
+export type AppointmentAddressInput = PartialAddressRequest;

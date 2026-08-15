@@ -1,20 +1,4 @@
-export interface AddressResponse {
-  addressLine1: string;
-  addressLine2: string | null;
-  townCity: string;
-  county: string | null;
-  postcode: string;
-  country: string;
-}
-
-export interface AddressRequest {
-  addressLine1: string;
-  addressLine2: string | null;
-  townCity: string;
-  county: string | null;
-  postcode: string;
-  country: string;
-}
+import { AddressRequest, AddressResponse } from '../../../shared/models/address-model';
 
 export interface ProfileResponse {
   id: string;
