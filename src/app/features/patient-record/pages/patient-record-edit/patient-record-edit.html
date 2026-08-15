@@ -1,107 +1,43 @@
 <section class="mx-auto max-w-3xl">
   <div class="mb-6">
-    <a
-      routerLink="/patient"
-      class="mb-5 inline-flex text-brand-plum underline"
-    >
+    <a routerLink="/patient" class="mb-5 inline-flex text-brand-plum underline">
       Back to patient record
     </a>
 
-    <h1 class="text-3xl font-bold text-brand-plum">
-      Edit patient record
-    </h1>
+    <h1 class="text-3xl font-bold text-brand-plum">Edit patient record</h1>
 
     @if (selectedPatient()) {
-      <p class="mt-1 text-brand-plum/70">
-        {{ selectedPatientName() }}
-      </p>
+      <p class="mt-1 text-brand-plum/70">{{ selectedPatientName() }}</p>
     }
   </div>
 
   @if (status() === 'loading') {
-    <div
-      class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum"
-      role="status"
-    >
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">
       Loading the patient record...
     </div>
   } @else if (status() === 'no-selection') {
     <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-8 text-center">
-      <h2 class="text-xl font-semibold text-brand-plum">
-        No patient selected
-      </h2>
-
-      <p class="mt-2 text-brand-plum/70">
-        Select an accessible patient before editing a patient record.
-      </p>
-
-      <a
-        routerLink="/patient"
-        class="btn btn-primary mt-6"
-      >
-        Return to patient record
-      </a>
+      <h2 class="text-xl font-semibold text-brand-plum">No patient selected</h2>
+      <p class="mt-2 text-brand-plum/70">Select an accessible patient before editing a patient record.</p>
+      <a routerLink="/patient" class="btn btn-primary mt-6">Return to patient record</a>
     </div>
   } @else if (status() === 'forbidden') {
-    <div
-      class="rounded-lg border border-brand-coral bg-brand-off-white p-8 text-center"
-      role="alert"
-    >
-      <h2 class="text-xl font-semibold text-brand-plum">
-        Editing unavailable
-      </h2>
-
-      <p class="mt-2 text-brand-plum/70">
-        You no longer have permission to edit this patient record.
-      </p>
-
-      <a
-        routerLink="/patient"
-        class="btn btn-primary mt-6"
-      >
-        Return to patient record
-      </a>
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-8 text-center" role="alert">
+      <h2 class="text-xl font-semibold text-brand-plum">Editing unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">You no longer have permission to edit this patient record.</p>
+      <a routerLink="/patient" class="btn btn-primary mt-6">Return to patient record</a>
     </div>
   } @else if (status() === 'not-found') {
-    <div
-      class="rounded-lg border border-brand-coral bg-brand-off-white p-8 text-center"
-      role="alert"
-    >
-      <h2 class="text-xl font-semibold text-brand-plum">
-        Patient record not found
-      </h2>
-
-      <p class="mt-2 text-brand-plum/70">
-        The selected patient record no longer exists or is no longer available.
-      </p>
-
-      <a
-        routerLink="/patient"
-        class="btn btn-primary mt-6"
-      >
-        Return to patient record
-      </a>
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-8 text-center" role="alert">
+      <h2 class="text-xl font-semibold text-brand-plum">Patient record not found</h2>
+      <p class="mt-2 text-brand-plum/70">The selected patient record no longer exists or is no longer available.</p>
+      <a routerLink="/patient" class="btn btn-primary mt-6">Return to patient record</a>
     </div>
   } @else if (status() === 'error') {
-    <div
-      class="rounded-lg border border-brand-coral bg-brand-off-white p-8 text-center"
-      role="alert"
-    >
-      <h2 class="text-xl font-semibold text-brand-plum">
-        Unable to load patient record
-      </h2>
-
-      <p class="mt-2 text-brand-coral">
-        {{ errorMessage() }}
-      </p>
-
-      <button
-        type="button"
-        class="btn btn-primary mt-6"
-        (click)="retry()"
-      >
-        Try again
-      </button>
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-8 text-center" role="alert">
+      <h2 class="text-xl font-semibold text-brand-plum">Unable to load patient record</h2>
+      <p class="mt-2 text-brand-coral">{{ errorMessage() }}</p>
+      <button type="button" class="btn btn-primary mt-6" (click)="retry()">Try again</button>
     </div>
   } @else if (status() === 'ready') {
     <form
@@ -111,119 +47,71 @@
       (ngSubmit)="save()"
     >
       <fieldset>
-        <legend class="text-xl font-semibold text-brand-plum">
-          Healthcare identifiers
-        </legend>
+        <legend class="text-xl font-semibold text-brand-plum">Healthcare identifiers</legend>
 
         <div class="mt-5 grid gap-5 md:grid-cols-2">
           <div>
-            <label
-              for="nhsNumber"
-              class="mb-1 block font-semibold text-brand-plum"
-            >
-              NHS number
-            </label>
+            <label for="nhsNumber" class="mb-1 block font-semibold text-brand-plum">NHS number</label>
 
             <input
               id="nhsNumber"
               type="text"
+              maxlength="10"
               class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
               formControlName="nhsNumber"
             />
 
-            @if (
-              form.controls.nhsNumber.errors?.['maxlength']
-              ) {
-              <p class="mt-1 text-sm text-brand-coral">
-                NHS number must not exceed 20 characters.
-              </p>
-            } @else if (
-              form.controls.nhsNumber.errors?.['server'];
-              as message
-              ) {
-              <p class="mt-1 text-sm text-brand-coral">
-                {{ message }}
-              </p>
+            @if (form.controls.nhsNumber.hasError('maxlength')) {
+              <p class="mt-1 text-sm text-brand-coral">NHS number must not exceed 10 characters.</p>
+            } @else if (form.controls.nhsNumber.errors?.['server']; as message) {
+              <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
             }
           </div>
 
           <div>
-            <label
-              for="chiNumber"
-              class="mb-1 block font-semibold text-brand-plum"
-            >
-              CHI number
-            </label>
+            <label for="chiNumber" class="mb-1 block font-semibold text-brand-plum">CHI number</label>
 
             <input
               id="chiNumber"
               type="text"
+              maxlength="10"
               class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
               formControlName="chiNumber"
             />
 
-            @if (
-              form.controls.chiNumber.errors?.['maxlength']
-              ) {
-              <p class="mt-1 text-sm text-brand-coral">
-                CHI number must not exceed 20 characters.
-              </p>
-            } @else if (
-              form.controls.chiNumber.errors?.['server'];
-              as message
-              ) {
-              <p class="mt-1 text-sm text-brand-coral">
-                {{ message }}
-              </p>
+            @if (form.controls.chiNumber.hasError('maxlength')) {
+              <p class="mt-1 text-sm text-brand-coral">CHI number must not exceed 10 characters.</p>
+            } @else if (form.controls.chiNumber.errors?.['server']; as message) {
+              <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
             }
           </div>
 
           <div>
-            <label
-              for="hcNumber"
-              class="mb-1 block font-semibold text-brand-plum"
-            >
-              H&amp;C number
-            </label>
+            <label for="hcNumber" class="mb-1 block font-semibold text-brand-plum">H&amp;C number</label>
 
             <input
               id="hcNumber"
               type="text"
+              maxlength="10"
               class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
               formControlName="hcNumber"
             />
 
-            @if (
-              form.controls.hcNumber.errors?.['maxlength']
-              ) {
-              <p class="mt-1 text-sm text-brand-coral">
-                H&amp;C number must not exceed 20 characters.
-              </p>
-            } @else if (
-              form.controls.hcNumber.errors?.['server'];
-              as message
-              ) {
-              <p class="mt-1 text-sm text-brand-coral">
-                {{ message }}
-              </p>
+            @if (form.controls.hcNumber.hasError('maxlength')) {
+              <p class="mt-1 text-sm text-brand-coral">H&amp;C number must not exceed 10 characters.</p>
+            } @else if (form.controls.hcNumber.errors?.['server']; as message) {
+              <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
             }
           </div>
         </div>
       </fieldset>
 
       <fieldset>
-        <legend class="text-xl font-semibold text-brand-plum">
-          Measurements
-        </legend>
+        <legend class="text-xl font-semibold text-brand-plum">Measurements</legend>
 
         <div class="mt-5 grid gap-5 md:grid-cols-2">
           <div>
-            <label
-              for="height"
-              class="mb-1 block font-semibold text-brand-plum"
-            >
-              Height
-            </label>
+            <label for="height" class="mb-1 block font-semibold text-brand-plum">Height</label>
 
             <input
               id="height"
@@ -235,67 +123,43 @@
               formControlName="height"
             />
 
-            @if (
-              form.controls.height.errors?.['min'] ||
-              form.controls.height.errors?.['max']
-              ) {
-              <p class="mt-1 text-sm text-brand-coral">
-                Height must be between 0.01 and 9999.99.
-              </p>
-            } @else if (
-              form.controls.height.errors?.['server'];
-              as message
-              ) {
-              <p class="mt-1 text-sm text-brand-coral">
-                {{ message }}
-              </p>
+            @if (form.controls.height.hasError('min') || form.controls.height.hasError('max')) {
+              <p class="mt-1 text-sm text-brand-coral">Height must be between 0.01 and 9999.99.</p>
+            } @else if (form.controls.height.hasError('decimalPlaces')) {
+              <p class="mt-1 text-sm text-brand-coral">Height must not contain more than two decimal places.</p>
+            } @else if (form.controls.height.errors?.['server']; as message) {
+              <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
             }
           </div>
 
           <div>
-            <label
-              for="heightUnit"
-              class="mb-1 block font-semibold text-brand-plum"
-            >
-              Height unit
-            </label>
+            <label for="heightUnit" class="mb-1 block font-semibold text-brand-plum">Height unit</label>
 
             <select
               id="heightUnit"
               class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
               formControlName="heightUnit"
             >
-              <option [ngValue]="null">
-                Not provided
-              </option>
+              <option [ngValue]="null">Not provided</option>
 
-              @for (
-                heightUnit of heightUnits;
-                track heightUnit
-                ) {
-                <option [ngValue]="heightUnit">
-                  {{ formatOption(heightUnit) }}
-                </option>
+              @for (heightUnit of heightUnits; track heightUnit) {
+                <option [ngValue]="heightUnit">{{ formatOption(heightUnit) }}</option>
               }
             </select>
 
-            @if (
-              form.controls.heightUnit.errors?.['server'];
-              as message
-              ) {
-              <p class="mt-1 text-sm text-brand-coral">
-                {{ message }}
-              </p>
+            @if (form.controls.heightUnit.errors?.['server']; as message) {
+              <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
             }
           </div>
+        </div>
 
+        @if (form.hasError('heightPair') && (form.controls.height.touched || form.controls.heightUnit.touched)) {
+          <p class="mt-2 text-sm text-brand-coral">Height and height unit must be provided together.</p>
+        }
+
+        <div class="mt-5 grid gap-5 md:grid-cols-2">
           <div>
-            <label
-              for="weight"
-              class="mb-1 block font-semibold text-brand-plum"
-            >
-              Weight
-            </label>
+            <label for="weight" class="mb-1 block font-semibold text-brand-plum">Weight</label>
 
             <input
               id="weight"
@@ -307,133 +171,77 @@
               formControlName="weight"
             />
 
-            @if (
-              form.controls.weight.errors?.['min'] ||
-              form.controls.weight.errors?.['max']
-              ) {
-              <p class="mt-1 text-sm text-brand-coral">
-                Weight must be between 0.01 and 9999.99.
-              </p>
-            } @else if (
-              form.controls.weight.errors?.['server'];
-              as message
-              ) {
-              <p class="mt-1 text-sm text-brand-coral">
-                {{ message }}
-              </p>
+            @if (form.controls.weight.hasError('min') || form.controls.weight.hasError('max')) {
+              <p class="mt-1 text-sm text-brand-coral">Weight must be between 0.01 and 9999.99.</p>
+            } @else if (form.controls.weight.hasError('decimalPlaces')) {
+              <p class="mt-1 text-sm text-brand-coral">Weight must not contain more than two decimal places.</p>
+            } @else if (form.controls.weight.errors?.['server']; as message) {
+              <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
             }
           </div>
 
           <div>
-            <label
-              for="weightUnit"
-              class="mb-1 block font-semibold text-brand-plum"
-            >
-              Weight unit
-            </label>
+            <label for="weightUnit" class="mb-1 block font-semibold text-brand-plum">Weight unit</label>
 
             <select
               id="weightUnit"
               class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
               formControlName="weightUnit"
             >
-              <option [ngValue]="null">
-                Not provided
-              </option>
+              <option [ngValue]="null">Not provided</option>
 
-              @for (
-                weightUnit of weightUnits;
-                track weightUnit
-                ) {
-                <option [ngValue]="weightUnit">
-                  {{ formatOption(weightUnit) }}
-                </option>
+              @for (weightUnit of weightUnits; track weightUnit) {
+                <option [ngValue]="weightUnit">{{ formatOption(weightUnit) }}</option>
               }
             </select>
 
-            @if (
-              form.controls.weightUnit.errors?.['server'];
-              as message
-              ) {
-              <p class="mt-1 text-sm text-brand-coral">
-                {{ message }}
-              </p>
+            @if (form.controls.weightUnit.errors?.['server']; as message) {
+              <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
             }
           </div>
         </div>
+
+        @if (form.hasError('weightPair') && (form.controls.weight.touched || form.controls.weightUnit.touched)) {
+          <p class="mt-2 text-sm text-brand-coral">Weight and weight unit must be provided together.</p>
+        }
       </fieldset>
 
       <fieldset>
-        <legend class="text-xl font-semibold text-brand-plum">
-          Clinical information
-        </legend>
+        <legend class="text-xl font-semibold text-brand-plum">Clinical information</legend>
 
         <div class="mt-5">
-          <label
-            for="bloodType"
-            class="mb-1 block font-semibold text-brand-plum"
-          >
-            Blood type
-          </label>
+          <label for="bloodType" class="mb-1 block font-semibold text-brand-plum">Blood type</label>
 
           <select
             id="bloodType"
             class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
             formControlName="bloodType"
           >
-            <option [ngValue]="null">
-              Not provided
-            </option>
+            <option [ngValue]="null">Not provided</option>
 
-            @for (
-              bloodType of bloodTypes;
-              track bloodType
-              ) {
-              <option [ngValue]="bloodType">
-                {{ formatOption(bloodType) }}
-              </option>
+            @for (bloodType of bloodTypes; track bloodType) {
+              <option [ngValue]="bloodType">{{ formatOption(bloodType) }}</option>
             }
           </select>
 
-          @if (
-            form.controls.bloodType.errors?.['server'];
-            as message
-            ) {
-            <p class="mt-1 text-sm text-brand-coral">
-              {{ message }}
-            </p>
+          @if (form.controls.bloodType.errors?.['server']; as message) {
+            <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
           }
         </div>
       </fieldset>
 
       @if (errorMessage()) {
-        <div
-          class="rounded-lg border border-brand-coral bg-white p-4 text-brand-coral"
-          role="alert"
-        >
+        <div class="rounded-lg border border-brand-coral bg-white p-4 text-brand-coral" role="alert">
           {{ errorMessage() }}
         </div>
       }
 
       <div class="flex flex-wrap gap-3">
-        <button
-          type="submit"
-          class="btn btn-primary"
-          [disabled]="isSaving()"
-        >
-          {{
-            isSaving()
-              ? 'Saving...'
-              : 'Save patient record'
-          }}
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
+          {{ isSaving() ? 'Saving...' : 'Save patient record' }}
         </button>
 
-        <a
-          routerLink="/patient"
-          class="btn btn-secondary"
-        >
-          Cancel
-        </a>
+        <a routerLink="/patient" class="btn btn-secondary">Cancel</a>
       </div>
     </form>
   }
