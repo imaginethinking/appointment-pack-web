@@ -1,52 +1,41 @@
-import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { Observable, tap, throwError } from 'rxjs';
 
-import { environment } from '../../../environments/environment';
-
-import {
-  LoginRequest,
-  LoginResponse,
-  MfaConfirmRequest,
-  MfaLoginRequest,
-  MfaSetupResponse,
-  RegisterRequest,
-  RegisterResponse
-} from '../models/auth-model';
+import { LoginRequest, LoginResponse, MfaLoginRequest, MfaSetupResponse, UserRole } from '../models/auth-model';
+import { AuthApiService } from './auth-api-service';
 
 interface JwtPayload {
   exp?: number;
+  roles?: unknown;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-  private readonly http = inject(HttpClient);
-  private readonly authUrl = `${environment.apiBaseUrl}/auth`;
+  private readonly authApi = inject(AuthApiService);
 
-  private readonly accessTokenKey = 'appointmentPack.accessToken'
-  private readonly mfaChallengeIdKey = 'appointmentPack.mfaChallengeId'
-  private readonly mfaEnabledKey = 'appointmentPack.mfaEnabled'
+  private readonly accessTokenKey = 'appointmentPack.accessToken';
+  private readonly mfaChallengeIdKey = 'appointmentPack.mfaChallengeId';
+  private readonly mfaEnabledKey = 'appointmentPack.mfaEnabled';
 
   private readonly authenticatedValue = signal(false);
+  private readonly rolesValue = signal<ReadonlySet<UserRole>>(new Set());
+
   readonly authenticated = this.authenticatedValue.asReadonly();
+  readonly roles = this.rolesValue.asReadonly();
+  readonly isAdmin = computed(() => this.rolesValue().has('ADMIN'));
 
   constructor() {
-    this.authenticatedValue.set(this.getAccessToken() !== null);
-  }
-
-  register(request: RegisterRequest): Observable<RegisterResponse> {
-    return this.http.post<RegisterResponse>(`${this.authUrl}/register`, request);
+    this.restoreAuthenticatedSession();
   }
 
   login(request: LoginRequest): Observable<LoginResponse> {
-    this.clearSession()
+    this.clearSession();
 
-    return this.http.post<LoginResponse>(`${this.authUrl}/login`, request)
-      .pipe(tap(response => {
-        this.handlePasswordLoginResponse(response);
-      }))
+    return this.authApi.login(request).pipe(
+      tap((response) => this.handlePasswordLoginResponse(response)),
+    );
   }
 
   completeMfaLogin(code: string): Observable<LoginResponse> {
@@ -58,38 +47,22 @@ export class AuthService {
 
     const request: MfaLoginRequest = {
       mfaChallengeId,
-      code
+      code,
     };
 
-    return this.http
-      .post<LoginResponse>(`${this.authUrl}/login/mfa`, request)
-      .pipe(
-        tap((response) => {
-          if (response.mfaRequired || response.accessToken === null || response.tokenType !== 'Bearer') {
-            throw new Error('The server returned an invalid MFA login response.');
-          }
-
-          this.storeAuthenticatedSession(response.accessToken, true);
-        })
-      );
+    return this.authApi.completeMfaLogin(request).pipe(
+      tap((response) => this.handleMfaLoginResponse(response)),
+    );
   }
 
   setupMfa(): Observable<MfaSetupResponse> {
-    return this.http.post<MfaSetupResponse>(`${this.authUrl}/mfa/setup`, null);
+    return this.authApi.setupMfa();
   }
 
   confirmMfa(code: string): Observable<void> {
-    const request: MfaConfirmRequest = {
-      code
-    };
-
-    return this.http
-      .post<void>(`${this.authUrl}/mfa/confirm`, request)
-      .pipe(
-        tap(() => {
-          sessionStorage.setItem(this.mfaEnabledKey, 'true');
-        })
-      );
+    return this.authApi.confirmMfa({ code }).pipe(
+      tap(() => sessionStorage.setItem(this.mfaEnabledKey, 'true')),
+    );
   }
 
   getAccessToken(): string | null {
@@ -99,13 +72,14 @@ export class AuthService {
       return null;
     }
 
-    if (this.isTokenExpired(accessToken)) {
+    const payload = this.decodeJwtPayload(accessToken);
+
+    if (payload === null || this.isPayloadExpired(payload)) {
       this.clearSession();
       return null;
     }
 
-    this.authenticatedValue.set(true);
-
+    this.updateAuthenticatedState(payload);
     return accessToken;
   }
 
@@ -113,12 +87,16 @@ export class AuthService {
     return this.getAccessToken() !== null;
   }
 
+  hasRole(role: UserRole): boolean {
+    return this.rolesValue().has(role);
+  }
+
   hasPendingMfaChallenge(): boolean {
-    return (sessionStorage.getItem(this.mfaChallengeIdKey) !== null);
+    return sessionStorage.getItem(this.mfaChallengeIdKey) !== null;
   }
 
   isMfaEnabled(): boolean {
-    return (sessionStorage.getItem(this.mfaEnabledKey) === 'true');
+    return sessionStorage.getItem(this.mfaEnabledKey) === 'true';
   }
 
   cancelMfaLogin(): void {
@@ -129,36 +107,82 @@ export class AuthService {
     this.clearSession();
   }
 
-  private handlePasswordLoginResponse(
-    response: LoginResponse): void {
-    if (response.mfaRequired) {
-      if (response.mfaChallengeId === null) {
-        throw new Error('MFA is required, but the server did not return a challenge ID.');
-      }
+  private handlePasswordLoginResponse(response: LoginResponse): void {
+    switch (response.status) {
+      case 'AUTHENTICATED':
+        if (response.accessToken === null || response.tokenType !== 'Bearer' || response.mfaChallengeId !== null) {
+          throw new Error('The server returned an invalid authenticated login response.');
+        }
 
-      if (response.accessToken !== null) {
-        throw new Error('The server returned an access token before MFA was completed.');
-      }
+        this.storeAuthenticatedSession(response.accessToken, false);
+        return;
 
-      sessionStorage.setItem(this.mfaChallengeIdKey, response.mfaChallengeId);
+      case 'EMAIL_VERIFICATION_REQUIRED':
+        if (response.accessToken !== null || response.tokenType !== null || response.mfaChallengeId !== null) {
+          throw new Error('The server returned an invalid email-verification login response.');
+        }
 
-      sessionStorage.setItem(this.mfaEnabledKey, 'true');
+        return;
 
-      return;
+      case 'MFA_REQUIRED':
+        if (response.mfaChallengeId === null || response.accessToken !== null || response.tokenType !== null) {
+          throw new Error('The server returned an invalid MFA login response.');
+        }
+
+        sessionStorage.setItem(this.mfaChallengeIdKey, response.mfaChallengeId);
+        sessionStorage.setItem(this.mfaEnabledKey, 'true');
+        return;
+    }
+  }
+
+  private handleMfaLoginResponse(response: LoginResponse): void {
+    if (
+      response.status !== 'AUTHENTICATED'
+      || response.accessToken === null
+      || response.tokenType !== 'Bearer'
+      || response.mfaChallengeId !== null
+    ) {
+      throw new Error('The server returned an invalid MFA login completion response.');
     }
 
-    if (response.accessToken === null || response.tokenType !== 'Bearer') {
-      throw new Error('The server did not return a valid bearer access token.');
-    }
-
-    this.storeAuthenticatedSession(response.accessToken, false);
+    this.storeAuthenticatedSession(response.accessToken, true);
   }
 
   private storeAuthenticatedSession(accessToken: string, mfaEnabled: boolean): void {
+    const payload = this.decodeJwtPayload(accessToken);
+
+    if (payload === null || this.isPayloadExpired(payload)) {
+      throw new Error('The server returned an invalid access token.');
+    }
+
     sessionStorage.setItem(this.accessTokenKey, accessToken);
     sessionStorage.setItem(this.mfaEnabledKey, String(mfaEnabled));
     sessionStorage.removeItem(this.mfaChallengeIdKey);
 
+    this.updateAuthenticatedState(payload);
+  }
+
+  private restoreAuthenticatedSession(): void {
+    const accessToken = sessionStorage.getItem(this.accessTokenKey);
+
+    if (accessToken === null) {
+      return;
+    }
+
+    const payload = this.decodeJwtPayload(accessToken);
+
+    if (payload === null || this.isPayloadExpired(payload)) {
+      this.clearSession();
+      return;
+    }
+
+    this.updateAuthenticatedState(payload);
+  }
+
+  private updateAuthenticatedState(payload: JwtPayload): void {
+    const roles = Array.isArray(payload.roles) ? payload.roles.filter(isUserRole) : [];
+
+    this.rolesValue.set(new Set(roles));
     this.authenticatedValue.set(true);
   }
 
@@ -167,36 +191,33 @@ export class AuthService {
     sessionStorage.removeItem(this.mfaChallengeIdKey);
     sessionStorage.removeItem(this.mfaEnabledKey);
 
+    this.rolesValue.set(new Set());
     this.authenticatedValue.set(false);
   }
 
-  private isTokenExpired(accessToken: string): boolean {
+  private decodeJwtPayload(accessToken: string): JwtPayload | null {
     try {
       const tokenParts = accessToken.split('.');
 
       if (tokenParts.length !== 3) {
-        return true;
+        return null;
       }
 
-      const encodedPayload = tokenParts[1]
-        .replace(/-/g, '+')
-        .replace(/_/g, '/');
-
-      const paddedPayload = encodedPayload.padEnd(
-        Math.ceil(encodedPayload.length / 4) * 4,
-        '=',
-      );
-
+      const encodedPayload = tokenParts[1].replace(/-/g, '+').replace(/_/g, '/');
+      const paddedPayload = encodedPayload.padEnd(Math.ceil(encodedPayload.length / 4) * 4, '=');
       const payload = JSON.parse(atob(paddedPayload)) as JwtPayload;
 
-      if (typeof payload.exp !== 'number') {
-        return true;
-      }
-
-      return payload.exp * 1000 <= Date.now();
+      return typeof payload.exp === 'number' ? payload : null;
     } catch {
-      return true;
+      return null;
     }
   }
 
+  private isPayloadExpired(payload: JwtPayload): boolean {
+    return payload.exp === undefined || payload.exp * 1000 <= Date.now();
+  }
+}
+
+function isUserRole(value: unknown): value is UserRole {
+  return value === 'USER' || value === 'ADMIN';
 }
