@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
@@ -20,8 +20,8 @@ export class Register {
   private readonly authApi = inject(AuthApiService);
   private readonly router = inject(Router);
 
-  protected errorMessage = '';
-  protected isSubmitting = false;
+  protected readonly errorMessage = signal('');
+  protected readonly isSubmitting = signal(false);
 
   protected readonly form = this.formBuilder.group({
     firstName: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(100)]),
@@ -35,7 +35,7 @@ export class Register {
   });
 
   protected register(): void {
-    this.errorMessage = '';
+    this.errorMessage.set('');
     clearServerFieldErrors(this.form);
 
     if (this.form.invalid) {
@@ -53,10 +53,10 @@ export class Register {
       confirmPassword: value.confirmPassword,
     };
 
-    this.isSubmitting = true;
+    this.isSubmitting.set(true);
 
     this.authApi.register(request).pipe(
-      finalize(() => this.isSubmitting = false),
+      finalize(() => this.isSubmitting.set(false)),
     ).subscribe({
       next: (response) => {
         if (response.emailVerificationRequired) {
@@ -76,11 +76,11 @@ export class Register {
         }
 
         if (hasHttpStatus(error, 409)) {
-          this.errorMessage = 'An account already exists for that email address.';
+          this.errorMessage.set('An account already exists for that email address.');
           return;
         }
 
-        this.errorMessage = getHttpErrorMessage(error, 'Registration failed.');
+        this.errorMessage.set(getHttpErrorMessage(error, 'Registration failed.'));
       },
     });
   }

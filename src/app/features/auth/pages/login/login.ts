@@ -1,9 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
-import { clearServerFieldErrors, applyServerFieldErrors } from '../../../../core/forms/server-field-errors';
+import { applyServerFieldErrors, clearServerFieldErrors } from '../../../../core/forms/server-field-errors';
 import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
 import { LoginRequest } from '../../../../core/models/auth-model';
 import { AuthService } from '../../../../core/services/auth-service';
@@ -19,9 +19,9 @@ export class Login {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
+  protected readonly errorMessage = signal('');
+  protected readonly isSubmitting = signal(false);
   protected readonly passwordResetSuccessful = this.route.snapshot.queryParamMap.get('passwordReset') === 'true';
-  protected errorMessage = '';
-  protected isSubmitting = false;
 
   protected readonly form = this.formBuilder.group({
     email: this.formBuilder.nonNullable.control('', [Validators.required, Validators.email, Validators.maxLength(254)]),
@@ -29,7 +29,7 @@ export class Login {
   });
 
   protected login(): void {
-    this.errorMessage = '';
+    this.errorMessage.set('');
     clearServerFieldErrors(this.form);
 
     if (this.form.invalid) {
@@ -43,10 +43,10 @@ export class Login {
       password: value.password,
     };
 
-    this.isSubmitting = true;
+    this.isSubmitting.set(true);
 
     this.authService.login(request).pipe(
-      finalize(() => this.isSubmitting = false),
+      finalize(() => this.isSubmitting.set(false)),
     ).subscribe({
       next: (response) => {
         const returnUrl = this.getReturnUrl();
@@ -55,7 +55,6 @@ export class Login {
           case 'AUTHENTICATED':
             void this.router.navigateByUrl(returnUrl);
             return;
-
           case 'EMAIL_VERIFICATION_REQUIRED':
             void this.router.navigate(['/verify-email'], {
               queryParams: {
@@ -64,7 +63,6 @@ export class Login {
               },
             });
             return;
-
           case 'MFA_REQUIRED':
             void this.router.navigate(['/login/mfa'], {
               queryParams: {
@@ -79,7 +77,7 @@ export class Login {
           return;
         }
 
-        this.errorMessage = getHttpErrorMessage(error, 'Login failed.');
+        this.errorMessage.set(getHttpErrorMessage(error, 'Login failed.'));
       },
     });
   }

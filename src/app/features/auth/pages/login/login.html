@@ -51,12 +51,12 @@
       </a>
     </div>
 
-    <button class="btn btn-primary w-full" type="submit" [disabled]="isSubmitting">
-      {{ isSubmitting ? 'Logging in...' : 'Login' }}
+    <button class="btn btn-primary w-full" type="submit" [disabled]="isSubmitting()">
+      {{ isSubmitting() ? 'Logging in...' : 'Login' }}
     </button>
 
-    @if (errorMessage) {
-      <p class="text-brand-coral" role="alert">{{ errorMessage }}</p>
+    @if (errorMessage()) {
+      <p class="text-brand-coral" role="alert">{{ errorMessage() }}</p>
     }
 
     <p class="text-center text-brand-plum">

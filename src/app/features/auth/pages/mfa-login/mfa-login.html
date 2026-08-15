@@ -24,16 +24,16 @@
       }
     </div>
 
-    <button class="btn btn-primary w-full" type="submit" [disabled]="isSubmitting">
-      {{ isSubmitting ? 'Verifying...' : 'Verify and login' }}
+    <button class="btn btn-primary w-full" type="submit" [disabled]="isSubmitting()">
+      {{ isSubmitting() ? 'Verifying...' : 'Verify and login' }}
     </button>
 
-    <button class="btn btn-secondary w-full" type="button" [disabled]="isSubmitting" (click)="cancel()">
+    <button class="btn btn-secondary w-full" type="button" [disabled]="isSubmitting()" (click)="cancel()">
       Cancel
     </button>
 
-    @if (errorMessage) {
-      <p class="text-brand-coral" role="alert">{{ errorMessage }}</p>
+    @if (errorMessage()) {
+      <p class="text-brand-coral" role="alert">{{ errorMessage() }}</p>
     }
   </form>
 </section>

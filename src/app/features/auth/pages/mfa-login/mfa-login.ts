@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
@@ -17,8 +17,8 @@ export class MfaLogin {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
-  protected errorMessage = '';
-  protected isSubmitting = false;
+  protected readonly errorMessage = signal('');
+  protected readonly isSubmitting = signal(false);
 
   protected readonly form = this.formBuilder.group({
     code: this.formBuilder.nonNullable.control('', [
@@ -28,21 +28,21 @@ export class MfaLogin {
   });
 
   protected completeLogin(): void {
-    this.errorMessage = '';
+    this.errorMessage.set('');
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    this.isSubmitting = true;
+    this.isSubmitting.set(true);
 
     this.authService.completeMfaLogin(this.form.controls.code.value.trim()).pipe(
-      finalize(() => this.isSubmitting = false),
+      finalize(() => this.isSubmitting.set(false)),
     ).subscribe({
       next: () => void this.router.navigateByUrl(this.getReturnUrl()),
       error: (error: unknown) => {
-        this.errorMessage = getHttpErrorMessage(error, 'MFA verification failed.');
+        this.errorMessage.set(getHttpErrorMessage(error, 'MFA verification failed.'));
       },
     });
   }

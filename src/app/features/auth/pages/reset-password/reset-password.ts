@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
@@ -22,8 +22,8 @@ export class ResetPassword {
   private readonly token = this.route.snapshot.queryParamMap.get('token');
 
   protected readonly hasToken = this.token !== null && this.token.length > 0 && this.token.length <= 256;
-  protected errorMessage = '';
-  protected isSubmitting = false;
+  protected readonly errorMessage = signal('');
+  protected readonly isSubmitting = signal(false);
 
   protected readonly form = this.formBuilder.group({
     newPassword: this.formBuilder.nonNullable.control('', [Validators.required, strongPasswordValidator]),
@@ -33,11 +33,11 @@ export class ResetPassword {
   });
 
   protected resetPassword(): void {
-    this.errorMessage = '';
+    this.errorMessage.set('');
     clearServerFieldErrors(this.form);
 
     if (!this.hasToken) {
-      this.errorMessage = 'The password-reset link is invalid.';
+      this.errorMessage.set('The password-reset link is invalid.');
       return;
     }
 
@@ -47,14 +47,14 @@ export class ResetPassword {
     }
 
     const value = this.form.getRawValue();
-    this.isSubmitting = true;
+    this.isSubmitting.set(true);
 
     this.authApi.confirmPasswordReset({
       token: this.token!,
       newPassword: value.newPassword,
       confirmPassword: value.confirmPassword,
     }).pipe(
-      finalize(() => this.isSubmitting = false),
+      finalize(() => this.isSubmitting.set(false)),
     ).subscribe({
       next: () => {
         void this.router.navigate(['/login'], {
@@ -68,7 +68,7 @@ export class ResetPassword {
           return;
         }
 
-        this.errorMessage = getHttpErrorMessage(error, 'The password-reset link is invalid or has expired.');
+        this.errorMessage.set(getHttpErrorMessage(error, 'The password-reset link is invalid or has expired.'));
       },
     });
   }
