@@ -21,10 +21,6 @@ export class PatientContextSelector {
   protected readonly isLoading = this.patientContextCoordinator.isLoading;
   protected readonly loadFailed = this.patientContextCoordinator.loadFailed;
 
-  protected canSelectPatient(context: SelectedPatientContext): boolean {
-    return this.selectedPatientState.canSelect(context);
-  }
-
   protected patientContextLabel(context: SelectedPatientContext): string {
     const relationshipLabel = context.contextType === 'SELF' ? 'Your record' : 'Carer access';
     return `${getPatientContextName(context)} — ${relationshipLabel}`;

@@ -26,8 +26,8 @@
     <option value="">No patient access</option>
   } @else {
     @for (context of patientContexts(); track context.patientRecordId) {
-      <option [value]="context.patientRecordId" [disabled]="!canSelectPatient(context)">
-        {{ patientContextLabel(context) }}{{ canSelectPatient(context) ? '' : ' — View unavailable' }}
+      <option [value]="context.patientRecordId">
+        {{ patientContextLabel(context) }}
       </option>
     }
   }
