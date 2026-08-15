@@ -10,7 +10,6 @@ import { AuthService } from '../../../../core/services/auth-service';
   selector: 'app-mfa-login',
   imports: [FormsModule],
   templateUrl: './mfa-login.html',
-  styleUrl: './mfa-login.css',
 })
 export class MfaLogin {
   private readonly authService = inject(AuthService);

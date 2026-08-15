@@ -10,7 +10,6 @@ import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
   selector: 'app-register',
   imports: [FormsModule],
   templateUrl: './register.html',
-  styleUrl: './register.css',
 })
 export class Register {
   private readonly authService = inject(AuthService);

@@ -15,7 +15,6 @@ import { PersonalPatientRecordState } from '../../services/personal-patient-reco
   selector: 'app-patient-record-create',
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './patient-record-create.html',
-  styleUrl: './patient-record-create.css',
 })
 export class PatientRecordCreate {
   private readonly formBuilder = inject(FormBuilder);

@@ -21,7 +21,6 @@ type PatientRecordEditStatus = 'loading' | 'ready' | 'no-selection' | 'forbidden
   selector: 'app-patient-record-edit',
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './patient-record-edit.html',
-  styleUrl: './patient-record-edit.css',
 })
 export class PatientRecordEdit {
   private readonly formBuilder = inject(FormBuilder);

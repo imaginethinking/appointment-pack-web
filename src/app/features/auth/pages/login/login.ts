@@ -17,7 +17,6 @@ import {LoginRequest} from '../../../../core/models/auth-model';
   selector: 'app-login',
   imports: [FormsModule, RouterLink],
   templateUrl: './login.html',
-  styleUrl: './login.css',
 })
 export class Login {
   private readonly authService = inject(AuthService);

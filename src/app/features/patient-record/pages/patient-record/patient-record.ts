@@ -17,7 +17,6 @@ type PatientRecordPageStatus = 'loading' | 'ready' | 'no-selection' | 'forbidden
   selector: 'app-patient-record',
   imports: [RouterLink],
   templateUrl: './patient-record.html',
-  styleUrl: './patient-record.css',
 })
 export class PatientRecord {
   private readonly patientRecordApi = inject(PatientRecordApiService);

@@ -9,7 +9,6 @@ import { ProfileState } from '../../services/profile-state';
   selector: 'app-profile',
   imports: [DatePipe, RouterLink],
   templateUrl: './profile.html',
-  styleUrl: './profile.css',
 })
 export class Profile implements OnInit {
   private readonly profileState = inject(ProfileState);

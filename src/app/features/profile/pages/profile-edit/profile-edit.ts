@@ -14,7 +14,6 @@ import {ProfileState} from '../../services/profile-state';
     RouterLink,
   ],
   templateUrl: './profile-edit.html',
-  styleUrl: './profile-edit.css',
 })
 export class ProfileEdit implements OnInit {
   private readonly formBuilder = inject(FormBuilder);

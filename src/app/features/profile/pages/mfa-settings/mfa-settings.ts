@@ -13,7 +13,6 @@ import { AuthService } from '../../../../core/services/auth-service';
     QrCodeComponent
   ],
   templateUrl: './mfa-settings.html',
-  styleUrl: './mfa-settings.css',
 })
 export class MfaSettings {
   private readonly authService = inject(AuthService);

@@ -5,6 +5,5 @@ import { RouterLink } from '@angular/router';
   selector: 'app-access-denied',
   imports: [RouterLink],
   templateUrl: './access-denied.html',
-  styleUrl: './access-denied.css',
 })
 export class AccessDenied {}
