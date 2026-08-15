@@ -1,5 +1,11 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
@@ -11,18 +17,25 @@ import { PatientContextAuthorisation } from '../../../patient-context/services/p
 import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
 import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
 import {
+  createPatientRecordForm,
+  mapPatientRecordFormToRequest,
+  resetPatientRecordForm,
+} from '../../forms/patient-record-form';
+import {
   BLOOD_TYPES,
-  BloodType,
   HEIGHT_UNITS,
-  HeightUnit,
   PatientRecordResponse,
   WEIGHT_UNITS,
-  WeightUnit,
 } from '../../models/patient-record-model';
 import { PatientRecordApiService } from '../../services/patient-record-api-service';
 
 type PatientRecordEditStatus =
-  'loading' | 'ready' | 'no-selection' | 'forbidden' | 'not-found' | 'error';
+  | 'loading'
+  | 'ready'
+  | 'no-selection'
+  | 'forbidden'
+  | 'not-found'
+  | 'error';
 
 @Component({
   selector: 'app-patient-record-edit',
@@ -39,7 +52,7 @@ export class PatientRecordEdit {
 
   private readonly authorisation = inject(PatientContextAuthorisation);
 
-  private readonly patientContextCoordinator = inject(PatientContextCoordinator);
+  private readonly patientContextCoordinator = inject(PatientContextCoordinator,);
 
   private readonly router = inject(Router);
 
@@ -54,11 +67,17 @@ export class PatientRecordEdit {
   protected readonly selectedPatientName = computed(() => {
     const selectedPatient = this.selectedPatient();
 
-    return selectedPatient === null ? '' : getPatientContextName(selectedPatient);
+    return selectedPatient === null
+      ? ''
+      : getPatientContextName(selectedPatient);
   });
 
   protected readonly canEditSelectedPatient = computed(() =>
-    this.authorisation.can(this.selectedPatient(), 'patient-record', 'edit'),
+    this.authorisation.can(
+      this.selectedPatient(),
+      'patient-record',
+      'edit',
+    ),
   );
 
   protected readonly status = signal<PatientRecordEditStatus>('loading');
@@ -72,29 +91,13 @@ export class PatientRecordEdit {
   protected readonly heightUnits = HEIGHT_UNITS;
   protected readonly weightUnits = WEIGHT_UNITS;
 
-  protected readonly form = this.formBuilder.group({
-    nhsNumber: this.formBuilder.nonNullable.control('', Validators.maxLength(20)),
-    chiNumber: this.formBuilder.nonNullable.control('', Validators.maxLength(20)),
-    hcNumber: this.formBuilder.nonNullable.control('', Validators.maxLength(20)),
-    height: this.formBuilder.control<number | null>(null, [
-      Validators.min(0.01),
-      Validators.max(9999.99),
-    ]),
-    heightUnit: this.formBuilder.control<HeightUnit | null>(null),
-    weight: this.formBuilder.control<number | null>(null, [
-      Validators.min(0.01),
-      Validators.max(9999.99),
-    ]),
-    weightUnit: this.formBuilder.control<WeightUnit | null>(null),
-    bloodType: this.formBuilder.control<BloodType | null>(null),
-  });
+  protected readonly form = createPatientRecordForm(this.formBuilder);
 
   constructor() {
     effect((onCleanup) => {
       this.reloadVersion();
 
       const patientRecordId = this.selectedPatientId();
-
       const canEdit = this.canEditSelectedPatient();
 
       this.patientRecord.set(null);
@@ -112,27 +115,20 @@ export class PatientRecordEdit {
 
       this.status.set('loading');
 
-      const subscription = this.patientRecordApi.getPatientRecord(patientRecordId).subscribe({
-        next: (patientRecord) => {
-          this.patientRecord.set(patientRecord);
+      const subscription = this.patientRecordApi
+        .getPatientRecord(patientRecordId)
+        .subscribe({
+          next: (patientRecord) => {
+            this.patientRecord.set(patientRecord);
 
-          this.form.reset({
-            nhsNumber: patientRecord.nhsNumber ?? '',
-            chiNumber: patientRecord.chiNumber ?? '',
-            hcNumber: patientRecord.hcNumber ?? '',
-            height: patientRecord.height,
-            heightUnit: patientRecord.heightUnit,
-            weight: patientRecord.weight,
-            weightUnit: patientRecord.weightUnit,
-            bloodType: patientRecord.bloodType,
-          });
+            resetPatientRecordForm(this.form, patientRecord);
 
-          this.status.set('ready');
-        },
-        error: (error) => {
-          this.handleLoadError(error, patientRecordId);
-        },
-      });
+            this.status.set('ready');
+          },
+          error: (error) => {
+            this.handleLoadError(error, patientRecordId);
+          },
+        });
 
       onCleanup(() => {
         subscription.unsubscribe();
@@ -142,12 +138,15 @@ export class PatientRecordEdit {
 
   protected save(): void {
     const patientRecord = this.patientRecord();
-
     const patientRecordId = this.selectedPatientId();
 
     this.errorMessage.set('');
 
-    if (patientRecord === null || patientRecordId === null || this.status() !== 'ready') {
+    if (
+      patientRecord === null ||
+      patientRecordId === null ||
+      this.status() !== 'ready'
+    ) {
       return;
     }
 
@@ -162,21 +161,13 @@ export class PatientRecordEdit {
       return;
     }
 
-    const value = this.form.getRawValue();
-
     this.isSaving.set(true);
 
     this.patientRecordApi
-      .updatePatientRecord(patientRecordId, {
-        nhsNumber: this.emptyToNull(value.nhsNumber),
-        chiNumber: this.emptyToNull(value.chiNumber),
-        hcNumber: this.emptyToNull(value.hcNumber),
-        height: value.height,
-        heightUnit: value.heightUnit,
-        weight: value.weight,
-        weightUnit: value.weightUnit,
-        bloodType: value.bloodType,
-      })
+      .updatePatientRecord(
+        patientRecordId,
+        mapPatientRecordFormToRequest(this.form),
+      )
       .pipe(
         finalize(() => {
           this.isSaving.set(false);
@@ -193,13 +184,24 @@ export class PatientRecordEdit {
             return;
           }
 
-          if (hasHttpStatus(error, 403) || hasHttpStatus(error, 404)) {
-            this.recoverAfterSaveFailure(error, patientRecordId);
+          if (
+            hasHttpStatus(error, 403) ||
+            hasHttpStatus(error, 404)
+          ) {
+            this.recoverAfterSaveFailure(
+              error,
+              patientRecordId,
+            );
 
             return;
           }
 
-          this.errorMessage.set(getHttpErrorMessage(error, 'Unable to update the patient record.'));
+          this.errorMessage.set(
+            getHttpErrorMessage(
+              error,
+              'Unable to update the patient record.',
+            ),
+          );
         },
       });
   }
@@ -215,14 +217,23 @@ export class PatientRecordEdit {
       .replace(/\b\w/g, (character) => character.toUpperCase());
   }
 
-  private handleLoadError(error: unknown, failedPatientRecordId: string): void {
+  private handleLoadError(
+    error: unknown,
+    failedPatientRecordId: string,
+  ): void {
     this.patientRecord.set(null);
 
-    if (!hasHttpStatus(error, 403) && !hasHttpStatus(error, 404)) {
+    if (
+      !hasHttpStatus(error, 403) &&
+      !hasHttpStatus(error, 404)
+    ) {
       this.status.set('error');
 
       this.errorMessage.set(
-        getHttpErrorMessage(error, 'Unable to load the patient record for editing.'),
+        getHttpErrorMessage(
+          error,
+          'Unable to load the patient record for editing.',
+        ),
       );
 
       return;
@@ -231,13 +242,19 @@ export class PatientRecordEdit {
     this.recoverContext(error, failedPatientRecordId);
   }
 
-  private recoverAfterSaveFailure(error: unknown, failedPatientRecordId: string): void {
+  private recoverAfterSaveFailure(
+    error: unknown,
+    failedPatientRecordId: string,
+  ): void {
     this.status.set('loading');
 
     this.recoverContext(error, failedPatientRecordId);
   }
 
-  private recoverContext(error: unknown, failedPatientRecordId: string): void {
+  private recoverContext(
+    error: unknown,
+    failedPatientRecordId: string,
+  ): void {
     const recordNotFound = hasHttpStatus(error, 404);
 
     this.status.set('loading');
@@ -246,33 +263,42 @@ export class PatientRecordEdit {
       next: () => {
         const selectedPatient = this.selectedPatient();
 
-        if (selectedPatient === null || selectedPatient.patientRecordId !== failedPatientRecordId) {
+        if (
+          selectedPatient === null ||
+          selectedPatient.patientRecordId !==
+          failedPatientRecordId
+        ) {
           void this.router.navigate(['/patient']);
 
           return;
         }
 
-        if (!this.authorisation.can(selectedPatient, 'patient-record', 'edit')) {
+        if (
+          !this.authorisation.can(
+            selectedPatient,
+            'patient-record',
+            'edit',
+          )
+        ) {
           void this.router.navigate(['/access-denied']);
 
           return;
         }
 
-        this.status.set(recordNotFound ? 'not-found' : 'forbidden');
+        this.status.set(
+          recordNotFound ? 'not-found' : 'forbidden',
+        );
       },
       error: (refreshError) => {
         this.status.set('error');
 
         this.errorMessage.set(
-          getHttpErrorMessage(refreshError, 'Unable to refresh your patient access.'),
+          getHttpErrorMessage(
+            refreshError,
+            'Unable to refresh your patient access.',
+          ),
         );
       },
     });
-  }
-
-  private emptyToNull(value: string): string | null {
-    const trimmedValue = value.trim();
-
-    return trimmedValue.length === 0 ? null : trimmedValue;
   }
 }

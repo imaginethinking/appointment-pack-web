@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
 import { applyServerFieldErrors } from '../../../../core/forms/server-field-errors';
@@ -7,12 +7,13 @@ import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
 import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
 import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
 import {
+  createPatientRecordForm,
+  mapPatientRecordFormToRequest,
+} from '../../forms/patient-record-form';
+import {
   BLOOD_TYPES,
-  BloodType,
   HEIGHT_UNITS,
-  HeightUnit,
   WEIGHT_UNITS,
-  WeightUnit,
 } from '../../models/patient-record-model';
 import { PersonalPatientRecordState } from '../../services/personal-patient-record-state';
 
@@ -36,22 +37,7 @@ export class PatientRecordCreate {
   protected readonly heightUnits = HEIGHT_UNITS;
   protected readonly weightUnits = WEIGHT_UNITS;
 
-  protected readonly form = this.formBuilder.group({
-    nhsNumber: this.formBuilder.nonNullable.control('', Validators.maxLength(20)),
-    chiNumber: this.formBuilder.nonNullable.control('', Validators.maxLength(20)),
-    hcNumber: this.formBuilder.nonNullable.control('', Validators.maxLength(20)),
-    height: this.formBuilder.control<number | null>(null, [
-      Validators.min(0.01),
-      Validators.max(9999.99),
-    ]),
-    heightUnit: this.formBuilder.control<HeightUnit | null>(null),
-    weight: this.formBuilder.control<number | null>(null, [
-      Validators.min(0.01),
-      Validators.max(9999.99),
-    ]),
-    weightUnit: this.formBuilder.control<WeightUnit | null>(null),
-    bloodType: this.formBuilder.control<BloodType | null>(null),
-  });
+  protected readonly form = createPatientRecordForm(this.formBuilder);
 
   protected create(): void {
     this.errorMessage.set('');
@@ -61,19 +47,8 @@ export class PatientRecordCreate {
       return;
     }
 
-    const value = this.form.getRawValue();
-
     this.patientRecordState
-      .createPatientRecord({
-        nhsNumber: this.emptyToNull(value.nhsNumber),
-        chiNumber: this.emptyToNull(value.chiNumber),
-        hcNumber: this.emptyToNull(value.hcNumber),
-        height: value.height,
-        heightUnit: value.heightUnit,
-        weight: value.weight,
-        weightUnit: value.weightUnit,
-        bloodType: value.bloodType,
-      })
+      .createPatientRecord(mapPatientRecordFormToRequest(this.form))
       .subscribe({
         next: () => {
           this.selectedPatientState.revalidateSelection();
@@ -92,7 +67,10 @@ export class PatientRecordCreate {
           }
 
           this.errorMessage.set(
-            getHttpErrorMessage(error, 'Unable to create your patient record.'),
+            getHttpErrorMessage(
+              error,
+              'Unable to create your patient record.',
+            ),
           );
         },
       });
@@ -103,11 +81,5 @@ export class PatientRecordCreate {
       .toLowerCase()
       .replaceAll('_', ' ')
       .replace(/\b\w/g, (character) => character.toUpperCase());
-  }
-
-  private emptyToNull(value: string): string | null {
-    const trimmedValue = value.trim();
-
-    return trimmedValue.length === 0 ? null : trimmedValue;
   }
 }
