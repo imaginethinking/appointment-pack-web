@@ -1,0 +1,72 @@
+<section class="mx-auto max-w-md p-8">
+  <h1 class="mb-3 text-2xl font-bold text-brand-plum">Verify your email</h1>
+
+  @if (state() === 'confirming') {
+    <div class="rounded border border-brand-plum/20 bg-brand-off-white p-4 text-brand-plum" role="status">
+      Verifying your email address...
+    </div>
+  } @else if (state() === 'confirmed') {
+    <div class="rounded border border-brand-mint bg-brand-off-white p-4 text-brand-plum" role="status">
+      Your email address has been verified successfully.
+    </div>
+
+    <a class="btn btn-primary mt-6 w-full" routerLink="/login" [queryParams]="{ returnUrl: returnUrl }">
+      Continue to login
+    </a>
+  } @else {
+    @if (state() === 'pending') {
+      <p class="mb-6 text-brand-plum/70">
+        Check your email and open the verification link before logging in. If required, you can request another verification email below.
+      </p>
+    }
+
+    @if (state() === 'failed') {
+      <div class="mb-6 rounded border border-brand-coral bg-brand-off-white p-4 text-brand-coral" role="alert">
+        {{ errorMessage() }}
+      </div>
+
+      <p class="mb-6 text-brand-plum/70">
+        You can request another verification email if the previous link has expired.
+      </p>
+    }
+
+    <form class="space-y-4" [formGroup]="resendForm" novalidate (ngSubmit)="resend()">
+      <div>
+        <label class="mb-1 block font-medium text-brand-plum" for="verificationEmail">Email</label>
+
+        <input
+          id="verificationEmail"
+          class="w-full rounded border border-brand-plum/30 p-2"
+          type="email"
+          autocomplete="email"
+          maxlength="254"
+          formControlName="email"
+        />
+
+        @if (resendForm.controls.email.touched && (resendForm.controls.email.hasError('required') || resendForm.controls.email.hasError('email'))) {
+          <p class="mt-1 text-sm text-brand-coral">Enter a valid email address.</p>
+        } @else if (resendForm.controls.email.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+
+      <button class="btn btn-secondary w-full" type="submit" [disabled]="isResending()">
+        {{ isResending() ? 'Requesting...' : 'Resend verification email' }}
+      </button>
+    </form>
+
+    @if (resendMessage()) {
+      <p class="mt-4 rounded border border-brand-mint bg-brand-off-white p-3 text-brand-plum" role="status">
+        {{ resendMessage() }}
+      </p>
+    }
+
+    @if (errorMessage() && state() !== 'failed') {
+      <p class="mt-4 text-brand-coral" role="alert">{{ errorMessage() }}</p>
+    }
+
+    <a class="btn btn-ghost mt-6 w-full" routerLink="/login" [queryParams]="{ returnUrl: returnUrl }">
+      Return to login
+    </a>
+  }
+</section>
