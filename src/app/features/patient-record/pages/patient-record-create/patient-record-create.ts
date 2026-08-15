@@ -5,16 +5,10 @@ import { Router, RouterLink } from '@angular/router';
 import { applyServerFieldErrors } from '../../../../core/forms/server-field-errors';
 import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
 import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
+import { formatEnumLabel } from '../../../../shared/utils/formatting';
 import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import {
-  createPatientRecordForm,
-  mapPatientRecordFormToRequest,
-} from '../../forms/patient-record-form';
-import {
-  BLOOD_TYPES,
-  HEIGHT_UNITS,
-  WEIGHT_UNITS,
-} from '../../models/patient-record-model';
+import { createPatientRecordForm, mapPatientRecordFormToRequest } from '../../forms/patient-record-form';
+import { BLOOD_TYPES, HEIGHT_UNITS, WEIGHT_UNITS } from '../../models/patient-record-model';
 import { PersonalPatientRecordState } from '../../services/personal-patient-record-state';
 
 @Component({
@@ -30,14 +24,12 @@ export class PatientRecordCreate {
   private readonly router = inject(Router);
 
   protected readonly isSaving = this.patientRecordState.isSaving;
-
   protected readonly errorMessage = signal('');
-
   protected readonly bloodTypes = BLOOD_TYPES;
   protected readonly heightUnits = HEIGHT_UNITS;
   protected readonly weightUnits = WEIGHT_UNITS;
-
   protected readonly form = createPatientRecordForm(this.formBuilder);
+  protected readonly formatOption = formatEnumLabel;
 
   protected create(): void {
     this.errorMessage.set('');
@@ -47,39 +39,23 @@ export class PatientRecordCreate {
       return;
     }
 
-    this.patientRecordState
-      .createPatientRecord(mapPatientRecordFormToRequest(this.form))
-      .subscribe({
-        next: () => {
-          this.selectedPatientState.revalidateSelection();
+    this.patientRecordState.createPatientRecord(mapPatientRecordFormToRequest(this.form)).subscribe({
+      next: () => {
+        this.selectedPatientState.revalidateSelection();
+        void this.router.navigate(['/patient']);
+      },
+      error: (error: unknown) => {
+        if (applyServerFieldErrors(this.form, error)) {
+          return;
+        }
 
-          void this.router.navigate(['/patient']);
-        },
-        error: (error: unknown) => {
-          if (applyServerFieldErrors(this.form, error)) {
-            return;
-          }
+        if (hasHttpStatus(error, 409)) {
+          this.errorMessage.set('A personal patient record already exists.');
+          return;
+        }
 
-          if (hasHttpStatus(error, 409)) {
-            this.errorMessage.set('A personal patient record already exists.');
-
-            return;
-          }
-
-          this.errorMessage.set(
-            getHttpErrorMessage(
-              error,
-              'Unable to create your patient record.',
-            ),
-          );
-        },
-      });
-  }
-
-  protected formatOption(value: string): string {
-    return value
-      .toLowerCase()
-      .replaceAll('_', ' ')
-      .replace(/\b\w/g, (character) => character.toUpperCase());
+        this.errorMessage.set(getHttpErrorMessage(error, 'Unable to create your patient record.'));
+      },
+    });
   }
 }
