@@ -9,19 +9,10 @@ import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
 import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
 import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
 import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import {
-  DocumentProcessingResultResponse,
-  DocumentResponse,
-} from '../../models/document-model';
+import { DocumentProcessingResultResponse, DocumentResponse } from '../../models/document-model';
 import { DocumentApiService } from '../../services/document-api-service';
 
-type ReviewPageStatus =
-  | 'loading'
-  | 'ready'
-  | 'invalid'
-  | 'not-found'
-  | 'forbidden'
-  | 'error';
+type ReviewPageStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 
 @Component({
   selector: 'app-deidentification-review',
@@ -30,97 +21,57 @@ type ReviewPageStatus =
 })
 export class DeidentificationReview implements OnInit {
   private readonly route = inject(ActivatedRoute);
-
   private readonly router = inject(Router);
-
   private readonly formBuilder = inject(FormBuilder);
-
   private readonly documentApi = inject(DocumentApiService);
-
   private readonly selectedPatientState = inject(SelectedPatientState);
-
   private readonly authorisation = inject(PatientContextAuthorisation);
-
   private readonly patientContextCoordinator = inject(PatientContextCoordinator);
 
   protected readonly document = signal<DocumentResponse | null>(null);
-
   protected readonly processing = signal<DocumentProcessingResultResponse | null>(null);
-
   protected readonly status = signal<ReviewPageStatus>('loading');
-
   protected readonly errorMessage = signal('');
-
   protected readonly actionError = signal('');
-
   protected readonly isSubmitting = signal(false);
 
   protected readonly contextMatchesDocument = computed(() => {
     const document = this.document();
     const selectedPatient = this.selectedPatientState.selectedPatient();
-
-    return (
-      document !== null &&
-      selectedPatient !== null &&
-      document.patientRecordId === selectedPatient.patientRecordId
-    );
+    return document !== null && selectedPatient !== null && document.patientRecordId === selectedPatient.patientRecordId;
   });
 
   protected readonly form = this.formBuilder.group({
-    approvedDeidentifiedText: this.formBuilder.nonNullable.control('', [
-      Validators.required,
-    ]),
-    externalTransmissionApproved: this.formBuilder.nonNullable.control(
-      false,
-      Validators.requiredTrue,
-    ),
+    approvedDeidentifiedText: this.formBuilder.nonNullable.control('', Validators.required),
+    externalTransmissionApproved: this.formBuilder.nonNullable.control(false, Validators.requiredTrue),
   });
 
   ngOnInit(): void {
     const documentId = this.route.snapshot.paramMap.get('documentId');
-
     if (documentId === null || documentId.length === 0) {
       this.status.set('not-found');
       return;
     }
-
     this.loadReview(documentId);
   }
 
   protected submit(): void {
     this.actionError.set('');
-
     const document = this.document();
 
-    if (
-      document === null ||
-      this.status() !== 'ready' ||
-      !this.contextMatchesDocument()
-    ) {
+    if (document === null || this.status() !== 'ready' || !this.contextMatchesDocument()) {
       return;
     }
 
     const selectedPatient = this.selectedPatientState.selectedPatient();
-
-    if (
-      !this.authorisation.can(
-        selectedPatient,
-        'document',
-        'edit',
-      )
-    ) {
+    if (!this.authorisation.can(selectedPatient, 'document', 'edit')) {
       this.status.set('forbidden');
       return;
     }
 
-    const approvedText =
-      this.form.controls.approvedDeidentifiedText.value;
-
+    const approvedText = this.form.controls.approvedDeidentifiedText.value;
     if (approvedText.trim().length === 0) {
-      this.form.controls.approvedDeidentifiedText.setErrors({
-        required: true,
-      });
-
+      this.form.controls.approvedDeidentifiedText.setErrors({ required: true });
       this.form.controls.approvedDeidentifiedText.markAsTouched();
     }
 
@@ -130,234 +81,153 @@ export class DeidentificationReview implements OnInit {
     }
 
     this.isSubmitting.set(true);
-
-    this.documentApi
-      .summariseDocument(document.id, {
-        approvedDeidentifiedText: approvedText,
-      })
-      .pipe(
-        finalize(() => {
-          this.isSubmitting.set(false);
-        }),
-      )
-      .subscribe({
-        next: () => {
-          void this.router.navigate([
-            '/documents',
-            document.id,
-          ]);
-        },
-        error: (error: unknown) => {
-          this.handleSubmissionError(error);
-        },
-      });
+    this.documentApi.summariseDocument(document.id, { approvedDeidentifiedText: approvedText }).pipe(
+      finalize(() => this.isSubmitting.set(false)),
+    ).subscribe({
+      next: () => void this.router.navigate(['/documents', document.id]),
+      error: (error: unknown) => this.handleSubmissionError(error, document),
+    });
   }
 
   protected retryLoad(): void {
     const documentId = this.route.snapshot.paramMap.get('documentId');
-
     if (documentId !== null) {
       this.loadReview(documentId);
     }
   }
 
-  private loadReview(documentId: string): void {
+  private loadReview(documentId: string, stateChangeMessage: string | null = null): void {
     this.status.set('loading');
     this.errorMessage.set('');
-    this.actionError.set('');
+    this.actionError.set(stateChangeMessage ?? '');
     this.document.set(null);
     this.processing.set(null);
 
-    this.documentApi
-      .getDocument(documentId)
-      .pipe(
-        switchMap((document) => {
-          this.document.set(document);
+    this.documentApi.getDocument(documentId).pipe(
+      switchMap((document) => {
+        this.document.set(document);
+        const selectedPatient = this.selectedPatientState.selectedPatient();
 
-          const selectedPatient =
-            this.selectedPatientState.selectedPatient();
+        if (selectedPatient === null || document.patientRecordId !== selectedPatient.patientRecordId) {
+          this.status.set('invalid');
+          this.errorMessage.set('This document does not belong to the currently selected patient.');
+          return EMPTY;
+        }
 
-          if (
-            selectedPatient === null ||
-            document.patientRecordId !==
-            selectedPatient.patientRecordId
-          ) {
-            this.status.set('invalid');
-            this.errorMessage.set(
-              'This document does not belong to the currently selected patient.',
-            );
+        if (document.documentType !== 'CONSULTATION_OUTCOME_LETTER' || document.status !== 'READY_FOR_DEIDENTIFICATION_REVIEW') {
+          this.status.set('invalid');
+          this.errorMessage.set(stateChangeMessage ?? 'This document is not awaiting de-identification review.');
+          return EMPTY;
+        }
 
-            return EMPTY;
-          }
+        return this.documentApi.getDocumentProcessing(document.id);
+      }),
+    ).subscribe({
+      next: (processing) => {
+        if (processing.machineDeidentifiedText === null) {
+          this.status.set('error');
+          this.errorMessage.set('The processing result does not contain de-identified text.');
+          return;
+        }
 
-          if (
-            document.documentType !==
-            'CONSULTATION_OUTCOME_LETTER' ||
-            document.status !==
-            'READY_FOR_DEIDENTIFICATION_REVIEW'
-          ) {
-            this.status.set('invalid');
-            this.errorMessage.set(
-              'This document is not awaiting de-identification review.',
-            );
-
-            return EMPTY;
-          }
-
-          return this.documentApi.getDocumentProcessing(
-            document.id,
-          );
-        }),
-      )
-      .subscribe({
-        next: (processing) => {
-          if (
-            processing.machineDeidentifiedText === null
-          ) {
-            this.status.set('error');
-            this.errorMessage.set(
-              'The processing result does not contain de-identified text.',
-            );
-
-            return;
-          }
-
-          this.processing.set(processing);
-
-          this.form.reset({
-            approvedDeidentifiedText:
-            processing.machineDeidentifiedText,
-            externalTransmissionApproved: false,
-          });
-
-          this.status.set('ready');
-        },
-        error: (error: unknown) => {
-          this.handleLoadError(error);
-        },
-      });
+        this.processing.set(processing);
+        this.form.reset({
+          approvedDeidentifiedText: processing.machineDeidentifiedText,
+          externalTransmissionApproved: false,
+        });
+        this.status.set('ready');
+      },
+      error: (error: unknown) => this.handleLoadError(error),
+    });
   }
 
   private handleLoadError(error: unknown): void {
     if (hasHttpStatus(error, 404)) {
       this.status.set('not-found');
+      this.refreshPatientAccess();
       return;
     }
 
     if (hasHttpStatus(error, 403)) {
       this.status.set('forbidden');
-      this.refreshPatientContext();
+      this.refreshPatientAccess();
       return;
     }
 
     this.status.set('error');
-
-    this.errorMessage.set(
-      getHttpErrorMessage(
-        error,
-        'Unable to load the de-identification review.',
-      ),
-    );
+    this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the de-identification review.'));
   }
 
-  private handleSubmissionError(error: unknown): void {
+  private handleSubmissionError(error: unknown, document: DocumentResponse): void {
     if (applyServerFieldErrors(this.form, error)) {
       return;
     }
 
     if (hasHttpStatus(error, 400)) {
-      this.actionError.set(
-        getHttpErrorMessage(
-          error,
-          'The approved de-identified text is invalid.',
-        ),
-      );
-
+      this.actionError.set(getHttpErrorMessage(error, 'The approved de-identified text is invalid.'));
       return;
     }
 
-    if (hasHttpStatus(error, 403) || hasHttpStatus(error, 404)) {
-      this.status.set('forbidden');
-      this.refreshPatientContext();
+    if (hasHttpStatus(error, 403)) {
+      this.refreshPatientAccess();
+      return;
+    }
+
+    if (hasHttpStatus(error, 404)) {
+      this.status.set('not-found');
+      this.refreshPatientAccess();
       return;
     }
 
     if (hasHttpStatus(error, 409)) {
-      this.status.set('invalid');
-      this.errorMessage.set(
-        'The document state changed before summarisation could start. Return to document details to reload its current state.',
-      );
-
+      this.loadReview(document.id, 'The document state changed before summarisation could start. The latest document state has been reloaded.');
       return;
     }
 
     if (hasHttpStatus(error, 413)) {
-      this.status.set('invalid');
-      this.errorMessage.set(
-        'The approved de-identified text exceeded the summarisation limit. Return to document details to reload the current document state.',
-      );
-
+      this.loadReview(document.id, 'The approved de-identified text exceeded the summarisation limit. The latest document state has been reloaded.');
       return;
     }
 
     if (hasHttpStatus(error, 502)) {
-      this.status.set('invalid');
-      this.errorMessage.set(
-        'The external summarisation service returned an invalid response. Return to document details to review the current document state.',
-      );
-
+      this.loadReview(document.id, 'The external summarisation service returned an invalid response. The latest document state has been reloaded.');
       return;
     }
 
     if (hasHttpStatus(error, 503)) {
-      this.status.set('invalid');
-      this.errorMessage.set(
-        'External summarisation is currently unavailable. Return to document details to review the current document state.',
-      );
-
+      this.loadReview(document.id, 'External summarisation is currently unavailable. The latest document state has been reloaded.');
       return;
     }
 
     if (hasHttpStatus(error, 504)) {
-      this.status.set('invalid');
-      this.errorMessage.set(
-        'External summarisation timed out. Return to document details to review the current document state.',
-      );
-
+      this.loadReview(document.id, 'External summarisation timed out. The latest document state has been reloaded.');
       return;
     }
 
-    this.status.set('invalid');
-    this.errorMessage.set(
-      'Summarisation did not complete. Return to document details before trying another action.',
-    );
+    this.loadReview(document.id, getHttpErrorMessage(error, 'Summarisation did not complete. The latest document state has been reloaded.'));
   }
 
-  private refreshPatientContext(): void {
-    this.patientContextCoordinator.load().subscribe({
+  private refreshPatientAccess(): void {
+    const failedPatientRecordId = this.document()?.patientRecordId ?? null;
+    this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       next: () => {
-        const selectedPatient =
-          this.selectedPatientState.selectedPatient();
+        const selectedPatient = this.selectedPatientState.selectedPatient();
 
-        if (
-          !this.authorisation.can(
-            selectedPatient,
-            'document',
-            'edit',
-          )
-        ) {
-          this.status.set('forbidden');
+        if (failedPatientRecordId !== null && selectedPatient?.patientRecordId !== failedPatientRecordId) {
+          void this.router.navigate(['/documents']);
+          return;
         }
+
+        if (!this.authorisation.can(selectedPatient, 'document', 'edit')) {
+          this.status.set('forbidden');
+          return;
+        }
+
+        this.actionError.set('Your patient access changed. Reload the document before continuing.');
       },
       error: (error: unknown) => {
         this.status.set('error');
-
-        this.errorMessage.set(
-          getHttpErrorMessage(
-            error,
-            'Unable to refresh your patient access.',
-          ),
-        );
+        this.errorMessage.set(getHttpErrorMessage(error, 'Unable to refresh your patient access.'));
       },
     });
   }

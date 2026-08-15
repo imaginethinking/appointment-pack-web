@@ -1,8 +1,4 @@
-export const DOCUMENT_TYPES = [
-  'APPOINTMENT_LETTER',
-  'CONSULTATION_OUTCOME_LETTER'
-] as const;
-
+export const DOCUMENT_TYPES = ['APPOINTMENT_LETTER', 'CONSULTATION_OUTCOME_LETTER'] as const;
 export type DocumentType = typeof DOCUMENT_TYPES[number];
 
 export const DOCUMENT_STATUSES = [
@@ -18,15 +14,9 @@ export const DOCUMENT_STATUSES = [
   'REJECTED',
   'ARCHIVED',
 ] as const;
-
 export type DocumentStatus = typeof DOCUMENT_STATUSES[number];
 
-export const SUMMARY_SOURCES = [
-  'DETERMINISTIC',
-  'OPENAI',
-  'MANUAL'
-] as const;
-
+export const SUMMARY_SOURCES = ['DETERMINISTIC', 'OPENAI', 'MANUAL'] as const;
 export type SummarySource = typeof SUMMARY_SOURCES[number];
 
 const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
@@ -94,30 +84,20 @@ export interface DocumentProcessingResultResponse {
   documentId: string;
   documentType: DocumentType;
   status: DocumentStatus;
-
   extractedText: string;
-
   machineDeidentifiedText: string | null;
   approvedDeidentifiedText: string | null;
-
   appointmentDetails: AppointmentDetailsResponse | null;
-
   generatedSummary: string | null;
   reviewedSummary: string | null;
-
   summarySource: SummarySource | null;
-
   processingWarning: string | null;
   processorVersion: string;
-
   model: DocumentModelMetadata | null;
-
   appointmentReviewedByUserId: string | null;
   appointmentReviewedAt: string | null;
-
   deidentificationReviewedByUserId: string | null;
   deidentificationReviewedAt: string | null;
-
   summaryReviewedByUserId: string | null;
   summaryReviewedAt: string | null;
 }
@@ -149,17 +129,11 @@ export function canExtractDocument(status: DocumentStatus): boolean {
 }
 
 export function canReviewAppointment(document: DocumentResponse): boolean {
-  return (
-    document.documentType === 'APPOINTMENT_LETTER' &&
-    document.status === 'READY_FOR_APPOINTMENT_REVIEW'
-  );
+  return document.documentType === 'APPOINTMENT_LETTER' && document.status === 'READY_FOR_APPOINTMENT_REVIEW';
 }
 
 export function canReviewDeidentifiedText(document: DocumentResponse): boolean {
-  return (
-    document.documentType === 'CONSULTATION_OUTCOME_LETTER' &&
-    document.status === 'READY_FOR_DEIDENTIFICATION_REVIEW'
-  );
+  return document.documentType === 'CONSULTATION_OUTCOME_LETTER' && document.status === 'READY_FOR_DEIDENTIFICATION_REVIEW';
 }
 
 export function canOpenSummaryReview(status: DocumentStatus): boolean {
@@ -167,25 +141,26 @@ export function canOpenSummaryReview(status: DocumentStatus): boolean {
 }
 
 export function canArchiveDocument(status: DocumentStatus): boolean {
-  return (
-    status === 'UPLOADED' ||
-    status === 'READY_FOR_APPOINTMENT_REVIEW' ||
-    status === 'READY_FOR_DEIDENTIFICATION_REVIEW' ||
-    status === 'READY_FOR_SUMMARY_REVIEW' ||
-    status === 'EXTRACTION_FAILED' ||
-    status === 'SUMMARISATION_FAILED' ||
-    status === 'REJECTED'
-  );
+  return [
+    'UPLOADED',
+    'READY_FOR_APPOINTMENT_REVIEW',
+    'READY_FOR_DEIDENTIFICATION_REVIEW',
+    'READY_FOR_SUMMARY_REVIEW',
+    'EXTRACTION_FAILED',
+    'SUMMARISATION_FAILED',
+    'REJECTED',
+    'ACCEPTED',
+  ].includes(status);
 }
 
 export function documentHasProcessingResult(status: DocumentStatus): boolean {
-  return (
-    status === 'READY_FOR_APPOINTMENT_REVIEW' ||
-    status === 'READY_FOR_DEIDENTIFICATION_REVIEW' ||
-    status === 'SUMMARISING' ||
-    status === 'READY_FOR_SUMMARY_REVIEW' ||
-    status === 'SUMMARISATION_FAILED' ||
-    status === 'ACCEPTED' ||
-    status === 'REJECTED'
-  );
+  return [
+    'READY_FOR_APPOINTMENT_REVIEW',
+    'READY_FOR_DEIDENTIFICATION_REVIEW',
+    'SUMMARISING',
+    'READY_FOR_SUMMARY_REVIEW',
+    'SUMMARISATION_FAILED',
+    'ACCEPTED',
+    'REJECTED',
+  ].includes(status);
 }
