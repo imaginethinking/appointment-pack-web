@@ -29,6 +29,10 @@ import { MedicalHistoryCreate } from './features/medical-history/pages/medical-h
 import { MedicalHistoryDetails } from './features/medical-history/pages/medical-history-details/medical-history-details';
 import { MedicalHistoryEdit } from './features/medical-history/pages/medical-history-edit/medical-history-edit';
 import { MedicalHistory } from './features/medical-history/pages/medical-history/medical-history';
+import { MedicationCreate } from './features/medications/pages/medication-create/medication-create';
+import { MedicationDetails } from './features/medications/pages/medication-details/medication-details';
+import { MedicationEdit } from './features/medications/pages/medication-edit/medication-edit';
+import { MedicationList } from './features/medications/pages/medication-list/medication-list';
 import { PatientRecordCreate } from './features/patient-record/pages/patient-record-create/patient-record-create';
 import { PatientRecordEdit } from './features/patient-record/pages/patient-record-edit/patient-record-edit';
 import { PatientRecord } from './features/patient-record/pages/patient-record/patient-record';
@@ -212,6 +216,50 @@ export const routes: Routes = [
         data: {
           permission: {
             resource: 'appointment',
+            action: 'view',
+          },
+        },
+      },
+      {
+        path: 'medications',
+        component: MedicationList,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'medication',
+            action: 'view',
+          },
+        },
+      },
+      {
+        path: 'medications/create',
+        component: MedicationCreate,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'medication',
+            action: 'edit',
+          },
+        },
+      },
+      {
+        path: 'medications/:medicationId/edit',
+        component: MedicationEdit,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'medication',
+            action: 'edit',
+          },
+        },
+      },
+      {
+        path: 'medications/:medicationId',
+        component: MedicationDetails,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'medication',
             action: 'view',
           },
         },

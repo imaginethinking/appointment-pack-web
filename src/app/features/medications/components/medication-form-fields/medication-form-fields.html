@@ -1,0 +1,102 @@
+<div class="space-y-6" [formGroup]="form()">
+  <section class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+    <div>
+      <h2 class="text-xl font-semibold text-brand-plum">Medication</h2>
+      <p class="mt-1 text-sm text-brand-plum/70">Record the medication name, dose and how it should be taken.</p>
+    </div>
+
+    <div>
+      <label [for]="idPrefix() + '-name'" class="mb-1 block font-semibold text-brand-plum">Medication name</label>
+      <input [id]="idPrefix() + '-name'" type="text" maxlength="200" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="name" />
+
+      @if (form().controls.name.touched && (form().controls.name.hasError('required') || form().controls.name.hasError('blank'))) {
+        <p class="mt-1 text-sm text-brand-coral">Medication name is required.</p>
+      } @else if (form().controls.name.hasError('maxlength')) {
+        <p class="mt-1 text-sm text-brand-coral">Medication name must not exceed 200 characters.</p>
+      } @else if (form().controls.name.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+      }
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label [for]="idPrefix() + '-dose'" class="mb-1 block font-semibold text-brand-plum">Dose</label>
+        <input [id]="idPrefix() + '-dose'" type="text" maxlength="100" placeholder="e.g. 20 mg" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="dose" />
+
+        @if (form().controls.dose.hasError('maxlength')) {
+          <p class="mt-1 text-sm text-brand-coral">Dose must not exceed 100 characters.</p>
+        } @else if (form().controls.dose.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+
+      <div>
+        <label [for]="idPrefix() + '-form'" class="mb-1 block font-semibold text-brand-plum">Form</label>
+        <input [id]="idPrefix() + '-form'" type="text" maxlength="100" placeholder="e.g. Tablet" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="form" />
+
+        @if (form().controls.form.hasError('maxlength')) {
+          <p class="mt-1 text-sm text-brand-coral">Medication form must not exceed 100 characters.</p>
+        } @else if (form().controls.form.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+    </div>
+
+    <div>
+      <label [for]="idPrefix() + '-instructions'" class="mb-1 block font-semibold text-brand-plum">Instructions</label>
+      <textarea [id]="idPrefix() + '-instructions'" rows="4" maxlength="500" placeholder="e.g. Take one tablet once daily with food" class="w-full rounded-md border border-brand-plum/30 bg-white p-3 text-brand-plum" formControlName="instructions"></textarea>
+
+      <div class="mt-1 text-right text-sm text-brand-plum/60">{{ form().controls.instructions.value.length }} / 500</div>
+
+      @if (form().controls.instructions.hasError('maxlength')) {
+        <p class="mt-1 text-sm text-brand-coral">Instructions must not exceed 500 characters.</p>
+      } @else if (form().controls.instructions.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+      }
+    </div>
+  </section>
+
+  <section class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+    <div>
+      <h2 class="text-xl font-semibold text-brand-plum">Course dates</h2>
+      <p class="mt-1 text-sm text-brand-plum/70">Dates are optional. If both are supplied, the end date cannot be before the start date.</p>
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label [for]="idPrefix() + '-start-date'" class="mb-1 block font-semibold text-brand-plum">Start date</label>
+        <input [id]="idPrefix() + '-start-date'" type="date" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="startDate" />
+
+        @if (form().controls.startDate.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+
+      <div>
+        <label [for]="idPrefix() + '-end-date'" class="mb-1 block font-semibold text-brand-plum">End date</label>
+        <input [id]="idPrefix() + '-end-date'" type="date" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="endDate" />
+
+        @if (form().hasError('endDateBeforeStart') && form().controls.endDate.touched) {
+          <p class="mt-1 text-sm text-brand-coral">End date cannot be before the start date.</p>
+        } @else if (form().controls.endDate.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+    <label [for]="idPrefix() + '-notes'" class="block text-xl font-semibold text-brand-plum">Notes</label>
+    <p class="mt-1 text-sm text-brand-plum/70">Optional additional information about this medication.</p>
+
+    <textarea [id]="idPrefix() + '-notes'" rows="5" maxlength="2000" class="mt-4 w-full rounded-md border border-brand-plum/30 bg-white p-3 text-brand-plum" formControlName="notes"></textarea>
+
+    <div class="mt-1 text-right text-sm text-brand-plum/60">{{ form().controls.notes.value.length }} / 2000</div>
+
+    @if (form().controls.notes.hasError('maxlength')) {
+      <p class="mt-1 text-sm text-brand-coral">Notes must not exceed 2000 characters.</p>
+    } @else if (form().controls.notes.errors?.['server']; as message) {
+      <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+    }
+  </section>
+</div>

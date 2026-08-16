@@ -1,0 +1,91 @@
+<section class="mx-auto max-w-5xl">
+  <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-brand-plum">Medications</h1>
+
+      @if (selectedPatient(); as patient) {
+        <p class="mt-1 text-brand-plum/70">
+          Medications for <span class="font-semibold text-brand-plum">{{ getPatientContextName(patient) }}</span>
+        </p>
+      } @else {
+        <p class="mt-1 text-brand-plum/70">View medications for the selected patient.</p>
+      }
+    </div>
+
+    @if (canEditMedications()) {
+      <a routerLink="/medications/create" class="btn btn-primary">Add medication</a>
+    }
+  </div>
+
+  @if (status() === 'loading') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">Loading medications...</div>
+  } @else if (status() === 'no-patient') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <h2 class="font-semibold text-brand-plum">No patient selected</h2>
+      <p class="mt-2 text-brand-plum/70">Select an accessible patient before viewing medications.</p>
+    </div>
+  } @else if (status() === 'forbidden') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Medications unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">You do not have permission to view medications for this patient.</p>
+    </div>
+  } @else if (status() === 'error') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-coral">{{ errorMessage() }}</p>
+      <button type="button" class="btn btn-secondary mt-4" (click)="retry()">Try again</button>
+    </div>
+  } @else if (medications().length === 0) {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <h2 class="font-semibold text-brand-plum">No medications</h2>
+      <p class="mt-2 text-brand-plum/70">There are no active medication records for this patient.</p>
+
+      @if (canEditMedications()) {
+        <a routerLink="/medications/create" class="btn btn-primary mt-4">Add medication</a>
+      }
+    </div>
+  } @else {
+    <div class="grid gap-4 lg:grid-cols-2">
+      @for (medication of medications(); track medication.id) {
+        <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+          <div>
+            <h2 class="text-xl font-semibold text-brand-plum">{{ medication.name }}</h2>
+
+            @if (medication.dose || medication.form) {
+              <p class="mt-1 text-brand-plum/70">
+                @if (medication.dose) {
+                  <span>{{ medication.dose }}</span>
+                }
+                @if (medication.dose && medication.form) {
+                  <span> · </span>
+                }
+                @if (medication.form) {
+                  <span>{{ medication.form }}</span>
+                }
+              </p>
+            }
+          </div>
+
+          @if (medication.instructions) {
+            <p class="mt-4 whitespace-pre-wrap text-brand-plum">{{ medication.instructions }}</p>
+          }
+
+          <dl class="mt-5 grid gap-4 border-t border-brand-plum/20 pt-4 sm:grid-cols-2">
+            <div>
+              <dt class="text-sm font-semibold text-brand-plum/70">Start date</dt>
+              <dd class="mt-1 text-brand-plum">{{ medication.startDate ? (medication.startDate | date: 'd MMMM y') : 'Not provided' }}</dd>
+            </div>
+
+            <div>
+              <dt class="text-sm font-semibold text-brand-plum/70">End date</dt>
+              <dd class="mt-1 text-brand-plum">{{ medication.endDate ? (medication.endDate | date: 'd MMMM y') : 'Not provided' }}</dd>
+            </div>
+          </dl>
+
+          <div class="mt-5 border-t border-brand-plum/20 pt-4">
+            <a [routerLink]="['/medications', medication.id]" class="text-sm font-semibold text-brand-plum underline">View medication</a>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>
