@@ -46,6 +46,10 @@ import { PatientRecord } from './features/patient-record/pages/patient-record/pa
 import { MfaSettings } from './features/profile/pages/mfa-settings/mfa-settings';
 import { ProfileEdit } from './features/profile/pages/profile-edit/profile-edit';
 import { Profile } from './features/profile/pages/profile/profile';
+import { BloodTestCreate } from './features/blood-results/pages/blood-test-create/blood-test-create';
+import { BloodTestDetails } from './features/blood-results/pages/blood-test-details/blood-test-details';
+import { BloodTestEdit } from './features/blood-results/pages/blood-test-edit/blood-test-edit';
+import { BloodTestList } from './features/blood-results/pages/blood-test-list/blood-test-list';
 
 export const routes: Routes = [
   {
@@ -344,6 +348,50 @@ export const routes: Routes = [
         data: {
           permission: {
             resource: 'contact',
+            action: 'view',
+          },
+        },
+      },
+      {
+        path: 'blood-results',
+        component: BloodTestList,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'blood-result',
+            action: 'view',
+          },
+        },
+      },
+      {
+        path: 'blood-results/create',
+        component: BloodTestCreate,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'blood-result',
+            action: 'edit',
+          },
+        },
+      },
+      {
+        path: 'blood-results/:bloodTestId/edit',
+        component: BloodTestEdit,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'blood-result',
+            action: 'edit',
+          },
+        },
+      },
+      {
+        path: 'blood-results/:bloodTestId',
+        component: BloodTestDetails,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'blood-result',
             action: 'view',
           },
         },

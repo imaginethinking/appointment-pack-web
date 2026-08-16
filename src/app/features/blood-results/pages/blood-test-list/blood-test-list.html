@@ -1,0 +1,95 @@
+<section class="mx-auto max-w-6xl">
+  <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-brand-plum">Blood results</h1>
+
+      @if (selectedPatient(); as patient) {
+        <p class="mt-1 text-brand-plum/70">Manually recorded blood tests for <span class="font-semibold text-brand-plum">{{ getPatientContextName(patient) }}</span></p>
+      } @else {
+        <p class="mt-1 text-brand-plum/70">View blood results for the selected patient.</p>
+      }
+    </div>
+
+    @if (canEditBloodResults()) {
+      <a routerLink="/blood-results/create" class="btn btn-primary">Add blood test</a>
+    }
+  </div>
+
+  @if (status() === 'loading') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">Loading blood results...</div>
+  } @else if (status() === 'no-patient') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <h2 class="font-semibold text-brand-plum">No patient selected</h2>
+      <p class="mt-2 text-brand-plum/70">Select an accessible patient before viewing blood results.</p>
+    </div>
+  } @else if (status() === 'forbidden') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Blood results unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">You do not have permission to view blood results for this patient.</p>
+    </div>
+  } @else if (status() === 'error') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-coral">{{ errorMessage() }}</p>
+      <button type="button" class="btn btn-secondary mt-4" (click)="retry()">Try again</button>
+    </div>
+  } @else if (bloodTests().length === 0) {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <h2 class="font-semibold text-brand-plum">No blood tests</h2>
+      <p class="mt-2 text-brand-plum/70">There are no manually recorded blood tests for this patient.</p>
+
+      @if (canEditBloodResults()) {
+        <a routerLink="/blood-results/create" class="btn btn-primary mt-4">Add blood test</a>
+      }
+    </div>
+  } @else {
+    <div class="space-y-4">
+      @for (bloodTest of bloodTests(); track bloodTest.id) {
+        <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h2 class="text-xl font-semibold text-brand-plum">{{ bloodTest.title || 'Blood test' }}</h2>
+
+              @if (bloodTest.provider) {
+                <p class="mt-1 text-brand-plum/70">{{ bloodTest.provider }}</p>
+              }
+            </div>
+
+            <time class="w-fit rounded-full bg-brand-mint px-3 py-1 text-sm font-semibold text-brand-plum">{{ bloodTest.testDate | date: 'd MMMM y' }}</time>
+          </div>
+
+          <div class="mt-5 overflow-x-auto border-t border-brand-plum/20 pt-4">
+            <table class="w-full min-w-[36rem] text-left text-sm">
+              <thead>
+              <tr class="text-brand-plum/70">
+                <th class="pb-2 pr-4 font-semibold">Analyte</th>
+                <th class="pb-2 pr-4 font-semibold">Result</th>
+                <th class="pb-2 pr-4 font-semibold">Reference range</th>
+                <th class="pb-2 font-semibold">Flag</th>
+              </tr>
+              </thead>
+
+              <tbody class="divide-y divide-brand-plum/10">
+                @for (result of bloodTest.results.slice(0, 4); track result.analyteKey) {
+                  <tr>
+                    <td class="py-2 pr-4 font-medium text-brand-plum">{{ result.analyteName }}</td>
+                    <td class="py-2 pr-4 text-brand-plum">{{ result.resultValue }}{{ result.unit ? ' ' + result.unit : '' }}</td>
+                    <td class="py-2 pr-4 text-brand-plum">{{ result.referenceRange || '—' }}</td>
+                    <td class="py-2 text-brand-plum">{{ result.flag ? formatFlag(result.flag) : '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          @if (bloodTest.results.length > 4) {
+            <p class="mt-3 text-sm text-brand-plum/60">+ {{ bloodTest.results.length - 4 }} more result{{ bloodTest.results.length - 4 === 1 ? '' : 's' }}</p>
+          }
+
+          <div class="mt-5 border-t border-brand-plum/20 pt-4">
+            <a [routerLink]="['/blood-results', bloodTest.id]" class="text-sm font-semibold text-brand-plum underline">View blood test</a>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

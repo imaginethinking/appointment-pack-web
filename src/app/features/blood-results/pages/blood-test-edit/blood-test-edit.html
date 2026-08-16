@@ -1,0 +1,48 @@
+<section class="mx-auto max-w-4xl">
+  <div class="mb-6">
+    @if (bloodTest(); as currentBloodTest) {
+      <a [routerLink]="['/blood-results', currentBloodTest.id]" class="text-sm font-semibold text-brand-plum underline">Back to blood test</a>
+    } @else {
+      <a routerLink="/blood-results" class="text-sm font-semibold text-brand-plum underline">Back to blood results</a>
+    }
+
+    <h1 class="mt-4 text-3xl font-bold text-brand-plum">Edit blood test</h1>
+  </div>
+
+  @if (status() === 'loading') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">Loading blood test...</div>
+  } @else if (status() === 'not-found') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Blood test not found</h2>
+      <p class="mt-2 text-brand-plum/70">The blood test does not exist, has been archived, or is no longer available.</p>
+    </div>
+  } @else if (status() === 'forbidden') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Editing unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">You do not have permission to edit this blood test.</p>
+    </div>
+  } @else if (status() === 'invalid') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-plum">{{ errorMessage() }}</p>
+      <a routerLink="/blood-results" class="btn btn-secondary mt-4">Return to blood results</a>
+    </div>
+  } @else if (status() === 'error') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-coral">{{ errorMessage() }}</p>
+      <button type="button" class="btn btn-secondary mt-4" (click)="retry()">Try again</button>
+    </div>
+  } @else if (bloodTest(); as currentBloodTest) {
+    <form class="space-y-6" [formGroup]="form" novalidate (ngSubmit)="save()">
+      <app-blood-test-form-fields [form]="form" idPrefix="edit-blood-test" />
+
+      @if (errorMessage()) {
+        <div class="rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral" role="alert">{{ errorMessage() }}</div>
+      }
+
+      <div class="flex flex-wrap gap-3">
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving()">{{ isSaving() ? 'Saving...' : 'Save blood test' }}</button>
+        <a [routerLink]="['/blood-results', currentBloodTest.id]" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  }
+</section>

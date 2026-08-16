@@ -46,6 +46,11 @@ const NAVIGATION_ITEMS: readonly NavigationItem[] = [
     permission: 'contact:view',
   },
   {
+    label: 'Blood Results',
+    route: '/blood-results',
+    permission: 'blood-result:view',
+  },
+  {
     label: 'Medical History',
     route: '/medical-history',
     permission: 'history:view',

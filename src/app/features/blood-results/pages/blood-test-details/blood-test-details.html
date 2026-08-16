@@ -1,0 +1,108 @@
+<section class="mx-auto max-w-5xl">
+  <div class="mb-6">
+    <a routerLink="/blood-results" class="text-sm font-semibold text-brand-plum underline">Back to blood results</a>
+    <h1 class="mt-4 text-3xl font-bold text-brand-plum">Blood test details</h1>
+  </div>
+
+  @if (status() === 'loading') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">Loading blood test...</div>
+  } @else if (status() === 'not-found') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Blood test not found</h2>
+      <p class="mt-2 text-brand-plum/70">The blood test does not exist, has been archived, or is no longer available.</p>
+    </div>
+  } @else if (status() === 'forbidden') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Blood test unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">You do not have permission to view this blood test.</p>
+    </div>
+  } @else if (status() === 'invalid') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-plum">{{ errorMessage() }}</p>
+      <a routerLink="/blood-results" class="btn btn-secondary mt-4">Return to blood results</a>
+    </div>
+  } @else if (status() === 'error') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-coral">{{ errorMessage() }}</p>
+      <button type="button" class="btn btn-secondary mt-4" (click)="retry()">Try again</button>
+    </div>
+  } @else if (bloodTest(); as currentBloodTest) {
+    <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h2 class="text-2xl font-semibold text-brand-plum">{{ currentBloodTest.title || 'Blood test' }}</h2>
+
+          @if (currentBloodTest.provider) {
+            <p class="mt-1 text-brand-plum/70">{{ currentBloodTest.provider }}</p>
+          }
+        </div>
+
+        <time class="w-fit rounded-full bg-brand-mint px-3 py-1 text-sm font-semibold text-brand-plum">{{ currentBloodTest.testDate | date: 'd MMMM y' }}</time>
+      </div>
+
+      <section class="mt-6 border-t border-brand-plum/20 pt-5">
+        <div class="mb-4">
+          <h3 class="text-xl font-semibold text-brand-plum">Results</h3>
+          <p class="mt-1 text-sm text-brand-plum/60">{{ currentBloodTest.results.length }} recorded result{{ currentBloodTest.results.length === 1 ? '' : 's' }}</p>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[44rem] text-left text-sm">
+            <thead>
+            <tr class="border-b border-brand-plum/20 text-brand-plum/70">
+              <th class="pb-3 pr-4 font-semibold">Analyte</th>
+              <th class="pb-3 pr-4 font-semibold">Result</th>
+              <th class="pb-3 pr-4 font-semibold">Unit</th>
+              <th class="pb-3 pr-4 font-semibold">Reference range</th>
+              <th class="pb-3 font-semibold">Flag</th>
+            </tr>
+            </thead>
+
+            <tbody class="divide-y divide-brand-plum/10">
+              @for (result of currentBloodTest.results; track result.analyteKey) {
+                <tr>
+                  <td class="py-3 pr-4 font-medium text-brand-plum">{{ result.analyteName }}</td>
+                  <td class="py-3 pr-4 text-brand-plum">{{ result.resultValue }}</td>
+                  <td class="py-3 pr-4 text-brand-plum">{{ result.unit || '—' }}</td>
+                  <td class="py-3 pr-4 text-brand-plum">{{ result.referenceRange || '—' }}</td>
+                  <td class="py-3 text-brand-plum">{{ result.flag ? formatFlag(result.flag) : '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="mt-6 border-t border-brand-plum/20 pt-5">
+        <h3 class="font-semibold text-brand-plum">Notes</h3>
+        <p class="mt-2 whitespace-pre-wrap text-brand-plum">{{ currentBloodTest.notes || 'No notes provided.' }}</p>
+      </section>
+
+      <dl class="mt-6 grid gap-5 border-t border-brand-plum/20 pt-5 text-sm sm:grid-cols-2">
+        <div>
+          <dt class="font-semibold text-brand-plum/70">Created</dt>
+          <dd class="mt-1 text-brand-plum">{{ currentBloodTest.createdAt | date: 'd MMMM y, HH:mm' }}</dd>
+        </div>
+
+        <div>
+          <dt class="font-semibold text-brand-plum/70">Last updated</dt>
+          <dd class="mt-1 text-brand-plum">{{ currentBloodTest.updatedAt | date: 'd MMMM y, HH:mm' }}</dd>
+        </div>
+      </dl>
+
+      @if (actionError()) {
+        <div class="mt-6 rounded-lg border border-brand-coral bg-white p-4 text-brand-coral" role="alert">{{ actionError() }}</div>
+      }
+
+      @if (canEdit()) {
+        <div class="mt-6 flex flex-wrap gap-3 border-t border-brand-plum/20 pt-5">
+          <a [routerLink]="['/blood-results', currentBloodTest.id, 'edit']" class="btn btn-primary">Edit blood test</a>
+
+          <button type="button" class="btn btn-danger" [disabled]="isArchiving()" (click)="archive()">
+            {{ isArchiving() ? 'Archiving...' : 'Archive blood test' }}
+          </button>
+        </div>
+      }
+    </article>
+  }
+</section>

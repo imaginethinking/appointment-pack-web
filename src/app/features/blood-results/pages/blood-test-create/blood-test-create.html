@@ -1,0 +1,39 @@
+<section class="mx-auto max-w-4xl">
+  <div class="mb-6">
+    <a routerLink="/blood-results" class="text-sm font-semibold text-brand-plum underline">Back to blood results</a>
+    <h1 class="mt-4 text-3xl font-bold text-brand-plum">Add blood test</h1>
+
+    @if (selectedPatient()) {
+      <p class="mt-1 text-brand-plum/70">Manually record a blood test for <span class="font-semibold text-brand-plum">{{ selectedPatientName() }}</span>.</p>
+    }
+  </div>
+
+  @if (!selectedPatient()) {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <h2 class="font-semibold text-brand-plum">No patient selected</h2>
+      <p class="mt-2 text-brand-plum/70">Select an accessible patient before adding a blood test.</p>
+    </div>
+  } @else if (!canEdit()) {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Blood-result editing unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">You do not have permission to add blood results for this patient.</p>
+    </div>
+  } @else {
+    <form class="space-y-6" [formGroup]="form" novalidate (ngSubmit)="create()">
+      <div class="rounded-lg border border-brand-peach bg-brand-off-white p-4 text-sm text-brand-plum">
+        Blood tests are entered manually. Uploaded document processing does not extract blood-test results.
+      </div>
+
+      <app-blood-test-form-fields [form]="form" idPrefix="create-blood-test" />
+
+      @if (errorMessage()) {
+        <div class="rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral" role="alert">{{ errorMessage() }}</div>
+      }
+
+      <div class="flex flex-wrap gap-3">
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving()">{{ isSaving() ? 'Creating...' : 'Create blood test' }}</button>
+        <a routerLink="/blood-results" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  }
+</section>
