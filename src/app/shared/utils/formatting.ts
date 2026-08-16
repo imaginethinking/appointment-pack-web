@@ -1,3 +1,5 @@
+import { AddressResponse } from '../models/address-model';
+
 export function formatEnumLabel(value: string | null, emptyLabel = 'Not provided'): string {
   if (value === null || value.trim().length === 0) {
     return emptyLabel;
@@ -19,6 +21,25 @@ export function formatFileSize(fileSize: number): string {
   }
 
   return `${(fileSize / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+export function formatLocalTime(value: string): string {
+  return value.length < 5 ? value : value.substring(0, 5);
+}
+
+export function formatAddressLines(address: AddressResponse | null): string[] {
+  if (address === null) {
+    return [];
+  }
+
+  return [
+    address.addressLine1,
+    address.addressLine2,
+    address.townCity,
+    address.county,
+    address.postcode,
+    address.country,
+  ].filter((value): value is string => value !== null && value.trim().length > 0);
 }
 
 export function normaliseOptionalText(value: string): string | null {

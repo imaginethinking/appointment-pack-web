@@ -1,13 +1,13 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { EMPTY, finalize, switchMap } from 'rxjs';
 
-import { applyServerFieldErrors } from '../../../../core/forms/server-field-errors';
+import { applyServerFieldErrors, clearServerFieldErrors } from '../../../../core/forms/server-field-errors';
 import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
 import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
-import { normaliseOptionalText } from '../../../../shared/utils/formatting';
-import { AppointmentAddressInput, AppointmentConfirmationRequest } from '../../../appointments/models/appointment-model';
+import { AppointmentFormFields } from '../../../appointments/components/appointment-form-fields/appointment-form-fields';
+import { createAppointmentForm, mapAppointmentFormToRequest, resetAppointmentForm } from '../../../appointments/forms/appointment-form';
 import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
 import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
 import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
@@ -18,7 +18,7 @@ type AppointmentReviewStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | '
 
 @Component({
   selector: 'app-appointment-review',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, AppointmentFormFields],
   templateUrl: './appointment-review.html',
 })
 export class AppointmentReview implements OnInit {
@@ -37,58 +37,51 @@ export class AppointmentReview implements OnInit {
   protected readonly actionError = signal('');
   protected readonly isConfirming = signal(false);
   protected readonly isRejecting = signal(false);
+  protected readonly form = createAppointmentForm(this.formBuilder);
 
   protected readonly contextMatchesDocument = computed(() => {
     const document = this.document();
     const selectedPatient = this.selectedPatientState.selectedPatient();
-    return document !== null && selectedPatient !== null && document.patientRecordId === selectedPatient.patientRecordId;
+
+    return document !== null
+      && selectedPatient !== null
+      && document.patientRecordId === selectedPatient.patientRecordId;
   });
 
   protected readonly canConfirm = computed(() => {
     if (!this.contextMatchesDocument()) {
       return false;
     }
+
     const selectedPatient = this.selectedPatientState.selectedPatient();
-    return this.authorisation.can(selectedPatient, 'document', 'edit') && this.authorisation.can(selectedPatient, 'appointment', 'edit');
+
+    return this.authorisation.can(selectedPatient, 'document', 'edit')
+      && this.authorisation.can(selectedPatient, 'appointment', 'edit');
   });
 
   protected readonly canReject = computed(() => {
     if (!this.contextMatchesDocument()) {
       return false;
     }
-    return this.authorisation.can(this.selectedPatientState.selectedPatient(), 'document', 'edit');
-  });
 
-  protected readonly form = this.formBuilder.group({
-    date: this.formBuilder.nonNullable.control('', Validators.required),
-    startTime: this.formBuilder.nonNullable.control('', Validators.required),
-    endTime: this.formBuilder.nonNullable.control(''),
-    service: this.formBuilder.nonNullable.control('', Validators.maxLength(250)),
-    appointmentType: this.formBuilder.nonNullable.control('', Validators.maxLength(250)),
-    clinicianOrTeam: this.formBuilder.nonNullable.control('', Validators.maxLength(250)),
-    locationName: this.formBuilder.nonNullable.control('', Validators.maxLength(250)),
-    address: this.formBuilder.group({
-      addressLine1: this.formBuilder.nonNullable.control('', Validators.maxLength(150)),
-      addressLine2: this.formBuilder.nonNullable.control('', Validators.maxLength(150)),
-      townCity: this.formBuilder.nonNullable.control('', Validators.maxLength(100)),
-      county: this.formBuilder.nonNullable.control('', Validators.maxLength(100)),
-      postcode: this.formBuilder.nonNullable.control('', Validators.maxLength(20)),
-      country: this.formBuilder.nonNullable.control('', Validators.maxLength(100)),
-    }),
-    notes: this.formBuilder.nonNullable.control('', Validators.maxLength(2000)),
+    return this.authorisation.can(this.selectedPatientState.selectedPatient(), 'document', 'edit');
   });
 
   ngOnInit(): void {
     const documentId = this.route.snapshot.paramMap.get('documentId');
+
     if (documentId === null || documentId.length === 0) {
       this.status.set('not-found');
       return;
     }
+
     this.loadReview(documentId);
   }
 
   protected confirm(): void {
     this.actionError.set('');
+    clearServerFieldErrors(this.form);
+
     const document = this.document();
 
     if (document === null || this.status() !== 'ready') {
@@ -100,27 +93,14 @@ export class AppointmentReview implements OnInit {
       return;
     }
 
-    this.validateTimes();
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    const value = this.form.getRawValue();
-    const request: AppointmentConfirmationRequest = {
-      date: value.date,
-      startTime: value.startTime,
-      endTime: normaliseOptionalText(value.endTime),
-      service: normaliseOptionalText(value.service),
-      appointmentType: normaliseOptionalText(value.appointmentType),
-      clinicianOrTeam: normaliseOptionalText(value.clinicianOrTeam),
-      locationName: normaliseOptionalText(value.locationName),
-      address: this.buildAddress(value.address),
-      notes: normaliseOptionalText(value.notes),
-    };
-
     this.isConfirming.set(true);
-    this.documentApi.confirmAppointment(document.id, request).pipe(
+
+    this.documentApi.confirmAppointment(document.id, mapAppointmentFormToRequest(this.form)).pipe(
       finalize(() => this.isConfirming.set(false)),
     ).subscribe({
       next: () => void this.router.navigate(['/documents', document.id]),
@@ -130,6 +110,7 @@ export class AppointmentReview implements OnInit {
 
   protected reject(): void {
     this.actionError.set('');
+
     const document = this.document();
 
     if (document === null || this.status() !== 'ready' || !this.canReject()) {
@@ -141,6 +122,7 @@ export class AppointmentReview implements OnInit {
     }
 
     this.isRejecting.set(true);
+
     this.documentApi.rejectAppointment(document.id).pipe(
       finalize(() => this.isRejecting.set(false)),
     ).subscribe({
@@ -151,6 +133,7 @@ export class AppointmentReview implements OnInit {
 
   protected retryLoad(): void {
     const documentId = this.route.snapshot.paramMap.get('documentId');
+
     if (documentId !== null) {
       this.loadReview(documentId);
     }
@@ -166,6 +149,7 @@ export class AppointmentReview implements OnInit {
     this.documentApi.getDocument(documentId).pipe(
       switchMap((document) => {
         this.document.set(document);
+
         const selectedPatient = this.selectedPatientState.selectedPatient();
 
         if (selectedPatient === null || document.patientRecordId !== selectedPatient.patientRecordId) {
@@ -185,6 +169,7 @@ export class AppointmentReview implements OnInit {
     ).subscribe({
       next: (processing) => {
         const details = processing.appointmentDetails;
+
         if (details === null) {
           this.status.set('error');
           this.errorMessage.set('The processing result does not contain appointment details.');
@@ -192,65 +177,16 @@ export class AppointmentReview implements OnInit {
         }
 
         this.processing.set(processing);
-        this.form.reset({
-          date: details.date ?? '',
-          startTime: this.toTimeInput(details.startTime),
-          endTime: this.toTimeInput(details.endTime),
-          service: details.service ?? '',
-          appointmentType: details.appointmentType ?? '',
-          clinicianOrTeam: details.clinicianOrTeam ?? '',
-          locationName: details.locationName ?? '',
-          address: {
-            addressLine1: details.address?.addressLine1 ?? '',
-            addressLine2: details.address?.addressLine2 ?? '',
-            townCity: details.address?.townCity ?? '',
-            county: details.address?.county ?? '',
-            postcode: details.address?.postcode ?? '',
-            country: details.address?.country ?? '',
-          },
-          notes: '',
+
+        resetAppointmentForm(this.form, {
+          ...details,
+          notes: null,
         });
+
         this.status.set('ready');
       },
       error: (error: unknown) => this.handleLoadError(error),
     });
-  }
-
-  private validateTimes(): void {
-    const startTime = this.form.controls.startTime.value;
-    const endTime = this.form.controls.endTime.value;
-    this.form.controls.endTime.setErrors(null);
-
-    if (startTime.length === 0 || endTime.length === 0) {
-      return;
-    }
-
-    if (endTime <= startTime) {
-      this.form.controls.endTime.setErrors({ afterStart: true });
-    }
-  }
-
-  private buildAddress(value: {
-    addressLine1: string;
-    addressLine2: string;
-    townCity: string;
-    county: string;
-    postcode: string;
-    country: string;
-  }): AppointmentAddressInput | null {
-    const address: AppointmentAddressInput = {
-      addressLine1: normaliseOptionalText(value.addressLine1),
-      addressLine2: normaliseOptionalText(value.addressLine2),
-      townCity: normaliseOptionalText(value.townCity),
-      county: normaliseOptionalText(value.county),
-      postcode: normaliseOptionalText(value.postcode),
-      country: normaliseOptionalText(value.country),
-    };
-    return Object.values(address).some((field) => field !== null) ? address : null;
-  }
-
-  private toTimeInput(value: string | null): string {
-    return value === null || value.length < 5 ? '' : value.substring(0, 5);
   }
 
   private handleLoadError(error: unknown): void {
@@ -292,7 +228,10 @@ export class AppointmentReview implements OnInit {
     }
 
     if (hasHttpStatus(error, 409)) {
-      this.loadReview(document.id, 'The document state changed or an appointment already exists for this document. The latest document state has been reloaded.');
+      this.loadReview(
+        document.id,
+        'The document state changed or an appointment already exists for this document. The latest document state has been reloaded.',
+      );
       return;
     }
 
@@ -312,7 +251,10 @@ export class AppointmentReview implements OnInit {
     }
 
     if (hasHttpStatus(error, 409)) {
-      this.loadReview(document.id, 'The document state changed before the appointment details could be rejected. The latest document state has been reloaded.');
+      this.loadReview(
+        document.id,
+        'The document state changed before the appointment details could be rejected. The latest document state has been reloaded.',
+      );
       return;
     }
 
@@ -321,6 +263,7 @@ export class AppointmentReview implements OnInit {
 
   private refreshPatientAccess(requireAppointmentEdit: boolean): void {
     const failedPatientRecordId = this.document()?.patientRecordId ?? null;
+
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       next: () => {
         const selectedPatient = this.selectedPatientState.selectedPatient();

@@ -1,206 +1,104 @@
 <section class="mx-auto max-w-5xl">
-  <div
-    class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"
-  >
+  <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
     <div>
-      <h1 class="text-3xl font-bold text-brand-plum">
-        Appointments
-      </h1>
+      <h1 class="text-3xl font-bold text-brand-plum">Appointments</h1>
 
       @if (selectedPatient(); as patient) {
         <p class="mt-1 text-brand-plum/70">
-          Appointments for
-          <span class="font-semibold text-brand-plum">
-            {{ getPatientContextName(patient) }}
-          </span>
+          Appointments for <span class="font-semibold text-brand-plum">{{ getPatientContextName(patient) }}</span>
         </p>
       } @else {
-        <p class="mt-1 text-brand-plum/70">
-          View appointments for the selected patient.
-        </p>
+        <p class="mt-1 text-brand-plum/70">View appointments for the selected patient.</p>
       }
     </div>
+
+    @if (canEditAppointments()) {
+      <a routerLink="/appointments/create" class="btn btn-primary">Add appointment</a>
+    }
   </div>
 
   @if (status() === 'loading') {
-    <div
-      class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum"
-      role="status"
-    >
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">
       Loading appointments...
     </div>
   } @else if (status() === 'no-patient') {
-    <div
-      class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6"
-    >
-      <h2 class="font-semibold text-brand-plum">
-        No patient selected
-      </h2>
-
-      <p class="mt-2 text-brand-plum/70">
-        Select an accessible patient before viewing appointments.
-      </p>
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <h2 class="font-semibold text-brand-plum">No patient selected</h2>
+      <p class="mt-2 text-brand-plum/70">Select an accessible patient before viewing appointments.</p>
     </div>
   } @else if (status() === 'forbidden') {
-    <div
-      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
-      role="alert"
-    >
-      <h2 class="font-semibold text-brand-plum">
-        Appointments unavailable
-      </h2>
-
-      <p class="mt-2 text-brand-plum/70">
-        You do not have permission to view appointments for this patient.
-      </p>
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Appointments unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">You do not have permission to view appointments for this patient.</p>
     </div>
   } @else if (status() === 'error') {
-    <div
-      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
-      role="alert"
-    >
-      <p class="text-brand-coral">
-        {{ errorMessage() }}
-      </p>
-
-      <button
-        type="button"
-        class="btn btn-secondary mt-4"
-        (click)="retry()"
-      >
-        Try again
-      </button>
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-coral">{{ errorMessage() }}</p>
+      <button type="button" class="btn btn-secondary mt-4" (click)="retry()">Try again</button>
     </div>
   } @else if (appointments().length === 0) {
-    <div
-      class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6"
-    >
-      <h2 class="font-semibold text-brand-plum">
-        No appointments
-      </h2>
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <h2 class="font-semibold text-brand-plum">No appointments</h2>
+      <p class="mt-2 text-brand-plum/70">There are no active appointments for this patient.</p>
+      <p class="mt-2 text-sm text-brand-plum/60">Appointments can be added manually or confirmed from uploaded appointment letters.</p>
 
-      <p class="mt-2 text-brand-plum/70">
-        There are no confirmed appointments for this patient.
-      </p>
+      <div class="mt-4 flex flex-wrap gap-3">
+        @if (canEditAppointments()) {
+          <a routerLink="/appointments/create" class="btn btn-primary">Add appointment</a>
+        }
 
-      <p class="mt-2 text-sm text-brand-plum/60">
-        Appointments confirmed from appointment letters will appear here.
-      </p>
-
-      <a
-        routerLink="/documents"
-        class="btn btn-secondary mt-4"
-      >
-        View documents
-      </a>
+        <a routerLink="/documents" class="btn btn-secondary">View documents</a>
+      </div>
     </div>
   } @else {
     <div class="space-y-4">
-      @for (
-        appointment of appointments();
-        track appointment.id
-        ) {
-        <article
-          class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6"
-        >
-          <div
-            class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"
-          >
+      @for (appointment of appointments(); track appointment.id) {
+        <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <h2 class="text-xl font-semibold text-brand-plum">
-                {{
-                  appointment.service ||
-                  appointment.appointmentType ||
-                  'Appointment'
-                }}
+                {{ appointment.service || appointment.appointmentType || 'Appointment' }}
               </h2>
 
-              @if (
-                appointment.service &&
-                appointment.appointmentType
-                ) {
-                <p class="mt-1 text-brand-plum/70">
-                  {{ appointment.appointmentType }}
-                </p>
+              @if (appointment.service && appointment.appointmentType) {
+                <p class="mt-1 text-brand-plum/70">{{ appointment.appointmentType }}</p>
               }
             </div>
 
-            <div
-              class="rounded-lg bg-brand-pink px-4 py-2 text-right text-brand-plum"
-            >
-              <div class="font-semibold">
-                {{
-                  appointment.date
-                    | date: 'd MMMM y'
-                }}
-              </div>
+            <div class="rounded-lg bg-brand-pink px-4 py-2 text-right text-brand-plum">
+              <div class="font-semibold">{{ appointment.date | date: 'd MMMM y' }}</div>
 
               <div class="text-sm">
-                {{
-                  formatTime(
-                    appointment.startTime
-                  )
-                }}
-
+                {{ formatTime(appointment.startTime) }}
                 @if (appointment.endTime) {
-                  –
-                  {{
-                    formatTime(
-                      appointment.endTime
-                    )
-                  }}
+                  – {{ formatTime(appointment.endTime) }}
                 }
               </div>
             </div>
           </div>
 
-          <dl
-            class="mt-5 grid gap-5 border-t border-brand-plum/20 pt-5 sm:grid-cols-2"
-          >
+          <dl class="mt-5 grid gap-5 border-t border-brand-plum/20 pt-5 sm:grid-cols-2">
             @if (appointment.clinicianOrTeam) {
               <div>
-                <dt
-                  class="text-sm font-semibold text-brand-plum/70"
-                >
-                  With
-                </dt>
-
-                <dd class="mt-1 text-brand-plum">
-                  {{ appointment.clinicianOrTeam }}
-                </dd>
+                <dt class="text-sm font-semibold text-brand-plum/70">With</dt>
+                <dd class="mt-1 text-brand-plum">{{ appointment.clinicianOrTeam }}</dd>
               </div>
             }
 
             @if (appointment.locationName) {
               <div>
-                <dt
-                  class="text-sm font-semibold text-brand-plum/70"
-                >
-                  Location
-                </dt>
-
-                <dd class="mt-1 text-brand-plum">
-                  {{ appointment.locationName }}
-                </dd>
+                <dt class="text-sm font-semibold text-brand-plum/70">Location</dt>
+                <dd class="mt-1 text-brand-plum">{{ appointment.locationName }}</dd>
               </div>
             }
 
             @if (formatAddress(appointment).length > 0) {
               <div>
-                <dt
-                  class="text-sm font-semibold text-brand-plum/70"
-                >
-                  Address
-                </dt>
+                <dt class="text-sm font-semibold text-brand-plum/70">Address</dt>
 
                 <dd class="mt-1 text-brand-plum">
-                  @for (
-                    addressLine of formatAddress(appointment);
-                    track $index
-                    ) {
-                    <div>
-                      {{ addressLine }}
-                    </div>
+                  @for (addressLine of formatAddress(appointment); track $index) {
+                    <div>{{ addressLine }}</div>
                   }
                 </dd>
               </div>
@@ -208,36 +106,23 @@
 
             @if (appointment.notes) {
               <div>
-                <dt
-                  class="text-sm font-semibold text-brand-plum/70"
-                >
-                  Notes
-                </dt>
-
-                <dd
-                  class="mt-1 whitespace-pre-wrap text-brand-plum"
-                >
-                  {{ appointment.notes }}
-                </dd>
+                <dt class="text-sm font-semibold text-brand-plum/70">Notes</dt>
+                <dd class="mt-1 whitespace-pre-wrap text-brand-plum">{{ appointment.notes }}</dd>
               </div>
             }
           </dl>
 
-          @if (appointment.sourceDocumentId) {
-            <div
-              class="mt-5 border-t border-brand-plum/20 pt-4"
-            >
-              <a
-                [routerLink]="[
-                  '/documents',
-                  appointment.sourceDocumentId
-                ]"
-                class="text-sm font-semibold text-brand-plum underline"
-              >
+          <div class="mt-5 flex flex-wrap items-center gap-4 border-t border-brand-plum/20 pt-4">
+            <a [routerLink]="['/appointments', appointment.id]" class="font-semibold text-brand-plum underline">
+              View appointment
+            </a>
+
+            @if (appointment.sourceDocumentId) {
+              <a [routerLink]="['/documents', appointment.sourceDocumentId]" class="text-sm font-semibold text-brand-plum underline">
                 View source document
               </a>
-            </div>
-          }
+            }
+          </div>
         </article>
       }
     </div>

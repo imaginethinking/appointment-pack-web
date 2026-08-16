@@ -4,6 +4,9 @@ import { authGuard } from './core/guards/auth-guard';
 import { mfaLoginGuard } from './core/guards/mfa-login-guard';
 import { patientContextLoadGuard } from './core/guards/patient-context-load-guard';
 import { selectedPatientPermissionGuard } from './core/guards/selected-patient-permission-guard';
+import { AppointmentCreate } from './features/appointments/pages/appointment-create/appointment-create';
+import { AppointmentDetails } from './features/appointments/pages/appointment-details/appointment-details';
+import { AppointmentEdit } from './features/appointments/pages/appointment-edit/appointment-edit';
 import { AppointmentList } from './features/appointments/pages/appointment-list/appointment-list';
 import { ForgotPassword } from './features/auth/pages/forgot-password/forgot-password';
 import { Login } from './features/auth/pages/login/login';
@@ -169,6 +172,39 @@ export const routes: Routes = [
       {
         path: 'appointments',
         component: AppointmentList,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'appointment',
+            action: 'view',
+          },
+        },
+      },
+      {
+        path: 'appointments/create',
+        component: AppointmentCreate,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'appointment',
+            action: 'edit',
+          },
+        },
+      },
+      {
+        path: 'appointments/:appointmentId/edit',
+        component: AppointmentEdit,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'appointment',
+            action: 'edit',
+          },
+        },
+      },
+      {
+        path: 'appointments/:appointmentId',
+        component: AppointmentDetails,
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {

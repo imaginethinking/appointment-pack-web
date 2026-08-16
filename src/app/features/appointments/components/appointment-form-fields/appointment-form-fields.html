@@ -1,0 +1,182 @@
+<div class="space-y-6" [formGroup]="form()">
+  <section class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+    <div>
+      <h2 class="text-xl font-semibold text-brand-plum">Appointment</h2>
+      <p class="mt-1 text-sm text-brand-plum/70">Enter the appointment date, time and clinical service information.</p>
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label [for]="idPrefix() + '-date'" class="mb-1 block font-semibold text-brand-plum">Date</label>
+        <input [id]="idPrefix() + '-date'" type="date" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="date" />
+
+        @if (form().controls.date.touched && form().controls.date.hasError('required')) {
+          <p class="mt-1 text-sm text-brand-coral">Appointment date is required.</p>
+        } @else if (form().controls.date.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+
+      <div>
+        <label [for]="idPrefix() + '-start-time'" class="mb-1 block font-semibold text-brand-plum">Start time</label>
+        <input [id]="idPrefix() + '-start-time'" type="time" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="startTime" />
+
+        @if (form().controls.startTime.touched && form().controls.startTime.hasError('required')) {
+          <p class="mt-1 text-sm text-brand-coral">Start time is required.</p>
+        } @else if (form().controls.startTime.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+
+      <div>
+        <label [for]="idPrefix() + '-end-time'" class="mb-1 block font-semibold text-brand-plum">End time</label>
+        <input [id]="idPrefix() + '-end-time'" type="time" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="endTime" />
+
+        @if (form().hasError('endTimeAfterStart') && form().controls.endTime.touched) {
+          <p class="mt-1 text-sm text-brand-coral">End time must be after the start time.</p>
+        } @else if (form().controls.endTime.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+
+      <div>
+        <label [for]="idPrefix() + '-appointment-type'" class="mb-1 block font-semibold text-brand-plum">Appointment type</label>
+        <input [id]="idPrefix() + '-appointment-type'" type="text" maxlength="250" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="appointmentType" />
+
+        @if (form().controls.appointmentType.hasError('maxlength')) {
+          <p class="mt-1 text-sm text-brand-coral">Appointment type must not exceed 250 characters.</p>
+        } @else if (form().controls.appointmentType.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+    </div>
+
+    <div>
+      <label [for]="idPrefix() + '-service'" class="mb-1 block font-semibold text-brand-plum">Service</label>
+      <input [id]="idPrefix() + '-service'" type="text" maxlength="250" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="service" />
+
+      @if (form().controls.service.hasError('maxlength')) {
+        <p class="mt-1 text-sm text-brand-coral">Service must not exceed 250 characters.</p>
+      } @else if (form().controls.service.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+      }
+    </div>
+
+    <div>
+      <label [for]="idPrefix() + '-clinician'" class="mb-1 block font-semibold text-brand-plum">With</label>
+      <input [id]="idPrefix() + '-clinician'" type="text" maxlength="250" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="clinicianOrTeam" />
+      <p class="mt-1 text-sm text-brand-plum/60">Clinician, consultant or clinical team.</p>
+
+      @if (form().controls.clinicianOrTeam.hasError('maxlength')) {
+        <p class="mt-1 text-sm text-brand-coral">Clinician or team must not exceed 250 characters.</p>
+      } @else if (form().controls.clinicianOrTeam.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+      }
+    </div>
+
+    <div>
+      <label [for]="idPrefix() + '-location'" class="mb-1 block font-semibold text-brand-plum">Location</label>
+      <input [id]="idPrefix() + '-location'" type="text" maxlength="250" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="locationName" />
+
+      @if (form().controls.locationName.hasError('maxlength')) {
+        <p class="mt-1 text-sm text-brand-coral">Location name must not exceed 250 characters.</p>
+      } @else if (form().controls.locationName.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+      }
+    </div>
+  </section>
+
+  <section class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6" formGroupName="address">
+    <div>
+      <h2 class="text-xl font-semibold text-brand-plum">Location address</h2>
+      <p class="mt-1 text-sm text-brand-plum/70">The appointment address is optional and may be partially completed.</p>
+    </div>
+
+    <div>
+      <label [for]="idPrefix() + '-address-line-1'" class="mb-1 block font-semibold text-brand-plum">Address line 1</label>
+      <input [id]="idPrefix() + '-address-line-1'" type="text" maxlength="150" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="addressLine1" />
+
+      @if (form().controls.address.controls.addressLine1.hasError('maxlength')) {
+        <p class="mt-1 text-sm text-brand-coral">Address line 1 must not exceed 150 characters.</p>
+      } @else if (form().controls.address.controls.addressLine1.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+      }
+    </div>
+
+    <div>
+      <label [for]="idPrefix() + '-address-line-2'" class="mb-1 block font-semibold text-brand-plum">Address line 2</label>
+      <input [id]="idPrefix() + '-address-line-2'" type="text" maxlength="150" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="addressLine2" />
+
+      @if (form().controls.address.controls.addressLine2.hasError('maxlength')) {
+        <p class="mt-1 text-sm text-brand-coral">Address line 2 must not exceed 150 characters.</p>
+      } @else if (form().controls.address.controls.addressLine2.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+      }
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label [for]="idPrefix() + '-town-city'" class="mb-1 block font-semibold text-brand-plum">Town or city</label>
+        <input [id]="idPrefix() + '-town-city'" type="text" maxlength="100" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="townCity" />
+
+        @if (form().controls.address.controls.townCity.hasError('maxlength')) {
+          <p class="mt-1 text-sm text-brand-coral">Town or city must not exceed 100 characters.</p>
+        } @else if (form().controls.address.controls.townCity.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+
+      <div>
+        <label [for]="idPrefix() + '-county'" class="mb-1 block font-semibold text-brand-plum">County</label>
+        <input [id]="idPrefix() + '-county'" type="text" maxlength="100" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="county" />
+
+        @if (form().controls.address.controls.county.hasError('maxlength')) {
+          <p class="mt-1 text-sm text-brand-coral">County must not exceed 100 characters.</p>
+        } @else if (form().controls.address.controls.county.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+
+      <div>
+        <label [for]="idPrefix() + '-postcode'" class="mb-1 block font-semibold text-brand-plum">Postcode</label>
+        <input [id]="idPrefix() + '-postcode'" type="text" maxlength="20" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="postcode" />
+
+        @if (form().controls.address.controls.postcode.hasError('maxlength')) {
+          <p class="mt-1 text-sm text-brand-coral">Postcode must not exceed 20 characters.</p>
+        } @else if (form().controls.address.controls.postcode.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+
+      <div>
+        <label [for]="idPrefix() + '-country'" class="mb-1 block font-semibold text-brand-plum">Country</label>
+        <input [id]="idPrefix() + '-country'" type="text" maxlength="100" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="country" />
+
+        @if (form().controls.address.controls.country.hasError('maxlength')) {
+          <p class="mt-1 text-sm text-brand-coral">Country must not exceed 100 characters.</p>
+        } @else if (form().controls.address.controls.country.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+    <label [for]="idPrefix() + '-notes'" class="block text-xl font-semibold text-brand-plum">Notes</label>
+    <p class="mt-1 text-sm text-brand-plum/70">Optional additional appointment information.</p>
+
+    <textarea
+      [id]="idPrefix() + '-notes'"
+      rows="5"
+      maxlength="2000"
+      class="mt-4 w-full rounded-md border border-brand-plum/30 bg-white p-3 text-brand-plum"
+      formControlName="notes"
+    ></textarea>
+
+    @if (form().controls.notes.hasError('maxlength')) {
+      <p class="mt-1 text-sm text-brand-coral">Notes must not exceed 2000 characters.</p>
+    } @else if (form().controls.notes.errors?.['server']; as message) {
+      <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+    }
+  </section>
+</div>

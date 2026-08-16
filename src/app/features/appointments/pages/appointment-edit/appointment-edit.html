@@ -1,0 +1,63 @@
+<section class="mx-auto max-w-3xl">
+  <div class="mb-6">
+    @if (appointment(); as currentAppointment) {
+      <a [routerLink]="['/appointments', currentAppointment.id]" class="text-sm font-semibold text-brand-plum underline">
+        Back to appointment
+      </a>
+    } @else {
+      <a routerLink="/appointments" class="text-sm font-semibold text-brand-plum underline">Back to appointments</a>
+    }
+
+    <h1 class="mt-4 text-3xl font-bold text-brand-plum">Edit appointment</h1>
+  </div>
+
+  @if (status() === 'loading') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">
+      Loading appointment...
+    </div>
+  } @else if (status() === 'not-found') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Appointment not found</h2>
+      <p class="mt-2 text-brand-plum/70">The appointment does not exist, has been archived, or is no longer available.</p>
+    </div>
+  } @else if (status() === 'forbidden') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Editing unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">You do not have permission to edit this appointment.</p>
+    </div>
+  } @else if (status() === 'invalid') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-plum">{{ errorMessage() }}</p>
+      <a routerLink="/appointments" class="btn btn-secondary mt-4">Return to appointments</a>
+    </div>
+  } @else if (status() === 'error') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-coral">{{ errorMessage() }}</p>
+      <button type="button" class="btn btn-secondary mt-4" (click)="retry()">Try again</button>
+    </div>
+  } @else if (appointment(); as currentAppointment) {
+    <form class="space-y-6" [formGroup]="form" novalidate (ngSubmit)="save()">
+      @if (currentAppointment.sourceDocumentId) {
+        <div class="rounded-lg border border-brand-peach bg-brand-off-white p-4 text-brand-plum">
+          This appointment was created from an appointment letter. Editing the appointment does not modify the source document.
+        </div>
+      }
+
+      <app-appointment-form-fields [form]="form" idPrefix="edit-appointment" />
+
+      @if (errorMessage()) {
+        <div class="rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral" role="alert">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <div class="flex flex-wrap gap-3">
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
+          {{ isSaving() ? 'Saving...' : 'Save appointment' }}
+        </button>
+
+        <a [routerLink]="['/appointments', currentAppointment.id]" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  }
+</section>

@@ -1,0 +1,123 @@
+<section class="mx-auto max-w-4xl">
+  <div class="mb-6">
+    <a routerLink="/appointments" class="text-sm font-semibold text-brand-plum underline">Back to appointments</a>
+    <h1 class="mt-4 text-3xl font-bold text-brand-plum">Appointment details</h1>
+  </div>
+
+  @if (status() === 'loading') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">
+      Loading appointment...
+    </div>
+  } @else if (status() === 'not-found') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Appointment not found</h2>
+      <p class="mt-2 text-brand-plum/70">The appointment does not exist, has been archived, or is no longer available.</p>
+    </div>
+  } @else if (status() === 'forbidden') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Appointment unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">You do not have permission to view this appointment.</p>
+    </div>
+  } @else if (status() === 'invalid') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-plum">{{ errorMessage() }}</p>
+      <a routerLink="/appointments" class="btn btn-secondary mt-4">Return to appointments</a>
+    </div>
+  } @else if (status() === 'error') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-coral">{{ errorMessage() }}</p>
+      <button type="button" class="btn btn-secondary mt-4" (click)="retry()">Try again</button>
+    </div>
+  } @else if (appointment(); as currentAppointment) {
+    <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h2 class="text-2xl font-semibold text-brand-plum">
+            {{ currentAppointment.service || currentAppointment.appointmentType || 'Appointment' }}
+          </h2>
+
+          @if (currentAppointment.service && currentAppointment.appointmentType) {
+            <p class="mt-1 text-brand-plum/70">{{ currentAppointment.appointmentType }}</p>
+          }
+        </div>
+
+        <div class="rounded-lg bg-brand-pink px-4 py-3 text-right text-brand-plum">
+          <div class="font-semibold">{{ currentAppointment.date | date: 'd MMMM y' }}</div>
+
+          <div class="text-sm">
+            {{ formatTime(currentAppointment.startTime) }}
+            @if (currentAppointment.endTime) {
+              – {{ formatTime(currentAppointment.endTime) }}
+            }
+          </div>
+        </div>
+      </div>
+
+      <dl class="mt-6 grid gap-5 border-t border-brand-plum/20 pt-5 sm:grid-cols-2">
+        <div>
+          <dt class="text-sm font-semibold text-brand-plum/70">Service</dt>
+          <dd class="mt-1 text-brand-plum">{{ currentAppointment.service || 'Not provided' }}</dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-semibold text-brand-plum/70">Appointment type</dt>
+          <dd class="mt-1 text-brand-plum">{{ currentAppointment.appointmentType || 'Not provided' }}</dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-semibold text-brand-plum/70">Clinician or team</dt>
+          <dd class="mt-1 text-brand-plum">{{ currentAppointment.clinicianOrTeam || 'Not provided' }}</dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-semibold text-brand-plum/70">Location</dt>
+          <dd class="mt-1 text-brand-plum">{{ currentAppointment.locationName || 'Not provided' }}</dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-semibold text-brand-plum/70">Address</dt>
+
+          <dd class="mt-1 text-brand-plum">
+            @if (formatAddress(currentAppointment).length === 0) {
+              Not provided
+            } @else {
+              @for (line of formatAddress(currentAppointment); track $index) {
+                <div>{{ line }}</div>
+              }
+            }
+          </dd>
+        </div>
+
+        <div>
+          <dt class="text-sm font-semibold text-brand-plum/70">Source</dt>
+          <dd class="mt-1 text-brand-plum">{{ currentAppointment.sourceDocumentId ? 'Appointment letter' : 'Manual entry' }}</dd>
+        </div>
+      </dl>
+
+      <div class="mt-6 border-t border-brand-plum/20 pt-5">
+        <h3 class="font-semibold text-brand-plum">Notes</h3>
+        <p class="mt-2 whitespace-pre-wrap text-brand-plum">{{ currentAppointment.notes || 'No notes provided.' }}</p>
+      </div>
+
+      @if (actionError()) {
+        <div class="mt-6 rounded-lg border border-brand-coral bg-white p-4 text-brand-coral" role="alert">
+          {{ actionError() }}
+        </div>
+      }
+
+      <div class="mt-6 flex flex-wrap gap-3 border-t border-brand-plum/20 pt-5">
+        @if (canEdit()) {
+          <a [routerLink]="['/appointments', currentAppointment.id, 'edit']" class="btn btn-primary">Edit appointment</a>
+
+          <button type="button" class="btn btn-danger" [disabled]="isArchiving()" (click)="archive()">
+            {{ isArchiving() ? 'Archiving...' : 'Archive appointment' }}
+          </button>
+        }
+
+        @if (currentAppointment.sourceDocumentId) {
+          <a [routerLink]="['/documents', currentAppointment.sourceDocumentId]" class="btn btn-secondary">View source document</a>
+        }
+      </div>
+    </article>
+  }
+</section>
