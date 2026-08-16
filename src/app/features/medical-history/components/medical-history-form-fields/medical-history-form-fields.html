@@ -1,0 +1,52 @@
+<div class="space-y-6" [formGroup]="form()">
+  <section class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+    <div>
+      <h2 class="text-xl font-semibold text-brand-plum">History entry</h2>
+      <p class="mt-1 text-sm text-brand-plum/70">Record the clinical event or information that should appear in the patient's medical history.</p>
+    </div>
+
+    <div>
+      <label [for]="idPrefix() + '-title'" class="mb-1 block font-semibold text-brand-plum">Title</label>
+      <input [id]="idPrefix() + '-title'" type="text" maxlength="200" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="title" />
+
+      @if (form().controls.title.touched && (form().controls.title.hasError('required') || form().controls.title.hasError('blank'))) {
+        <p class="mt-1 text-sm text-brand-coral">History title is required.</p>
+      } @else if (form().controls.title.hasError('maxlength')) {
+        <p class="mt-1 text-sm text-brand-coral">History title must not exceed 200 characters.</p>
+      } @else if (form().controls.title.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+      }
+    </div>
+
+    <div>
+      <label [for]="idPrefix() + '-entry-date'" class="mb-1 block font-semibold text-brand-plum">History date</label>
+      <input [id]="idPrefix() + '-entry-date'" type="date" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="entryDate" />
+
+      @if (form().controls.entryDate.touched && form().controls.entryDate.hasError('required')) {
+        <p class="mt-1 text-sm text-brand-coral">History date is required.</p>
+      } @else if (form().controls.entryDate.touched && form().controls.entryDate.hasError('pastOrPresentDate')) {
+        <p class="mt-1 text-sm text-brand-coral">History date must not be in the future.</p>
+      } @else if (form().controls.entryDate.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+      }
+    </div>
+
+    <div>
+      <label [for]="idPrefix() + '-summary'" class="mb-1 block font-semibold text-brand-plum">Summary</label>
+      <textarea [id]="idPrefix() + '-summary'" rows="10" maxlength="10000" class="w-full rounded-md border border-brand-plum/30 bg-white p-3 text-brand-plum" formControlName="summary"></textarea>
+
+      <div class="mt-1 flex flex-wrap justify-between gap-2 text-sm">
+        <span class="text-brand-plum/60">Record clinically relevant information in a concise form.</span>
+        <span class="text-brand-plum/60">{{ form().controls.summary.value.length }} / 10000</span>
+      </div>
+
+      @if (form().controls.summary.touched && (form().controls.summary.hasError('required') || form().controls.summary.hasError('blank'))) {
+        <p class="mt-1 text-sm text-brand-coral">History summary is required.</p>
+      } @else if (form().controls.summary.hasError('maxlength')) {
+        <p class="mt-1 text-sm text-brand-coral">History summary must not exceed 10000 characters.</p>
+      } @else if (form().controls.summary.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+      }
+    </div>
+  </section>
+</div>

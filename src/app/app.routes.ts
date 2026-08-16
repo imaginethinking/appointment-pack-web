@@ -25,6 +25,9 @@ import { SummaryReview } from './features/documents/pages/summary-review/summary
 import { AccessDenied } from './features/errors/pages/access-denied/access-denied';
 import { NotFound } from './features/errors/pages/not-found/not-found';
 import { Home } from './features/home/pages/home/home';
+import { MedicalHistoryCreate } from './features/medical-history/pages/medical-history-create/medical-history-create';
+import { MedicalHistoryDetails } from './features/medical-history/pages/medical-history-details/medical-history-details';
+import { MedicalHistoryEdit } from './features/medical-history/pages/medical-history-edit/medical-history-edit';
 import { MedicalHistory } from './features/medical-history/pages/medical-history/medical-history';
 import { PatientRecordCreate } from './features/patient-record/pages/patient-record-create/patient-record-create';
 import { PatientRecordEdit } from './features/patient-record/pages/patient-record-edit/patient-record-edit';
@@ -216,6 +219,39 @@ export const routes: Routes = [
       {
         path: 'medical-history',
         component: MedicalHistory,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'history',
+            action: 'view',
+          },
+        },
+      },
+      {
+        path: 'medical-history/create',
+        component: MedicalHistoryCreate,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'history',
+            action: 'edit',
+          },
+        },
+      },
+      {
+        path: 'medical-history/:entryId/edit',
+        component: MedicalHistoryEdit,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'history',
+            action: 'edit',
+          },
+        },
+      },
+      {
+        path: 'medical-history/:entryId',
+        component: MedicalHistoryDetails,
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {

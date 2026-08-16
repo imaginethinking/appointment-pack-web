@@ -1,183 +1,93 @@
 <section class="mx-auto max-w-5xl">
-  <div class="mb-6">
-    <h1 class="text-3xl font-bold text-brand-plum">
-      Medical history
-    </h1>
+  <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-brand-plum">Medical history</h1>
 
-    @if (selectedPatient(); as patient) {
-      <p class="mt-1 text-brand-plum/70">
-        Clinical history for
-        <span class="font-semibold text-brand-plum">
-          {{ getPatientContextName(patient) }}
-        </span>
-      </p>
-    } @else {
-      <p class="mt-1 text-brand-plum/70">
-        View medical history for the selected patient.
-      </p>
+      @if (selectedPatient(); as patient) {
+        <p class="mt-1 text-brand-plum/70">
+          Clinical history for <span class="font-semibold text-brand-plum">{{ getPatientContextName(patient) }}</span>
+        </p>
+      } @else {
+        <p class="mt-1 text-brand-plum/70">View medical history for the selected patient.</p>
+      }
+    </div>
+
+    @if (canEditHistory()) {
+      <a routerLink="/medical-history/create" class="btn btn-primary">Add history entry</a>
     }
   </div>
 
   @if (status() === 'loading') {
-    <div
-      class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum"
-      role="status"
-    >
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">
       Loading medical history...
     </div>
   } @else if (status() === 'no-patient') {
-    <div
-      class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6"
-    >
-      <h2 class="font-semibold text-brand-plum">
-        No patient selected
-      </h2>
-
-      <p class="mt-2 text-brand-plum/70">
-        Select an accessible patient before viewing medical history.
-      </p>
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <h2 class="font-semibold text-brand-plum">No patient selected</h2>
+      <p class="mt-2 text-brand-plum/70">Select an accessible patient before viewing medical history.</p>
     </div>
   } @else if (status() === 'forbidden') {
-    <div
-      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
-      role="alert"
-    >
-      <h2 class="font-semibold text-brand-plum">
-        Medical history unavailable
-      </h2>
-
-      <p class="mt-2 text-brand-plum/70">
-        You do not have permission to view medical history for this patient.
-      </p>
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Medical history unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">You do not have permission to view medical history for this patient.</p>
     </div>
   } @else if (status() === 'error') {
-    <div
-      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
-      role="alert"
-    >
-      <p class="text-brand-coral">
-        {{ errorMessage() }}
-      </p>
-
-      <button
-        type="button"
-        class="btn btn-secondary mt-4"
-        (click)="retry()"
-      >
-        Try again
-      </button>
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-coral">{{ errorMessage() }}</p>
+      <button type="button" class="btn btn-secondary mt-4" (click)="retry()">Try again</button>
     </div>
   } @else if (entries().length === 0) {
-    <div
-      class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6"
-    >
-      <h2 class="font-semibold text-brand-plum">
-        No medical-history entries
-      </h2>
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <h2 class="font-semibold text-brand-plum">No medical-history entries</h2>
+      <p class="mt-2 text-brand-plum/70">There are no medical-history entries for this patient yet.</p>
+      <p class="mt-2 text-sm text-brand-plum/60">Entries can be added manually or created from accepted consultation summaries.</p>
 
-      <p class="mt-2 text-brand-plum/70">
-        There are no medical-history entries for this patient yet.
-      </p>
+      <div class="mt-4 flex flex-wrap gap-3">
+        @if (canEditHistory()) {
+          <a routerLink="/medical-history/create" class="btn btn-primary">Add history entry</a>
+        }
 
-      <p class="mt-2 text-sm text-brand-plum/60">
-        Accepted consultation summaries will appear here.
-      </p>
-
-      <a
-        routerLink="/documents"
-        class="btn btn-secondary mt-4"
-      >
-        View documents
-      </a>
+        <a routerLink="/documents" class="btn btn-secondary">View documents</a>
+      </div>
     </div>
   } @else {
     <div class="relative">
-      <div
-        class="absolute bottom-0 left-4 top-0 w-px bg-brand-plum/20 sm:left-6"
-        aria-hidden="true"
-      ></div>
+      <div class="absolute bottom-0 left-4 top-0 w-px bg-brand-plum/20 sm:left-6" aria-hidden="true"></div>
 
       <div class="space-y-6">
-        @for (
-          entry of entries();
-          track entry.id
-          ) {
-          <article
-            class="relative pl-10 sm:pl-14"
-          >
-            <div
-              class="absolute left-[0.65rem] top-7 h-3 w-3 rounded-full border-2 border-brand-plum bg-brand-pink sm:left-[1.15rem]"
-              aria-hidden="true"
-            ></div>
+        @for (entry of entries(); track entry.id) {
+          <article class="relative pl-10 sm:pl-14">
+            <div class="absolute left-[0.65rem] top-7 h-3 w-3 rounded-full border-2 border-brand-plum bg-brand-pink sm:left-[1.15rem]" aria-hidden="true"></div>
 
-            <div
-              class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6"
-            >
-              <div
-                class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
-              >
+            <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <h2
-                    class="text-xl font-semibold text-brand-plum"
-                  >
-                    {{ entry.title }}
-                  </h2>
-
-                  <p
-                    class="mt-1 text-sm text-brand-plum/60"
-                  >
-                    {{
-                      getMedicalHistorySourceLabel(
-                        entry.sourceType
-                      )
-                    }}
-                  </p>
+                  <h2 class="text-xl font-semibold text-brand-plum">{{ entry.title }}</h2>
+                  <p class="mt-1 text-sm text-brand-plum/60">{{ getMedicalHistorySourceLabel(entry.sourceType) }}</p>
                 </div>
 
-                <time
-                  class="w-fit rounded-full bg-brand-mint px-3 py-1 text-sm font-semibold text-brand-plum"
-                >
-                  {{
-                    entry.entryDate
-                      | date: 'd MMMM y'
-                  }}
+                <time class="w-fit rounded-full bg-brand-mint px-3 py-1 text-sm font-semibold text-brand-plum">
+                  {{ entry.entryDate | date: 'd MMMM y' }}
                 </time>
               </div>
 
-              <p
-                class="mt-5 whitespace-pre-wrap leading-relaxed text-brand-plum"
-              >
-                {{ entry.summary }}
-              </p>
+              <p class="mt-5 whitespace-pre-wrap leading-relaxed text-brand-plum">{{ entry.summary }}</p>
 
-              @if (entry.sourceDocumentId) {
-                <div
-                  class="mt-5 border-t border-brand-plum/20 pt-4"
-                >
+              <div class="mt-5 flex flex-wrap items-center gap-4 border-t border-brand-plum/20 pt-4">
+                <a [routerLink]="['/medical-history', entry.id]" class="text-sm font-semibold text-brand-plum underline">View entry</a>
+
+                @if (canEditHistory()) {
+                  <a [routerLink]="['/medical-history', entry.id, 'edit']" class="text-sm font-semibold text-brand-plum underline">Edit entry</a>
+                }
+
+                @if (entry.sourceDocumentId) {
                   @if (entry.sourceDocumentType) {
-                    <p
-                      class="mb-2 text-sm text-brand-plum/60"
-                    >
-                      Source:
-                      {{
-                        getDocumentTypeLabel(
-                          entry.sourceDocumentType
-                        )
-                      }}
-                    </p>
+                    <span class="text-sm text-brand-plum/60">Source: {{ getDocumentTypeLabel(entry.sourceDocumentType) }}</span>
                   }
 
-                  <a
-                    [routerLink]="[
-                      '/documents',
-                      entry.sourceDocumentId
-                    ]"
-                    class="text-sm font-semibold text-brand-plum underline"
-                  >
-                    View source document
-                  </a>
-                </div>
-              }
+                  <a [routerLink]="['/documents', entry.sourceDocumentId]" class="text-sm font-semibold text-brand-plum underline">View source document</a>
+                }
+              </div>
             </div>
           </article>
         }

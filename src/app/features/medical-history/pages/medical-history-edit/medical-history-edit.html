@@ -1,0 +1,71 @@
+<section class="mx-auto max-w-3xl">
+  <div class="mb-6">
+    @if (entry(); as currentEntry) {
+      <a [routerLink]="['/medical-history', currentEntry.id]" class="text-sm font-semibold text-brand-plum underline">Back to history entry</a>
+    } @else {
+      <a routerLink="/medical-history" class="text-sm font-semibold text-brand-plum underline">Back to medical history</a>
+    }
+
+    <h1 class="mt-4 text-3xl font-bold text-brand-plum">Edit medical-history entry</h1>
+  </div>
+
+  @if (status() === 'loading') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">Loading medical-history entry...</div>
+  } @else if (status() === 'not-found') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">History entry not found</h2>
+      <p class="mt-2 text-brand-plum/70">The entry does not exist, has been archived, or is no longer available.</p>
+    </div>
+  } @else if (status() === 'forbidden') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Editing unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">You do not have permission to edit this medical-history entry.</p>
+    </div>
+  } @else if (status() === 'invalid') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-plum">{{ errorMessage() }}</p>
+      <a routerLink="/medical-history" class="btn btn-secondary mt-4">Return to medical history</a>
+    </div>
+  } @else if (status() === 'error') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-coral">{{ errorMessage() }}</p>
+      <button type="button" class="btn btn-secondary mt-4" (click)="retry()">Try again</button>
+    </div>
+  } @else if (entry(); as currentEntry) {
+    <form class="space-y-6" [formGroup]="form" novalidate (ngSubmit)="save()">
+      @if (currentEntry.sourceType === 'DOCUMENT_SUMMARY') {
+        <div class="rounded-lg border border-brand-peach bg-brand-off-white p-4 text-sm text-brand-plum">
+          <p>This entry was created from an accepted consultation summary. You can edit the history title, date and summary, but its document provenance remains unchanged.</p>
+
+          @if (currentEntry.sourceDocumentId) {
+            <div class="mt-2 flex flex-wrap items-center gap-3">
+              @if (currentEntry.sourceDocumentType) {
+                <span class="text-brand-plum/60">{{ getDocumentTypeLabel(currentEntry.sourceDocumentType) }}</span>
+              }
+
+              <a [routerLink]="['/documents', currentEntry.sourceDocumentId]" class="font-semibold text-brand-plum underline">View source document</a>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-4 text-sm text-brand-plum/70">
+          {{ getMedicalHistorySourceLabel(currentEntry.sourceType) }}
+        </div>
+      }
+
+      <app-medical-history-form-fields [form]="form" idPrefix="edit-history" />
+
+      @if (errorMessage()) {
+        <div class="rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral" role="alert">{{ errorMessage() }}</div>
+      }
+
+      <div class="flex flex-wrap gap-3">
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
+          {{ isSaving() ? 'Saving...' : 'Save history entry' }}
+        </button>
+
+        <a [routerLink]="['/medical-history', currentEntry.id]" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  }
+</section>
