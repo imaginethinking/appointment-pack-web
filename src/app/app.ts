@@ -9,7 +9,6 @@ import { Navbar } from './shared/components/navbar/navbar';
   selector: 'app-root',
   imports: [Navbar, RouterOutlet],
   templateUrl: './app.html',
-  styleUrl: './app.css',
 })
 export class App {
   private readonly authService = inject(AuthService);
