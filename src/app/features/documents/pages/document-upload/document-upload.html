@@ -1,160 +1,77 @@
-<section class="mx-auto max-w-2xl">
+<section class="mx-auto max-w-3xl">
   <div class="mb-6">
-    <a
-      routerLink="/documents"
-      class="text-sm font-semibold text-brand-plum underline"
-    >
-      Back to documents
-    </a>
-
-    <h1 class="mt-4 text-3xl font-bold text-brand-plum">
-      Upload document
-    </h1>
+    <a routerLink="/documents" class="text-sm font-semibold text-brand-plum underline">Back to documents</a>
+    <h1 class="mt-4 text-3xl font-bold text-brand-plum">Upload document</h1>
 
     @if (selectedPatient()) {
-      <p class="mt-1 text-brand-plum/70">
-        Upload a document for {{ selectedPatientName() }}.
-      </p>
+      <p class="mt-1 text-brand-plum/70">Upload a document for <span class="font-semibold text-brand-plum">{{ selectedPatientName() }}</span>.</p>
     }
   </div>
 
   @if (!selectedPatient()) {
     <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
-      <h2 class="font-semibold text-brand-plum">
-        No patient selected
-      </h2>
-
-      <p class="mt-2 text-brand-plum/70">
-        Select a patient before uploading a document.
-      </p>
+      <h2 class="font-semibold text-brand-plum">No patient selected</h2>
+      <p class="mt-2 text-brand-plum/70">Select an accessible patient before uploading a document.</p>
     </div>
   } @else if (!canUpload()) {
-    <div
-      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
-      role="alert"
-    >
-      <h2 class="font-semibold text-brand-plum">
-        Upload unavailable
-      </h2>
-
-      <p class="mt-2 text-brand-plum/70">
-        You do not have permission to upload documents for this patient.
-      </p>
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Document upload unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">You do not have permission to upload documents for this patient.</p>
     </div>
   } @else {
-    <form
-      class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6"
-      [formGroup]="form"
-      novalidate
-      (ngSubmit)="upload()"
-    >
-      <div>
-        <label
-          for="documentType"
-          class="mb-1 block font-semibold text-brand-plum"
-        >
-          Document type
-        </label>
+    <form class="space-y-6" [formGroup]="form" novalidate (ngSubmit)="upload()">
+      <section class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+        <div>
+          <label for="documentType" class="mb-1 block font-semibold text-brand-plum">Document type</label>
 
-        <select
-          id="documentType"
-          class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
-          formControlName="documentType"
-        >
-          <option value="">
-            Select document type
-          </option>
+          <select id="documentType" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="documentType">
+            <option value="">Select a document type</option>
 
-          @for (documentType of documentTypes; track documentType) {
-            <option [value]="documentType">
-              {{ getDocumentTypeLabel(documentType) }}
-            </option>
+            @for (documentType of documentTypes; track documentType) {
+              <option [value]="documentType">{{ getDocumentTypeLabel(documentType) }}</option>
+            }
+          </select>
+
+          @if (form.controls.documentType.touched && form.controls.documentType.hasError('required')) {
+            <p class="mt-1 text-sm text-brand-coral">Select the type of document being uploaded.</p>
           }
-        </select>
+        </div>
 
-        @if (
-          form.controls.documentType.touched &&
-          form.controls.documentType.hasError('required')
-          ) {
-          <p class="mt-1 text-sm text-brand-coral">
-            Document type is required.
+        <div>
+          <label for="documentFile" class="mb-1 block font-semibold text-brand-plum">Document file</label>
+
+          <input
+            id="documentFile"
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+            class="block w-full text-brand-plum"
+            (change)="selectFile($event)"
+          />
+
+          <p class="mt-2 text-sm text-brand-plum/60">
+            PDF, JPEG or PNG. Maximum file size 10 MB. Spring verifies the actual file signature after upload rather than trusting the filename or browser MIME type.
           </p>
-        }
-      </div>
 
-      <div>
-        <label
-          for="documentFile"
-          class="mb-1 block font-semibold text-brand-plum"
-        >
-          Document
-        </label>
+          @if (fileError()) {
+            <p class="mt-2 text-sm text-brand-coral" role="alert">{{ fileError() }}</p>
+          }
 
-        <input
-          id="documentFile"
-          type="file"
-          accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
-          class="block w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
-          [disabled]="isUploading()"
-          (change)="selectFile($event)"
-        />
-
-        <p class="mt-1 text-sm text-brand-plum/70">
-          PDF, JPEG or PNG. Maximum file size 10 MB.
-        </p>
-
-        @if (fileError()) {
-          <p
-            class="mt-1 text-sm text-brand-coral"
-            role="alert"
-          >
-            {{ fileError() }}
-          </p>
-        }
-
-        @if (selectedFile(); as file) {
-          <div class="mt-3 rounded-md bg-brand-peach/40 p-3">
-            <p class="break-words text-sm font-medium text-brand-plum">
-              {{ file.name }}
-            </p>
-
-            <p class="mt-1 text-sm text-brand-plum/70">
-              {{ formatFileSize(file.size) }}
-            </p>
-          </div>
-        }
-      </div>
-
-      <div class="rounded-md border border-brand-plum/20 bg-brand-peach/30 p-4">
-        <p class="text-sm text-brand-plum">
-          Uploading stores the original document only. Document processing is a separate action.
-        </p>
-      </div>
+          @if (selectedFile(); as file) {
+            <div class="mt-4 rounded-md border border-brand-plum/20 bg-white p-4">
+              <p class="break-all font-medium text-brand-plum">{{ file.name }}</p>
+              <p class="mt-1 text-sm text-brand-plum/60">{{ formatFileSize(file.size) }}</p>
+            </div>
+          }
+        </div>
+      </section>
 
       @if (errorMessage()) {
-        <p
-          class="text-brand-coral"
-          role="alert"
-        >
-          {{ errorMessage() }}
-        </p>
+        <div class="rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral" role="alert">{{ errorMessage() }}</div>
       }
 
       <div class="flex flex-wrap gap-3">
-        <button
-          type="submit"
-          class="btn btn-primary"
-          [disabled]="isUploading()"
-        >
-          {{ isUploading() ? 'Uploading...' : 'Upload document' }}
-        </button>
-
-        <a
-          routerLink="/documents"
-          class="btn btn-secondary"
-        >
-          Cancel
-        </a>
+        <button type="submit" class="btn btn-primary" [disabled]="isUploading()">{{ isUploading() ? 'Uploading...' : 'Upload document' }}</button>
+        <a routerLink="/documents" class="btn btn-secondary">Cancel</a>
       </div>
     </form>
   }

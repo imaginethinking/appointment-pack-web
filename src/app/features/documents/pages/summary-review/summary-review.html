@@ -1,522 +1,243 @@
 <section class="mx-auto max-w-5xl">
   <div class="mb-6">
     @if (document(); as currentDocument) {
-      <a
-        [routerLink]="['/documents', currentDocument.id]"
-        class="text-sm font-semibold text-brand-plum underline"
-      >
-        Back to document
-      </a>
+      <a [routerLink]="['/documents', currentDocument.id]" class="text-sm font-semibold text-brand-plum underline">Back to document</a>
     } @else {
-      <a
-        routerLink="/documents"
-        class="text-sm font-semibold text-brand-plum underline"
-      >
-        Back to documents
-      </a>
+      <a routerLink="/documents" class="text-sm font-semibold text-brand-plum underline">Back to documents</a>
     }
 
-    <h1 class="mt-4 text-3xl font-bold text-brand-plum">
-      Consultation summary
-    </h1>
+    <h1 class="mt-4 text-3xl font-bold text-brand-plum">Review consultation summary</h1>
 
-    <p class="mt-1 text-brand-plum/70">
-      Review the consultation summary before adding it to medical history.
-    </p>
+    @if (document(); as currentDocument) {
+      <p class="mt-1 text-brand-plum/70">{{ getDocumentTypeLabel(currentDocument.documentType) }}</p>
+    }
   </div>
 
   @if (status() === 'loading') {
-    <div
-      class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum"
-      role="status"
-    >
-      Loading summary...
-    </div>
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">Loading summary review...</div>
   } @else if (status() === 'not-found') {
-    <div
-      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
-      role="alert"
-    >
-      <p class="text-brand-plum">
-        The document could not be found.
-      </p>
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Document not found</h2>
+      <p class="mt-2 text-brand-plum/70">The document does not exist, has been archived, or is no longer available.</p>
     </div>
   } @else if (status() === 'forbidden') {
-    <div
-      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
-      role="alert"
-    >
-      <p class="text-brand-plum">
-        You do not have permission to review this document.
-      </p>
-    </div>
-  } @else if (status() === 'error') {
-    <div
-      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
-      role="alert"
-    >
-      <p class="text-brand-coral">
-        {{ errorMessage() }}
-      </p>
-
-      <button
-        type="button"
-        class="btn btn-secondary mt-4"
-        (click)="retryLoad()"
-      >
-        Try again
-      </button>
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Summary review unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">You do not have permission to review this document.</p>
     </div>
   } @else if (status() === 'invalid') {
-    <div
-      class="rounded-lg border border-brand-coral bg-brand-off-white p-6"
-      role="alert"
-    >
-      <p class="text-brand-plum">
-        {{ errorMessage() }}
-      </p>
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-plum">{{ errorMessage() }}</p>
 
       @if (document(); as currentDocument) {
-        <a
-          [routerLink]="['/documents', currentDocument.id]"
-          class="btn btn-secondary mt-4"
-        >
-          Return to document details
-        </a>
+        <a [routerLink]="['/documents', currentDocument.id]" class="btn btn-secondary mt-4">Return to document details</a>
       }
+    </div>
+  } @else if (status() === 'error') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-coral">{{ errorMessage() }}</p>
+      <button type="button" class="btn btn-secondary mt-4" (click)="retryLoad()">Try again</button>
     </div>
   } @else if (status() === 'failed' && processing(); as currentProcessing) {
     <div class="space-y-6">
-      <section class="rounded-lg border border-brand-coral/50 bg-brand-off-white p-6">
-        <h2 class="text-xl font-semibold text-brand-plum">
-          Summary generation failed
-        </h2>
+      <section class="rounded-lg border border-brand-coral/50 bg-brand-peach/30 p-6">
+        <h2 class="text-xl font-semibold text-brand-plum">External summarisation did not complete</h2>
+        <p class="mt-2 text-brand-plum/70">The approved de-identified text has been retained. You can retry using that exact approved snapshot or enter a manual summary.</p>
 
-        <p class="mt-2 text-brand-plum/70">
-          The approved de-identified consultation text has been retained.
-          You can retry external summarisation without repeating extraction or
-          de-identification, or enter a summary manually.
-        </p>
+        @if (actionError()) {
+          <p class="mt-4 text-brand-coral" role="alert">{{ actionError() }}</p>
+        }
       </section>
 
       <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
-        <h2 class="text-xl font-semibold text-brand-plum">
-          Approved de-identified text
-        </h2>
+        <h2 class="text-xl font-semibold text-brand-plum">Approved de-identified text</h2>
+        <p class="mt-1 text-sm text-brand-plum/70">This snapshot is read-only during recovery and is reused exactly when summarisation is retried.</p>
 
-        <p class="mt-1 text-sm text-brand-plum/70">
-          This is the exact text previously approved for external transmission.
-          It cannot be edited during retry.
-        </p>
-
-        <div
-          class="mt-4 max-h-96 overflow-y-auto whitespace-pre-wrap rounded-md border border-brand-plum/20 bg-white p-4 text-sm text-brand-plum"
-        >
+        <div class="mt-4 max-h-[32rem] overflow-y-auto whitespace-pre-wrap rounded-md border border-brand-plum/20 bg-white p-4 font-mono text-sm text-brand-plum">
           {{ currentProcessing.approvedDeidentifiedText }}
         </div>
-
-        @if (currentProcessing.deidentificationReviewedAt) {
-          <p class="mt-3 text-sm text-brand-plum/60">
-            The de-identification review has already been completed and does not need to be repeated.
-          </p>
-        }
       </section>
 
       @if (!manualSummaryMode()) {
         <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
-          <h2 class="text-xl font-semibold text-brand-plum">
-            Recovery options
-          </h2>
+          <h2 class="text-xl font-semibold text-brand-plum">Recovery options</h2>
 
-          <p class="mt-2 text-brand-plum/70">
-            Retry the external AI service using the approved text above, or create the consultation summary manually.
-          </p>
-
-          @if (actionError()) {
-            <div
-              class="mt-4 rounded-lg border border-brand-coral bg-white p-4 text-brand-coral"
-              role="alert"
-            >
-              {{ actionError() }}
-            </div>
-          }
-
-          <div class="mt-5 flex flex-wrap gap-3">
-            <button
-              type="button"
-              class="btn btn-primary"
-              [disabled]="!canRetry() || isAccepting()"
-              (click)="retrySummarisation()"
-            >
-              {{ isRetrying() ? 'Retrying summarisation...' : 'Retry summarisation' }}
-            </button>
-
-            <button
-              type="button"
-              class="btn btn-secondary"
-              [disabled]="isRetrying() || isAccepting() || !canEditDocument()"
-              (click)="enableManualSummary()"
-            >
-              Enter manual summary
-            </button>
+          <div class="mt-4 flex flex-wrap gap-3">
+            <button type="button" class="btn btn-primary" [disabled]="!canRetry()" (click)="retrySummarisation()">{{ isRetrying() ? 'Retrying...' : 'Retry summarisation' }}</button>
+            <button type="button" class="btn btn-secondary" [disabled]="isRetrying() || !canEditDocument()" (click)="enableManualSummary()">Enter manual summary</button>
           </div>
         </section>
       } @else {
-        <form
-          class="space-y-6"
-          [formGroup]="form"
-          novalidate
-          (ngSubmit)="accept()"
-        >
+        <form class="space-y-6" [formGroup]="form" novalidate (ngSubmit)="accept()">
           <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
-            <h2 class="text-xl font-semibold text-brand-plum">
-              Manual summary
-            </h2>
+            <label for="manualReviewedSummary" class="block text-xl font-semibold text-brand-plum">Manual summary</label>
+            <p class="mt-1 text-sm text-brand-plum/70">This text will become the medical-history summary and Spring will record the summary source as Manual.</p>
 
-            <p class="mt-1 text-sm text-brand-plum/70">
-              Write a concise summary based on the consultation document. The submitted text will become the reviewed medical-history summary.
-            </p>
+            <textarea id="manualReviewedSummary" rows="10" [attr.maxlength]="reviewedSummaryMaximumLength" class="mt-4 w-full rounded-md border border-brand-plum/30 bg-white p-3 text-brand-plum" formControlName="reviewedSummary"></textarea>
 
-            <div class="mt-5">
-              <label
-                for="manualReviewedSummary"
-                class="mb-1 block font-semibold text-brand-plum"
-              >
-                Summary
-              </label>
-
-              <textarea
-                id="manualReviewedSummary"
-                rows="10"
-                class="w-full rounded-md border border-brand-plum/30 bg-white p-3 text-brand-plum"
-                formControlName="reviewedSummary"
-              ></textarea>
-
-              @if (
-                form.controls.reviewedSummary.touched &&
-                form.controls.reviewedSummary.hasError('required')
-                ) {
-                <p class="mt-1 text-sm text-brand-coral">
-                  A summary is required.
-                </p>
-              } @else if (form.controls.reviewedSummary.errors?.['server']; as message) {
-                <p class="mt-1 text-sm text-brand-coral">
-                  {{ message }}
-                </p>
-              }
+            <div class="mt-1 flex flex-wrap justify-between gap-2 text-sm text-brand-plum/60">
+              <span>Final medical-history summary.</span>
+              <span>{{ form.controls.reviewedSummary.value.length }} / {{ reviewedSummaryMaximumLength }}</span>
             </div>
+
+            @if (form.controls.reviewedSummary.touched && form.controls.reviewedSummary.hasError('required')) {
+              <p class="mt-1 text-sm text-brand-coral">A summary is required.</p>
+            } @else if (form.controls.reviewedSummary.hasError('maxlength')) {
+              <p class="mt-1 text-sm text-brand-coral">The summary must not exceed {{ reviewedSummaryMaximumLength }} characters.</p>
+            } @else if (form.controls.reviewedSummary.errors?.['server']; as message) {
+              <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+            }
           </section>
 
           <section class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
             <div>
-              <h2 class="text-xl font-semibold text-brand-plum">
-                Medical-history details
-              </h2>
-
-              <p class="mt-1 text-sm text-brand-plum/70">
-                Confirm how this consultation should appear in the patient's medical history.
-              </p>
+              <h2 class="text-xl font-semibold text-brand-plum">Medical-history details</h2>
+              <p class="mt-1 text-sm text-brand-plum/70">Confirm how this consultation should appear in the patient's medical history.</p>
             </div>
 
             <div>
-              <label
-                for="manualHistoryTitle"
-                class="mb-1 block font-semibold text-brand-plum"
-              >
-                History title
-              </label>
+              <label for="manualHistoryTitle" class="mb-1 block font-semibold text-brand-plum">History title</label>
+              <input id="manualHistoryTitle" type="text" [attr.maxlength]="historyTitleMaximumLength" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="historyTitle" />
 
-              <input
-                id="manualHistoryTitle"
-                type="text"
-                maxlength="200"
-                class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
-                formControlName="historyTitle"
-              />
-
-              @if (
-                form.controls.historyTitle.touched &&
-                form.controls.historyTitle.hasError('required')
-                ) {
-                <p class="mt-1 text-sm text-brand-coral">
-                  A history title is required.
-                </p>
-              } @else if (
-                form.controls.historyTitle.touched &&
-                form.controls.historyTitle.hasError('maxlength')
-                ) {
-                <p class="mt-1 text-sm text-brand-coral">
-                  The history title must not exceed 200 characters.
-                </p>
+              @if (form.controls.historyTitle.touched && form.controls.historyTitle.hasError('required')) {
+                <p class="mt-1 text-sm text-brand-coral">A history title is required.</p>
+              } @else if (form.controls.historyTitle.hasError('maxlength')) {
+                <p class="mt-1 text-sm text-brand-coral">The history title must not exceed {{ historyTitleMaximumLength }} characters.</p>
+              } @else if (form.controls.historyTitle.errors?.['server']; as message) {
+                <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
               }
             </div>
 
             <div>
-              <label
-                for="manualHistoryDate"
-                class="mb-1 block font-semibold text-brand-plum"
-              >
-                Clinical date
-              </label>
+              <label for="manualHistoryDate" class="mb-1 block font-semibold text-brand-plum">Clinical date</label>
+              <input id="manualHistoryDate" type="date" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="historyDate" />
+              <p class="mt-1 text-sm text-brand-plum/60">Enter the clinical event date. Do not use the upload date unless it is genuinely the consultation date.</p>
 
-              <input
-                id="manualHistoryDate"
-                type="date"
-                class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
-                formControlName="historyDate"
-              />
-
-              <p class="mt-1 text-sm text-brand-plum/60">
-                Enter the clinical event date. Do not use the upload date unless it is genuinely the consultation date.
-              </p>
-
-              @if (
-                form.controls.historyDate.touched &&
-                form.controls.historyDate.hasError('required')
-                ) {
-                <p class="mt-1 text-sm text-brand-coral">
-                  A clinical date is required.
-                </p>
+              @if (form.controls.historyDate.touched && form.controls.historyDate.hasError('required')) {
+                <p class="mt-1 text-sm text-brand-coral">A clinical date is required.</p>
+              } @else if (form.controls.historyDate.touched && form.controls.historyDate.hasError('pastOrPresentDate')) {
+                <p class="mt-1 text-sm text-brand-coral">The clinical date must not be in the future.</p>
+              } @else if (form.controls.historyDate.errors?.['server']; as message) {
+                <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
               }
             </div>
           </section>
 
           @if (!canWriteHistory()) {
             <div class="rounded-lg border border-brand-coral/50 bg-brand-peach/30 p-4">
-              <p class="text-sm text-brand-plum">
-                You can edit this summary, but you do not have permission to add entries to this patient's medical history.
-              </p>
+              <p class="text-sm text-brand-plum">You can edit this summary, but you do not have permission to add entries to this patient's medical history.</p>
             </div>
           }
 
           @if (actionError()) {
-            <div
-              class="rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral"
-              role="alert"
-            >
-              {{ actionError() }}
-            </div>
+            <div class="rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral" role="alert">{{ actionError() }}</div>
           }
 
           <div class="flex flex-wrap gap-3">
-            <button
-              type="submit"
-              class="btn btn-primary"
-              [disabled]="isAccepting() || isRetrying() || !canAccept()"
-            >
-              {{ isAccepting() ? 'Saving...' : 'Accept manual summary' }}
-            </button>
-
-            <button
-              type="button"
-              class="btn btn-secondary"
-              [disabled]="isAccepting()"
-              (click)="cancelManualSummary()"
-            >
-              Back to recovery options
-            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="isAccepting() || isRetrying() || !canAccept()">{{ isAccepting() ? 'Saving...' : 'Accept manual summary' }}</button>
+            <button type="button" class="btn btn-secondary" [disabled]="isAccepting()" (click)="cancelManualSummary()">Back to recovery options</button>
           </div>
         </form>
       }
     </div>
   } @else if (status() === 'ready' && processing(); as currentProcessing) {
-    <form
-      class="space-y-6"
-      [formGroup]="form"
-      novalidate
-      (ngSubmit)="accept()"
-    >
+    <form class="space-y-6" [formGroup]="form" novalidate (ngSubmit)="accept()">
       <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h2 class="text-xl font-semibold text-brand-plum">
-              Generated summary
-            </h2>
-
-            <p class="mt-1 text-sm text-brand-plum/70">
-              Review and edit the generated text before accepting it.
-            </p>
+            <h2 class="text-xl font-semibold text-brand-plum">Generated summary</h2>
+            <p class="mt-1 text-sm text-brand-plum/70">Review and edit the generated text before accepting it.</p>
           </div>
 
           @if (currentProcessing.summarySource; as source) {
-            <span class="w-fit rounded-full bg-brand-mint px-3 py-1 text-sm font-semibold text-brand-plum">
-              {{ getSummarySourceLabel(source) }}
-            </span>
+            <span class="w-fit rounded-full bg-brand-mint px-3 py-1 text-sm font-semibold text-brand-plum">{{ getSummarySourceLabel(source) }}</span>
           }
         </div>
 
-        <div class="mt-4 whitespace-pre-wrap rounded-md border border-brand-plum/20 bg-white p-4 text-brand-plum">
-          {{ currentProcessing.generatedSummary }}
-        </div>
+        <div class="mt-4 whitespace-pre-wrap rounded-md border border-brand-plum/20 bg-white p-4 text-brand-plum">{{ currentProcessing.generatedSummary }}</div>
 
         @if (currentProcessing.processingWarning; as warning) {
           <div class="mt-4 rounded-md border border-brand-coral/50 bg-brand-peach/30 p-4">
-            <p class="font-semibold text-brand-plum">
-              Processing warning
-            </p>
-
-            <p class="mt-1 text-sm text-brand-plum/80">
-              {{ warning }}
-            </p>
+            <p class="font-semibold text-brand-plum">Processing warning</p>
+            <p class="mt-1 text-sm text-brand-plum/80">{{ warning }}</p>
           </div>
         }
 
         @if (currentProcessing.model; as model) {
-          <p class="mt-4 text-sm text-brand-plum/60">
-            Model: {{ model.name }} · Prompt: {{ model.promptVersion }}
-          </p>
+          <p class="mt-4 text-sm text-brand-plum/60">Model: {{ model.name }} · Prompt: {{ model.promptVersion }}</p>
         }
       </section>
 
       <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
-        <label
-          for="reviewedSummary"
-          class="block text-xl font-semibold text-brand-plum"
-        >
-          Reviewed summary
-        </label>
+        <label for="reviewedSummary" class="block text-xl font-semibold text-brand-plum">Reviewed summary</label>
+        <p class="mt-1 text-sm text-brand-plum/70">This is the authoritative text that will be copied into medical history.</p>
 
-        <p class="mt-1 text-sm text-brand-plum/70">
-          This is the text that will be copied into medical history.
-        </p>
+        <textarea id="reviewedSummary" rows="10" [attr.maxlength]="reviewedSummaryMaximumLength" class="mt-4 w-full rounded-md border border-brand-plum/30 bg-white p-3 text-brand-plum" formControlName="reviewedSummary"></textarea>
 
-        <textarea
-          id="reviewedSummary"
-          rows="10"
-          class="mt-4 w-full rounded-md border border-brand-plum/30 bg-white p-3 text-brand-plum"
-          formControlName="reviewedSummary"
-        ></textarea>
+        <div class="mt-1 flex flex-wrap justify-between gap-2 text-sm text-brand-plum/60">
+          <span>You may edit the generated text before acceptance.</span>
+          <span>{{ form.controls.reviewedSummary.value.length }} / {{ reviewedSummaryMaximumLength }}</span>
+        </div>
 
-        @if (
-          form.controls.reviewedSummary.touched &&
-          form.controls.reviewedSummary.hasError('required')
-          ) {
-          <p class="mt-1 text-sm text-brand-coral">
-            A reviewed summary is required.
-          </p>
+        @if (form.controls.reviewedSummary.touched && form.controls.reviewedSummary.hasError('required')) {
+          <p class="mt-1 text-sm text-brand-coral">A reviewed summary is required.</p>
+        } @else if (form.controls.reviewedSummary.hasError('maxlength')) {
+          <p class="mt-1 text-sm text-brand-coral">The reviewed summary must not exceed {{ reviewedSummaryMaximumLength }} characters.</p>
         } @else if (form.controls.reviewedSummary.errors?.['server']; as message) {
-          <p class="mt-1 text-sm text-brand-coral">
-            {{ message }}
-          </p>
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
         }
       </section>
 
       <section class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
         <div>
-          <h2 class="text-xl font-semibold text-brand-plum">
-            Medical-history details
-          </h2>
-
-          <p class="mt-1 text-sm text-brand-plum/70">
-            Confirm how this consultation should appear in medical history.
-          </p>
+          <h2 class="text-xl font-semibold text-brand-plum">Medical-history details</h2>
+          <p class="mt-1 text-sm text-brand-plum/70">Confirm how this consultation should appear in the patient's medical history.</p>
         </div>
 
         <div>
-          <label
-            for="historyTitle"
-            class="mb-1 block font-semibold text-brand-plum"
-          >
-            History title
-          </label>
+          <label for="historyTitle" class="mb-1 block font-semibold text-brand-plum">History title</label>
+          <input id="historyTitle" type="text" [attr.maxlength]="historyTitleMaximumLength" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="historyTitle" />
 
-          <input
-            id="historyTitle"
-            type="text"
-            maxlength="200"
-            class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
-            formControlName="historyTitle"
-          />
-
-          @if (
-            form.controls.historyTitle.touched &&
-            form.controls.historyTitle.hasError('required')
-            ) {
-            <p class="mt-1 text-sm text-brand-coral">
-              A history title is required.
-            </p>
-          } @else if (
-            form.controls.historyTitle.touched &&
-            form.controls.historyTitle.hasError('maxlength')
-            ) {
-            <p class="mt-1 text-sm text-brand-coral">
-              The history title must not exceed 200 characters.
-            </p>
+          @if (form.controls.historyTitle.touched && form.controls.historyTitle.hasError('required')) {
+            <p class="mt-1 text-sm text-brand-coral">A history title is required.</p>
+          } @else if (form.controls.historyTitle.hasError('maxlength')) {
+            <p class="mt-1 text-sm text-brand-coral">The history title must not exceed {{ historyTitleMaximumLength }} characters.</p>
+          } @else if (form.controls.historyTitle.errors?.['server']; as message) {
+            <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
           }
         </div>
 
         <div>
-          <label
-            for="historyDate"
-            class="mb-1 block font-semibold text-brand-plum"
-          >
-            Clinical date
-          </label>
+          <label for="historyDate" class="mb-1 block font-semibold text-brand-plum">Clinical date</label>
+          <input id="historyDate" type="date" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="historyDate" />
+          <p class="mt-1 text-sm text-brand-plum/60">Enter the clinical event date. Do not use the upload date unless it is genuinely the consultation date.</p>
 
-          <input
-            id="historyDate"
-            type="date"
-            class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
-            formControlName="historyDate"
-          />
-
-          <p class="mt-1 text-sm text-brand-plum/60">
-            Confirm the clinical event date rather than relying on the upload date.
-          </p>
-
-          @if (
-            form.controls.historyDate.touched &&
-            form.controls.historyDate.hasError('required')
-            ) {
-            <p class="mt-1 text-sm text-brand-coral">
-              A clinical date is required.
-            </p>
+          @if (form.controls.historyDate.touched && form.controls.historyDate.hasError('required')) {
+            <p class="mt-1 text-sm text-brand-coral">A clinical date is required.</p>
+          } @else if (form.controls.historyDate.touched && form.controls.historyDate.hasError('pastOrPresentDate')) {
+            <p class="mt-1 text-sm text-brand-coral">The clinical date must not be in the future.</p>
+          } @else if (form.controls.historyDate.errors?.['server']; as message) {
+            <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
           }
         </div>
       </section>
 
       @if (!canWriteHistory()) {
         <div class="rounded-lg border border-brand-coral/50 bg-brand-peach/30 p-4">
-          <p class="text-sm text-brand-plum">
-            You can review this summary, but you do not have permission to add entries to this patient's medical history.
-          </p>
+          <p class="text-sm text-brand-plum">You can review or reject this summary, but you do not have permission to add entries to this patient's medical history.</p>
         </div>
       }
 
       @if (actionError()) {
-        <div
-          class="rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral"
-          role="alert"
-        >
-          {{ actionError() }}
-        </div>
+        <div class="rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral" role="alert">{{ actionError() }}</div>
       }
 
       <div class="flex flex-wrap gap-3">
-        <button
-          type="submit"
-          class="btn btn-primary"
-          [disabled]="isAccepting() || isRejecting() || !canAccept()"
-        >
-          {{ isAccepting() ? 'Accepting...' : 'Accept into medical history' }}
-        </button>
-
-        <button
-          type="button"
-          class="btn btn-danger"
-          [disabled]="isAccepting() || isRejecting() || !canReject()"
-          (click)="reject()"
-        >
-          {{ isRejecting() ? 'Rejecting...' : 'Reject summary' }}
-        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="isAccepting() || isRejecting() || !canAccept()">{{ isAccepting() ? 'Saving...' : 'Accept summary' }}</button>
+        <button type="button" class="btn btn-danger" [disabled]="isAccepting() || isRejecting() || !canReject()" (click)="reject()">{{ isRejecting() ? 'Rejecting...' : 'Reject summary' }}</button>
 
         @if (document(); as currentDocument) {
-          <a
-            [routerLink]="['/documents', currentDocument.id]"
-            class="btn btn-secondary"
-          >
-            Cancel
-          </a>
+          <a [routerLink]="['/documents', currentDocument.id]" class="btn btn-secondary">Cancel</a>
         }
       </div>
     </form>

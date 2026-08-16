@@ -10,11 +10,9 @@ import { getPatientContextName } from '../../../patient-context/models/selected-
 import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
 import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
 import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
+import { DOCUMENT_MAXIMUM_FILE_SIZE_BYTES } from '../../models/document-constraints';
 import { DOCUMENT_TYPES, DocumentType, getDocumentTypeLabel } from '../../models/document-model';
 import { DocumentApiService } from '../../services/document-api-service';
-
-const MAXIMUM_DOCUMENT_FILE_SIZE_BYTES = 10 * 1024 * 1024;
-const SUPPORTED_FILE_EXTENSIONS = ['.pdf', '.jpg', '.jpeg', '.png'] as const;
 
 @Component({
   selector: 'app-document-upload',
@@ -35,16 +33,19 @@ export class DocumentUpload {
   protected readonly fileError = signal('');
   protected readonly errorMessage = signal('');
   protected readonly isUploading = signal(false);
+  protected readonly getDocumentTypeLabel = getDocumentTypeLabel;
+  protected readonly formatFileSize = formatFileSize;
+
   protected readonly selectedPatientName = computed(() => {
     const selectedPatient = this.selectedPatient();
     return selectedPatient === null ? '' : getPatientContextName(selectedPatient);
   });
+
   protected readonly canUpload = computed(() => this.authorisation.can(this.selectedPatient(), 'document', 'upload'));
+
   protected readonly form = this.formBuilder.group({
     documentType: this.formBuilder.nonNullable.control<DocumentType | ''>('', Validators.required),
   });
-  protected readonly getDocumentTypeLabel = getDocumentTypeLabel;
-  protected readonly formatFileSize = formatFileSize;
 
   constructor() {
     effect(() => {
@@ -79,11 +80,12 @@ export class DocumentUpload {
 
   protected upload(): void {
     this.errorMessage.set('');
+    this.fileError.set('');
 
     const selectedPatient = this.selectedPatient();
     const file = this.selectedFile();
 
-    if (selectedPatient === null || !this.authorisation.can(selectedPatient, 'document', 'upload')) {
+    if (selectedPatient === null || !this.canUpload()) {
       this.errorMessage.set('You do not have permission to upload documents for the selected patient.');
       return;
     }
@@ -118,7 +120,7 @@ export class DocumentUpload {
 
         void this.router.navigate(['/documents', document.id]);
       },
-      error: (error: unknown) => this.handleUploadError(error),
+      error: (error: unknown) => this.handleUploadError(error, patientRecordId),
     });
   }
 
@@ -127,24 +129,21 @@ export class DocumentUpload {
       return 'The selected file is empty.';
     }
 
-    if (file.size > MAXIMUM_DOCUMENT_FILE_SIZE_BYTES) {
+    if (file.size > DOCUMENT_MAXIMUM_FILE_SIZE_BYTES) {
       return 'The selected file exceeds the 10 MB maximum size.';
     }
 
-    const lowerCaseName = file.name.toLowerCase();
-    const supported = SUPPORTED_FILE_EXTENSIONS.some((extension) => lowerCaseName.endsWith(extension));
-
-    return supported ? null : 'Select a PDF, JPEG or PNG document.';
+    return null;
   }
 
-  private handleUploadError(error: unknown): void {
+  private handleUploadError(error: unknown, failedPatientRecordId: string): void {
     if (hasHttpStatus(error, 413)) {
       this.errorMessage.set('The selected document exceeds the maximum upload size.');
       return;
     }
 
     if (hasHttpStatus(error, 415)) {
-      this.errorMessage.set('Only PDF, JPEG and PNG documents are supported.');
+      this.errorMessage.set('The uploaded file contents are not a supported PDF, JPEG or PNG document.');
       return;
     }
 
@@ -154,20 +153,20 @@ export class DocumentUpload {
     }
 
     if (hasHttpStatus(error, 403) || hasHttpStatus(error, 404)) {
-      this.refreshPatientContextAfterStaleAccess();
+      this.refreshPatientAccess(failedPatientRecordId);
       return;
     }
 
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to upload the document.'));
   }
 
-  private refreshPatientContextAfterStaleAccess(): void {
+  private refreshPatientAccess(failedPatientRecordId: string): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       next: () => {
         const selectedPatient = this.selectedPatient();
 
-        if (selectedPatient === null) {
-          this.errorMessage.set('Your patient access has changed. Select a patient and try again.');
+        if (selectedPatient?.patientRecordId !== failedPatientRecordId) {
+          this.errorMessage.set('Your patient access changed. Select the appropriate patient before uploading again.');
           return;
         }
 
@@ -176,11 +175,9 @@ export class DocumentUpload {
           return;
         }
 
-        this.errorMessage.set('The patient record is no longer available for this upload. Please try again.');
+        this.errorMessage.set('The selected patient record is no longer available for this upload.');
       },
-      error: (refreshError: unknown) => {
-        this.errorMessage.set(getHttpErrorMessage(refreshError, 'Unable to refresh your patient access.'));
-      },
+      error: (refreshError: unknown) => this.errorMessage.set(getHttpErrorMessage(refreshError, 'Unable to refresh your patient access.')),
     });
   }
 
