@@ -101,29 +101,49 @@
                 <app-permission-badges class="mt-3 block" [permissions]="relationship.permissions" />
 
                 @if (editingAccessId() === relationship.id) {
-                  <form class="mt-5 border-t border-brand-plum/20 pt-4" (ngSubmit)="savePermissions()">
+                  <div class="mt-5 border-t border-brand-plum/20 pt-4">
                     <app-permission-selector
                       [selectedPermissions]="editingPermissions()"
                       (permissionToggled)="toggleEditingPermission($event.permission, $event.checked)"
                     />
 
                     <div class="mt-5 flex flex-wrap gap-3">
-                      <button type="submit" class="btn btn-primary" [disabled]="isBusy(relationship.id)">
+                      <button
+                        type="button"
+                        class="btn btn-primary"
+                        [disabled]="isBusy(relationship.id)"
+                        (click)="savePermissions()"
+                      >
                         {{ isBusy(relationship.id) ? 'Saving...' : 'Save permissions' }}
                       </button>
 
-                      <button type="button" class="btn btn-secondary" [disabled]="isBusy(relationship.id)" (click)="cancelPermissionEdit()">
+                      <button
+                        type="button"
+                        class="btn btn-secondary"
+                        [disabled]="isBusy(relationship.id)"
+                        (click)="cancelPermissionEdit()"
+                      >
                         Cancel
                       </button>
                     </div>
-                  </form>
+                  </div>
                 } @else {
                   <div class="mt-5 flex flex-wrap gap-3">
-                    <button type="button" class="btn btn-secondary" [disabled]="busyAccessId() !== null" (click)="startPermissionEdit(relationship)">
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      [disabled]="busyAccessId() !== null"
+                      (click)="startPermissionEdit(relationship)"
+                    >
                       Edit permissions
                     </button>
 
-                    <button type="button" class="btn btn-danger" [disabled]="busyAccessId() !== null" (click)="cancelInvitation(relationship)">
+                    <button
+                      type="button"
+                      class="btn btn-danger"
+                      [disabled]="busyAccessId() !== null"
+                      (click)="cancelInvitation(relationship)"
+                    >
                       {{ isBusy(relationship.id) ? 'Cancelling...' : 'Cancel invitation' }}
                     </button>
                   </div>
@@ -159,29 +179,49 @@
                 <app-permission-badges class="mt-3 block" [permissions]="relationship.permissions" />
 
                 @if (editingAccessId() === relationship.id) {
-                  <form class="mt-5 border-t border-brand-plum/20 pt-4" (ngSubmit)="savePermissions()">
+                  <div class="mt-5 border-t border-brand-plum/20 pt-4">
                     <app-permission-selector
                       [selectedPermissions]="editingPermissions()"
                       (permissionToggled)="toggleEditingPermission($event.permission, $event.checked)"
                     />
 
                     <div class="mt-5 flex flex-wrap gap-3">
-                      <button type="submit" class="btn btn-primary" [disabled]="isBusy(relationship.id)">
+                      <button
+                        type="button"
+                        class="btn btn-primary"
+                        [disabled]="isBusy(relationship.id)"
+                        (click)="savePermissions()"
+                      >
                         {{ isBusy(relationship.id) ? 'Saving...' : 'Save permissions' }}
                       </button>
 
-                      <button type="button" class="btn btn-secondary" [disabled]="isBusy(relationship.id)" (click)="cancelPermissionEdit()">
+                      <button
+                        type="button"
+                        class="btn btn-secondary"
+                        [disabled]="isBusy(relationship.id)"
+                        (click)="cancelPermissionEdit()"
+                      >
                         Cancel
                       </button>
                     </div>
-                  </form>
+                  </div>
                 } @else {
                   <div class="mt-5 flex flex-wrap gap-3">
-                    <button type="button" class="btn btn-secondary" [disabled]="busyAccessId() !== null" (click)="startPermissionEdit(relationship)">
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      [disabled]="busyAccessId() !== null"
+                      (click)="startPermissionEdit(relationship)"
+                    >
                       Edit permissions
                     </button>
 
-                    <button type="button" class="btn btn-danger" [disabled]="busyAccessId() !== null" (click)="revokeAccess(relationship)">
+                    <button
+                      type="button"
+                      class="btn btn-danger"
+                      [disabled]="busyAccessId() !== null"
+                      (click)="revokeAccess(relationship)"
+                    >
                       {{ isBusy(relationship.id) ? 'Revoking...' : 'Revoke access' }}
                     </button>
                   </div>
