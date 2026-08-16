@@ -7,7 +7,7 @@ export function applyServerFieldErrors(form: FormGroup, error: unknown): boolean
   let applied = false;
 
   for (const [fieldName, message] of Object.entries(fieldErrors)) {
-    const control = form.get(fieldName);
+    const control = form.get(normaliseControlPath(fieldName));
 
     if (control === null) {
       continue;
@@ -48,4 +48,8 @@ export function clearServerFieldError(control: AbstractControl): void {
 
   const remainingErrors = Object.fromEntries(Object.entries(errors).filter(([key]) => key !== 'server'));
   control.setErrors(Object.keys(remainingErrors).length > 0 ? remainingErrors : null);
+}
+
+function normaliseControlPath(fieldName: string): string {
+  return fieldName.replace(/\[(\d+)]/g, '.$1');
 }
