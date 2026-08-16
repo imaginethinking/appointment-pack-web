@@ -4,19 +4,24 @@ import { authGuard } from './core/guards/auth-guard';
 import { mfaLoginGuard } from './core/guards/mfa-login-guard';
 import { patientContextLoadGuard } from './core/guards/patient-context-load-guard';
 import { selectedPatientPermissionGuard } from './core/guards/selected-patient-permission-guard';
+import { AppointmentPackCreate } from './features/appointment-packs/pages/appointment-pack-create/appointment-pack-create';
+import { AppointmentPackDetails } from './features/appointment-packs/pages/appointment-pack-details/appointment-pack-details';
+import { AppointmentPackList } from './features/appointment-packs/pages/appointment-pack-list/appointment-pack-list';
 import { AppointmentCreate } from './features/appointments/pages/appointment-create/appointment-create';
 import { AppointmentDetails } from './features/appointments/pages/appointment-details/appointment-details';
 import { AppointmentEdit } from './features/appointments/pages/appointment-edit/appointment-edit';
 import { AppointmentList } from './features/appointments/pages/appointment-list/appointment-list';
-import { AppointmentPackCreate } from './features/appointment-packs/pages/appointment-pack-create/appointment-pack-create';
-import { AppointmentPackDetails } from './features/appointment-packs/pages/appointment-pack-details/appointment-pack-details';
-import { AppointmentPackList } from './features/appointment-packs/pages/appointment-pack-list/appointment-pack-list';
+import { PatientAudit } from './features/audit/pages/patient-audit/patient-audit';
 import { ForgotPassword } from './features/auth/pages/forgot-password/forgot-password';
 import { Login } from './features/auth/pages/login/login';
 import { MfaLogin } from './features/auth/pages/mfa-login/mfa-login';
 import { Register } from './features/auth/pages/register/register';
 import { ResetPassword } from './features/auth/pages/reset-password/reset-password';
 import { VerifyEmail } from './features/auth/pages/verify-email/verify-email';
+import { BloodTestCreate } from './features/blood-results/pages/blood-test-create/blood-test-create';
+import { BloodTestDetails } from './features/blood-results/pages/blood-test-details/blood-test-details';
+import { BloodTestEdit } from './features/blood-results/pages/blood-test-edit/blood-test-edit';
+import { BloodTestList } from './features/blood-results/pages/blood-test-list/blood-test-list';
 import { CareNetwork } from './features/care-network/pages/care-network/care-network';
 import { CarerAccess } from './features/care-network/pages/carer-access/carer-access';
 import { ContactList } from './features/contacts/pages/contact-list/contact-list';
@@ -49,10 +54,6 @@ import { PatientRecord } from './features/patient-record/pages/patient-record/pa
 import { MfaSettings } from './features/profile/pages/mfa-settings/mfa-settings';
 import { ProfileEdit } from './features/profile/pages/profile-edit/profile-edit';
 import { Profile } from './features/profile/pages/profile/profile';
-import { BloodTestCreate } from './features/blood-results/pages/blood-test-create/blood-test-create';
-import { BloodTestDetails } from './features/blood-results/pages/blood-test-details/blood-test-details';
-import { BloodTestEdit } from './features/blood-results/pages/blood-test-edit/blood-test-edit';
-import { BloodTestList } from './features/blood-results/pages/blood-test-list/blood-test-list';
 
 export const routes: Routes = [
   {
@@ -472,6 +473,17 @@ export const routes: Routes = [
         data: {
           permission: {
             resource: 'history',
+            action: 'view',
+          },
+        },
+      },
+      {
+        path: 'activity-history',
+        component: PatientAudit,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'audit',
             action: 'view',
           },
         },

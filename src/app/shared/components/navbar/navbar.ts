@@ -61,6 +61,11 @@ const NAVIGATION_ITEMS: readonly NavigationItem[] = [
     permission: 'history:view',
   },
   {
+    label: 'Activity History',
+    route: '/activity-history',
+    permission: 'audit:view',
+  },
+  {
     label: 'Care Network',
     route: '/care-network',
   },

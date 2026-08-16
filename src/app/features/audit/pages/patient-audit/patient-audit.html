@@ -1,0 +1,97 @@
+<section class="mx-auto max-w-5xl">
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-brand-plum">Activity history</h1>
+
+    @if (selectedPatient(); as patient) {
+      <p class="mt-1 text-brand-plum/70">
+        Recorded patient activity for
+        <span class="font-semibold text-brand-plum">{{ getPatientContextName(patient) }}</span>
+      </p>
+    } @else {
+      <p class="mt-1 text-brand-plum/70">View recorded activity for the selected patient.</p>
+    }
+  </div>
+
+  <div class="mb-6 rounded-lg border border-brand-peach bg-brand-off-white p-4 text-sm text-brand-plum">
+    Activity history records important actions affecting the patient record. It does not contain copies of clinical text or values.
+  </div>
+
+  @if (status() === 'loading') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">
+      Loading activity history...
+    </div>
+  } @else if (status() === 'no-patient') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <h2 class="font-semibold text-brand-plum">No patient selected</h2>
+      <p class="mt-2 text-brand-plum/70">Select an accessible patient before viewing activity history.</p>
+    </div>
+  } @else if (status() === 'forbidden') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Activity history unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">You do not have permission to view activity history for this patient.</p>
+    </div>
+  } @else if (status() === 'error') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-coral">{{ errorMessage() }}</p>
+      <button type="button" class="btn btn-secondary mt-4" (click)="retry()">Try again</button>
+    </div>
+  } @else if (auditPage(); as currentPage) {
+    @if (currentPage.events.length === 0) {
+      <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+        <h2 class="font-semibold text-brand-plum">No recorded activity</h2>
+        <p class="mt-2 text-brand-plum/70">There are no patient activity events to display.</p>
+      </div>
+    } @else {
+      <ol class="space-y-4">
+        @for (event of currentPage.events; track event.id) {
+          <li>
+            <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <h2 class="font-semibold text-brand-plum">{{ getActionLabel(event.action) }}</h2>
+                    <span class="rounded-full bg-brand-mint px-3 py-1 text-xs font-semibold text-brand-plum">
+                      {{ getResourceTypeLabel(event.resourceType) }}
+                    </span>
+                  </div>
+
+                  <p class="mt-2 text-sm text-brand-plum/70">
+                    By
+                    <span class="font-semibold text-brand-plum">{{ event.actorDisplayName || 'Unknown user' }}</span>
+                  </p>
+                </div>
+
+                <time class="text-sm text-brand-plum/60" [attr.datetime]="event.occurredAt">
+                  {{ event.occurredAt | date: 'd MMMM y, HH:mm:ss' }}
+                </time>
+              </div>
+            </article>
+          </li>
+        }
+      </ol>
+
+      <div class="mt-6 flex flex-col gap-4 rounded-lg border border-brand-plum/20 bg-brand-off-white p-4 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-sm text-brand-plum/70">
+          Showing
+          <span class="font-semibold text-brand-plum">{{ showingFrom(currentPage) }}–{{ showingTo(currentPage) }}</span>
+          of
+          <span class="font-semibold text-brand-plum">{{ currentPage.totalElements }}</span>
+          events
+        </p>
+
+        <div class="flex items-center gap-3">
+          <button type="button" class="btn btn-secondary" [disabled]="currentPage.page === 0" (click)="previousPage()">Previous</button>
+
+          <span class="text-sm text-brand-plum/70">
+            Page
+            <span class="font-semibold text-brand-plum">{{ currentPage.page + 1 }}</span>
+            of
+            <span class="font-semibold text-brand-plum">{{ currentPage.totalPages }}</span>
+          </span>
+
+          <button type="button" class="btn btn-secondary" [disabled]="currentPage.page + 1 >= currentPage.totalPages" (click)="nextPage()">Next</button>
+        </div>
+      </div>
+    }
+  }
+</section>
