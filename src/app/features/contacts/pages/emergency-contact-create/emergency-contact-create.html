@@ -1,0 +1,35 @@
+<section class="mx-auto max-w-3xl">
+  <div class="mb-6">
+    <a routerLink="/contacts" class="text-sm font-semibold text-brand-plum underline">Back to contacts</a>
+    <h1 class="mt-4 text-3xl font-bold text-brand-plum">Add emergency contact</h1>
+
+    @if (selectedPatient()) {
+      <p class="mt-1 text-brand-plum/70">Add an emergency contact for <span class="font-semibold text-brand-plum">{{ selectedPatientName() }}</span>.</p>
+    }
+  </div>
+
+  @if (!selectedPatient()) {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <h2 class="font-semibold text-brand-plum">No patient selected</h2>
+      <p class="mt-2 text-brand-plum/70">Select an accessible patient before adding an emergency contact.</p>
+    </div>
+  } @else if (!canEdit()) {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Contact editing unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">You do not have permission to add contacts for this patient.</p>
+    </div>
+  } @else {
+    <form class="space-y-6" [formGroup]="form" novalidate (ngSubmit)="create()">
+      <app-emergency-contact-form-fields [form]="form" idPrefix="create-emergency-contact" />
+
+      @if (errorMessage()) {
+        <div class="rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral" role="alert">{{ errorMessage() }}</div>
+      }
+
+      <div class="flex flex-wrap gap-3">
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving()">{{ isSaving() ? 'Creating...' : 'Create emergency contact' }}</button>
+        <a routerLink="/contacts" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  }
+</section>

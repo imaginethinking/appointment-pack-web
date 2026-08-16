@@ -16,6 +16,13 @@ import { ResetPassword } from './features/auth/pages/reset-password/reset-passwo
 import { VerifyEmail } from './features/auth/pages/verify-email/verify-email';
 import { CareNetwork } from './features/care-network/pages/care-network/care-network';
 import { CarerAccess } from './features/care-network/pages/carer-access/carer-access';
+import { ContactList } from './features/contacts/pages/contact-list/contact-list';
+import { EmergencyContactCreate } from './features/contacts/pages/emergency-contact-create/emergency-contact-create';
+import { EmergencyContactDetails } from './features/contacts/pages/emergency-contact-details/emergency-contact-details';
+import { EmergencyContactEdit } from './features/contacts/pages/emergency-contact-edit/emergency-contact-edit';
+import { HealthcareContactCreate } from './features/contacts/pages/healthcare-contact-create/healthcare-contact-create';
+import { HealthcareContactDetails } from './features/contacts/pages/healthcare-contact-details/healthcare-contact-details';
+import { HealthcareContactEdit } from './features/contacts/pages/healthcare-contact-edit/healthcare-contact-edit';
 import { AppointmentReview } from './features/documents/pages/appointment-review/appointment-review';
 import { DeidentificationReview } from './features/documents/pages/deidentification-review/deidentification-review';
 import { DocumentDetails } from './features/documents/pages/document-details/document-details';
@@ -260,6 +267,83 @@ export const routes: Routes = [
         data: {
           permission: {
             resource: 'medication',
+            action: 'view',
+          },
+        },
+      },
+      {
+        path: 'contacts',
+        component: ContactList,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'contact',
+            action: 'view',
+          },
+        },
+      },
+      {
+        path: 'contacts/healthcare/create',
+        component: HealthcareContactCreate,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'contact',
+            action: 'edit',
+          },
+        },
+      },
+      {
+        path: 'contacts/healthcare/:contactId/edit',
+        component: HealthcareContactEdit,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'contact',
+            action: 'edit',
+          },
+        },
+      },
+      {
+        path: 'contacts/healthcare/:contactId',
+        component: HealthcareContactDetails,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'contact',
+            action: 'view',
+          },
+        },
+      },
+      {
+        path: 'contacts/emergency/create',
+        component: EmergencyContactCreate,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'contact',
+            action: 'edit',
+          },
+        },
+      },
+      {
+        path: 'contacts/emergency/:contactId/edit',
+        component: EmergencyContactEdit,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'contact',
+            action: 'edit',
+          },
+        },
+      },
+      {
+        path: 'contacts/emergency/:contactId',
+        component: EmergencyContactDetails,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'contact',
             action: 'view',
           },
         },

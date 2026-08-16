@@ -41,6 +41,11 @@ const NAVIGATION_ITEMS: readonly NavigationItem[] = [
     permission: 'medication:view',
   },
   {
+    label: 'Contacts',
+    route: '/contacts',
+    permission: 'contact:view',
+  },
+  {
     label: 'Medical History',
     route: '/medical-history',
     permission: 'history:view',

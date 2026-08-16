@@ -1,0 +1,165 @@
+<div class="space-y-6" [formGroup]="form()">
+  <section class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+    <div>
+      <h2 class="text-xl font-semibold text-brand-plum">Healthcare contact</h2>
+      <p class="mt-1 text-sm text-brand-plum/70">Record the clinician, service or organisation details.</p>
+    </div>
+
+    <div>
+      <label [for]="idPrefix() + '-name'" class="mb-1 block font-semibold text-brand-plum">Name</label>
+      <input [id]="idPrefix() + '-name'" type="text" maxlength="200" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="name" />
+
+      @if (form().controls.name.touched && (form().controls.name.hasError('required') || form().controls.name.hasError('blank'))) {
+        <p class="mt-1 text-sm text-brand-coral">Contact name is required.</p>
+      } @else if (form().controls.name.hasError('maxlength')) {
+        <p class="mt-1 text-sm text-brand-coral">Contact name must not exceed 200 characters.</p>
+      } @else if (form().controls.name.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+      }
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label [for]="idPrefix() + '-role'" class="mb-1 block font-semibold text-brand-plum">Role</label>
+        <input [id]="idPrefix() + '-role'" type="text" maxlength="150" placeholder="e.g. Neurologist" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="role" />
+
+        @if (form().controls.role.hasError('maxlength')) {
+          <p class="mt-1 text-sm text-brand-coral">Role must not exceed 150 characters.</p>
+        } @else if (form().controls.role.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+
+      <div>
+        <label [for]="idPrefix() + '-organisation'" class="mb-1 block font-semibold text-brand-plum">Organisation</label>
+        <input [id]="idPrefix() + '-organisation'" type="text" maxlength="200" placeholder="e.g. Dumfries and Galloway Royal Infirmary" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="organisation" />
+
+        @if (form().controls.organisation.hasError('maxlength')) {
+          <p class="mt-1 text-sm text-brand-coral">Organisation must not exceed 200 characters.</p>
+        } @else if (form().controls.organisation.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label [for]="idPrefix() + '-phone'" class="mb-1 block font-semibold text-brand-plum">Phone number</label>
+        <input [id]="idPrefix() + '-phone'" type="tel" maxlength="50" autocomplete="tel" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="phoneNumber" />
+
+        @if (form().controls.phoneNumber.hasError('maxlength')) {
+          <p class="mt-1 text-sm text-brand-coral">Phone number must not exceed 50 characters.</p>
+        } @else if (form().controls.phoneNumber.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+
+      <div>
+        <label [for]="idPrefix() + '-email'" class="mb-1 block font-semibold text-brand-plum">Email</label>
+        <input [id]="idPrefix() + '-email'" type="email" maxlength="254" autocomplete="email" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="email" />
+
+        @if (form().controls.email.touched && form().controls.email.hasError('email')) {
+          <p class="mt-1 text-sm text-brand-coral">Enter a valid email address.</p>
+        } @else if (form().controls.email.hasError('maxlength')) {
+          <p class="mt-1 text-sm text-brand-coral">Email must not exceed 254 characters.</p>
+        } @else if (form().controls.email.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6" formGroupName="address">
+    <div>
+      <h2 class="text-xl font-semibold text-brand-plum">Address</h2>
+      <p class="mt-1 text-sm text-brand-plum/70">The address is optional. If you enter an address, address line 1, town or city, postcode and country are required.</p>
+    </div>
+
+    <div>
+      <label [for]="idPrefix() + '-address-line-1'" class="mb-1 block font-semibold text-brand-plum">Address line 1</label>
+      <input [id]="idPrefix() + '-address-line-1'" type="text" maxlength="150" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="addressLine1" />
+
+      @if (form().controls.address.controls.addressLine1.hasError('maxlength')) {
+        <p class="mt-1 text-sm text-brand-coral">Address line 1 must not exceed 150 characters.</p>
+      } @else if (form().controls.address.controls.addressLine1.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+      }
+    </div>
+
+    <div>
+      <label [for]="idPrefix() + '-address-line-2'" class="mb-1 block font-semibold text-brand-plum">Address line 2</label>
+      <input [id]="idPrefix() + '-address-line-2'" type="text" maxlength="150" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="addressLine2" />
+
+      @if (form().controls.address.controls.addressLine2.hasError('maxlength')) {
+        <p class="mt-1 text-sm text-brand-coral">Address line 2 must not exceed 150 characters.</p>
+      } @else if (form().controls.address.controls.addressLine2.errors?.['server']; as message) {
+        <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+      }
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label [for]="idPrefix() + '-town-city'" class="mb-1 block font-semibold text-brand-plum">Town or city</label>
+        <input [id]="idPrefix() + '-town-city'" type="text" maxlength="100" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="townCity" />
+
+        @if (form().controls.address.controls.townCity.hasError('maxlength')) {
+          <p class="mt-1 text-sm text-brand-coral">Town or city must not exceed 100 characters.</p>
+        } @else if (form().controls.address.controls.townCity.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+
+      <div>
+        <label [for]="idPrefix() + '-county'" class="mb-1 block font-semibold text-brand-plum">County</label>
+        <input [id]="idPrefix() + '-county'" type="text" maxlength="100" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="county" />
+
+        @if (form().controls.address.controls.county.hasError('maxlength')) {
+          <p class="mt-1 text-sm text-brand-coral">County must not exceed 100 characters.</p>
+        } @else if (form().controls.address.controls.county.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+
+      <div>
+        <label [for]="idPrefix() + '-postcode'" class="mb-1 block font-semibold text-brand-plum">Postcode</label>
+        <input [id]="idPrefix() + '-postcode'" type="text" maxlength="20" autocomplete="postal-code" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="postcode" />
+
+        @if (form().controls.address.controls.postcode.hasError('maxlength')) {
+          <p class="mt-1 text-sm text-brand-coral">Postcode must not exceed 20 characters.</p>
+        } @else if (form().controls.address.controls.postcode.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+
+      <div>
+        <label [for]="idPrefix() + '-country'" class="mb-1 block font-semibold text-brand-plum">Country</label>
+        <input [id]="idPrefix() + '-country'" type="text" maxlength="100" autocomplete="country-name" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="country" />
+
+        @if (form().controls.address.controls.country.hasError('maxlength')) {
+          <p class="mt-1 text-sm text-brand-coral">Country must not exceed 100 characters.</p>
+        } @else if (form().controls.address.controls.country.errors?.['server']; as message) {
+          <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+        }
+      </div>
+    </div>
+
+    @if (form().controls.address.hasError('incompleteAddress') && form().controls.address.touched) {
+      <p class="text-sm text-brand-coral">Complete address line 1, town or city, postcode and country, or leave the whole address blank.</p>
+    }
+  </section>
+
+  <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+    <label [for]="idPrefix() + '-notes'" class="block text-xl font-semibold text-brand-plum">Notes</label>
+    <p class="mt-1 text-sm text-brand-plum/70">Optional additional information about this healthcare contact.</p>
+
+    <textarea [id]="idPrefix() + '-notes'" rows="5" maxlength="2000" class="mt-4 w-full rounded-md border border-brand-plum/30 bg-white p-3 text-brand-plum" formControlName="notes"></textarea>
+
+    <div class="mt-1 text-right text-sm text-brand-plum/60">{{ form().controls.notes.value.length }} / 2000</div>
+
+    @if (form().controls.notes.hasError('maxlength')) {
+      <p class="mt-1 text-sm text-brand-coral">Notes must not exceed 2000 characters.</p>
+    } @else if (form().controls.notes.errors?.['server']; as message) {
+      <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+    }
+  </section>
+</div>

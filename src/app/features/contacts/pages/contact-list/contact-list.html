@@ -1,0 +1,165 @@
+<section class="mx-auto max-w-6xl">
+  <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-brand-plum">Contacts</h1>
+
+      @if (selectedPatient(); as patient) {
+        <p class="mt-1 text-brand-plum/70">Healthcare and emergency contacts for <span class="font-semibold text-brand-plum">{{ getPatientContextName(patient) }}</span></p>
+      } @else {
+        <p class="mt-1 text-brand-plum/70">View contacts for the selected patient.</p>
+      }
+    </div>
+
+    @if (canEditContacts()) {
+      <div class="flex flex-wrap gap-3">
+        <a routerLink="/contacts/healthcare/create" class="btn btn-primary">Add healthcare contact</a>
+        <a routerLink="/contacts/emergency/create" class="btn btn-secondary">Add emergency contact</a>
+      </div>
+    }
+  </div>
+
+  @if (status() === 'loading') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">Loading contacts...</div>
+  } @else if (status() === 'no-patient') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <h2 class="font-semibold text-brand-plum">No patient selected</h2>
+      <p class="mt-2 text-brand-plum/70">Select an accessible patient before viewing contacts.</p>
+    </div>
+  } @else if (status() === 'forbidden') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Contacts unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">You do not have permission to view contacts for this patient.</p>
+    </div>
+  } @else if (status() === 'error') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-coral">{{ errorMessage() }}</p>
+      <button type="button" class="btn btn-secondary mt-4" (click)="retry()">Try again</button>
+    </div>
+  } @else {
+    <div class="space-y-10">
+      <section>
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-2xl font-semibold text-brand-plum">Healthcare contacts</h2>
+            <p class="mt-1 text-sm text-brand-plum/70">Clinicians, teams, services and healthcare organisations.</p>
+          </div>
+
+          @if (canEditContacts()) {
+            <a routerLink="/contacts/healthcare/create" class="text-sm font-semibold text-brand-plum underline">Add healthcare contact</a>
+          }
+        </div>
+
+        @if (healthcareContacts().length === 0) {
+          <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum/70">No healthcare contacts have been recorded.</div>
+        } @else {
+          <div class="grid gap-4 lg:grid-cols-2">
+            @for (contact of healthcareContacts(); track contact.id) {
+              <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+                <h3 class="text-xl font-semibold text-brand-plum">{{ contact.name }}</h3>
+
+                @if (contact.role || contact.organisation) {
+                  <p class="mt-1 text-brand-plum/70">
+                    @if (contact.role) {
+                      <span>{{ contact.role }}</span>
+                    }
+
+                    @if (contact.role && contact.organisation) {
+                      <span> · </span>
+                    }
+
+                    @if (contact.organisation) {
+                      <span>{{ contact.organisation }}</span>
+                    }
+                  </p>
+                }
+
+                <dl class="mt-5 space-y-3 border-t border-brand-plum/20 pt-4 text-sm">
+                  @if (contact.phoneNumber) {
+                    <div>
+                      <dt class="font-semibold text-brand-plum/70">Phone</dt>
+                      <dd class="mt-1 text-brand-plum">{{ contact.phoneNumber }}</dd>
+                    </div>
+                  }
+
+                  @if (contact.email) {
+                    <div>
+                      <dt class="font-semibold text-brand-plum/70">Email</dt>
+                      <dd class="mt-1 break-all text-brand-plum">{{ contact.email }}</dd>
+                    </div>
+                  }
+
+                  @if (formatAddress(contact).length > 0) {
+                    <div>
+                      <dt class="font-semibold text-brand-plum/70">Address</dt>
+
+                      <dd class="mt-1 text-brand-plum">
+                        @for (line of formatAddress(contact); track $index) {
+                          <div>{{ line }}</div>
+                        }
+                      </dd>
+                    </div>
+                  }
+                </dl>
+
+                <div class="mt-5 border-t border-brand-plum/20 pt-4">
+                  <a [routerLink]="['/contacts/healthcare', contact.id]" class="text-sm font-semibold text-brand-plum underline">View healthcare contact</a>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </section>
+
+      <section>
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-2xl font-semibold text-brand-plum">Emergency contacts</h2>
+            <p class="mt-1 text-sm text-brand-plum/70">People who should be contacted in an emergency.</p>
+          </div>
+
+          @if (canEditContacts()) {
+            <a routerLink="/contacts/emergency/create" class="text-sm font-semibold text-brand-plum underline">Add emergency contact</a>
+          }
+        </div>
+
+        @if (emergencyContacts().length === 0) {
+          <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum/70">No emergency contacts have been recorded.</div>
+        } @else {
+          <div class="grid gap-4 lg:grid-cols-2">
+            @for (contact of emergencyContacts(); track contact.id) {
+              <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+                <h3 class="text-xl font-semibold text-brand-plum">{{ contact.name }}</h3>
+                <p class="mt-1 text-brand-plum/70">{{ contact.relationship }}</p>
+
+                <dl class="mt-5 space-y-3 border-t border-brand-plum/20 pt-4 text-sm">
+                  <div>
+                    <dt class="font-semibold text-brand-plum/70">Phone</dt>
+                    <dd class="mt-1 text-brand-plum">{{ contact.phoneNumber }}</dd>
+                  </div>
+
+                  @if (contact.alternativePhoneNumber) {
+                    <div>
+                      <dt class="font-semibold text-brand-plum/70">Alternative phone</dt>
+                      <dd class="mt-1 text-brand-plum">{{ contact.alternativePhoneNumber }}</dd>
+                    </div>
+                  }
+
+                  @if (contact.email) {
+                    <div>
+                      <dt class="font-semibold text-brand-plum/70">Email</dt>
+                      <dd class="mt-1 break-all text-brand-plum">{{ contact.email }}</dd>
+                    </div>
+                  }
+                </dl>
+
+                <div class="mt-5 border-t border-brand-plum/20 pt-4">
+                  <a [routerLink]="['/contacts/emergency', contact.id]" class="text-sm font-semibold text-brand-plum underline">View emergency contact</a>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </section>
+    </div>
+  }
+</section>
