@@ -1,0 +1,248 @@
+<section class="mx-auto max-w-5xl">
+  <div class="mb-6">
+    <a routerLink="/appointment-packs" class="text-sm font-semibold text-brand-plum underline">Back to appointment packs</a>
+    <h1 class="mt-4 text-3xl font-bold text-brand-plum">Generate appointment pack</h1>
+
+    @if (selectedPatient()) {
+      <p class="mt-1 text-brand-plum/70">Create an immutable appointment snapshot for <span class="font-semibold text-brand-plum">{{ selectedPatientName() }}</span>.</p>
+    }
+  </div>
+
+  @if (status() === 'loading') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">Loading available appointment-pack information...</div>
+  } @else if (status() === 'no-patient') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <h2 class="font-semibold text-brand-plum">No patient selected</h2>
+      <p class="mt-2 text-brand-plum/70">Select an accessible patient before generating an appointment pack.</p>
+    </div>
+  } @else if (status() === 'forbidden') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Pack generation unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">You do not have permission to generate appointment packs for this patient.</p>
+    </div>
+  } @else if (status() === 'error') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-coral">{{ errorMessage() }}</p>
+      <button type="button" class="btn btn-secondary mt-4" (click)="retry()">Try again</button>
+    </div>
+  } @else {
+    <form class="space-y-6" [formGroup]="form" novalidate (ngSubmit)="generate()">
+      <div class="rounded-lg border border-brand-peach bg-brand-off-white p-4 text-sm text-brand-plum">
+        Each generated pack is an immutable PDF snapshot. If the appointment or selected clinical information changes later, generate a new pack rather than editing the existing one.
+      </div>
+
+      <section class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+        <div>
+          <h2 class="text-xl font-semibold text-brand-plum">Appointment</h2>
+          <p class="mt-1 text-sm text-brand-plum/70">Every appointment pack automatically includes the selected appointment and the patient profile/patient-record information supported by Spring.</p>
+        </div>
+
+        @if (!canViewAppointments()) {
+          <div class="rounded-md border border-brand-coral bg-white p-4" role="alert">
+            <p class="font-semibold text-brand-plum">Appointment access required</p>
+            <p class="mt-1 text-sm text-brand-plum/70">Generating a pack also requires <code>appointment:view</code> so that an appointment can be selected.</p>
+          </div>
+        } @else if (appointments().length === 0) {
+          <div class="rounded-md border border-brand-plum/20 bg-white p-4">
+            <p class="font-semibold text-brand-plum">No active appointments</p>
+            <p class="mt-1 text-sm text-brand-plum/70">Create or confirm an appointment before generating an appointment pack.</p>
+
+            @if (canEditAppointments()) {
+              <a routerLink="/appointments/create" class="btn btn-secondary mt-4">Create appointment</a>
+            }
+          </div>
+        } @else {
+          <div>
+            <label for="appointmentId" class="mb-1 block font-semibold text-brand-plum">Appointment to include</label>
+            <select id="appointmentId" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="appointmentId">
+              <option value="">Select an appointment</option>
+
+              @for (appointment of appointments(); track appointment.id) {
+                <option [value]="appointment.id">
+                  {{ appointment.date | date: 'd MMMM y' }} at {{ formatLocalTime(appointment.startTime) }}{{ appointment.service ? ' — ' + appointment.service : '' }}
+                </option>
+              }
+            </select>
+
+            @if (form.controls.appointmentId.touched && form.controls.appointmentId.hasError('required')) {
+              <p class="mt-1 text-sm text-brand-coral">Select an appointment for the pack.</p>
+            } @else if (form.controls.appointmentId.errors?.['server']; as message) {
+              <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+            }
+          </div>
+        }
+      </section>
+
+      <section class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+        <div>
+          <h2 class="text-xl font-semibold text-brand-plum">Pack details</h2>
+          <p class="mt-1 text-sm text-brand-plum/70">Both fields are optional. If the title is blank, Spring creates one from the selected appointment service and date.</p>
+        </div>
+
+        <div>
+          <label for="title" class="mb-1 block font-semibold text-brand-plum">Title</label>
+          <input id="title" type="text" maxlength="250" class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum" formControlName="title" />
+          <div class="mt-1 text-right text-sm text-brand-plum/60">{{ form.controls.title.value.length }} / 250</div>
+
+          @if (form.controls.title.hasError('maxlength')) {
+            <p class="mt-1 text-sm text-brand-coral">Pack title must not exceed 250 characters.</p>
+          } @else if (form.controls.title.errors?.['server']; as message) {
+            <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+          }
+        </div>
+
+        <div>
+          <label for="notes" class="mb-1 block font-semibold text-brand-plum">Notes</label>
+          <textarea id="notes" rows="5" maxlength="2000" class="w-full rounded-md border border-brand-plum/30 bg-white p-3 text-brand-plum" formControlName="notes"></textarea>
+          <div class="mt-1 text-right text-sm text-brand-plum/60">{{ form.controls.notes.value.length }} / 2000</div>
+
+          @if (form.controls.notes.hasError('maxlength')) {
+            <p class="mt-1 text-sm text-brand-coral">Pack notes must not exceed 2000 characters.</p>
+          } @else if (form.controls.notes.errors?.['server']; as message) {
+            <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+          }
+        </div>
+      </section>
+
+      <section class="space-y-6 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+        <div>
+          <h2 class="text-xl font-semibold text-brand-plum">Optional clinical information</h2>
+          <p class="mt-1 text-sm text-brand-plum/70">Select only the information that is useful for this appointment. Original uploaded documents are not embedded in appointment packs.</p>
+        </div>
+
+        <div class="border-t border-brand-plum/20 pt-5">
+          <h3 class="font-semibold text-brand-plum">Medications</h3>
+
+          @if (!canViewMedications()) {
+            <p class="mt-2 text-sm text-brand-plum/60">Medication selection is unavailable because this patient context does not grant <code>medication:view</code>.</p>
+          } @else if (medications().length === 0) {
+            <p class="mt-2 text-sm text-brand-plum/60">No active medications are available.</p>
+          } @else {
+            <div class="mt-3 grid gap-3 md:grid-cols-2">
+              @for (medication of medications(); track medication.id) {
+                <label class="flex items-start gap-3 rounded-md border border-brand-plum/20 bg-white p-4">
+                  <input type="checkbox" class="mt-1" [checked]="selectedMedicationIds().has(medication.id)" (change)="toggleMedication(medication.id, $event)" />
+                  <span>
+                    <span class="block font-semibold text-brand-plum">{{ medication.name }}</span>
+                    @if (medication.dose || medication.form) {
+                      <span class="mt-1 block text-sm text-brand-plum/70">{{ medication.dose || '' }}{{ medication.dose && medication.form ? ' · ' : '' }}{{ medication.form || '' }}</span>
+                    }
+                  </span>
+                </label>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="border-t border-brand-plum/20 pt-5">
+          <h3 class="font-semibold text-brand-plum">Healthcare contacts</h3>
+
+          @if (!canViewContacts()) {
+            <p class="mt-2 text-sm text-brand-plum/60">Contact selection is unavailable because this patient context does not grant <code>contact:view</code>.</p>
+          } @else if (healthcareContacts().length === 0) {
+            <p class="mt-2 text-sm text-brand-plum/60">No active healthcare contacts are available.</p>
+          } @else {
+            <div class="mt-3 grid gap-3 md:grid-cols-2">
+              @for (contact of healthcareContacts(); track contact.id) {
+                <label class="flex items-start gap-3 rounded-md border border-brand-plum/20 bg-white p-4">
+                  <input type="checkbox" class="mt-1" [checked]="selectedHealthcareContactIds().has(contact.id)" (change)="toggleHealthcareContact(contact.id, $event)" />
+                  <span>
+                    <span class="block font-semibold text-brand-plum">{{ contact.name }}</span>
+                    @if (contact.role || contact.organisation) {
+                      <span class="mt-1 block text-sm text-brand-plum/70">{{ contact.role || '' }}{{ contact.role && contact.organisation ? ' · ' : '' }}{{ contact.organisation || '' }}</span>
+                    }
+                  </span>
+                </label>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="border-t border-brand-plum/20 pt-5">
+          <h3 class="font-semibold text-brand-plum">Emergency contacts</h3>
+
+          @if (!canViewContacts()) {
+            <p class="mt-2 text-sm text-brand-plum/60">Contact selection is unavailable because this patient context does not grant <code>contact:view</code>.</p>
+          } @else if (emergencyContacts().length === 0) {
+            <p class="mt-2 text-sm text-brand-plum/60">No active emergency contacts are available.</p>
+          } @else {
+            <div class="mt-3 grid gap-3 md:grid-cols-2">
+              @for (contact of emergencyContacts(); track contact.id) {
+                <label class="flex items-start gap-3 rounded-md border border-brand-plum/20 bg-white p-4">
+                  <input type="checkbox" class="mt-1" [checked]="selectedEmergencyContactIds().has(contact.id)" (change)="toggleEmergencyContact(contact.id, $event)" />
+                  <span>
+                    <span class="block font-semibold text-brand-plum">{{ contact.name }}</span>
+                    <span class="mt-1 block text-sm text-brand-plum/70">{{ contact.relationship }} · {{ contact.phoneNumber }}</span>
+                  </span>
+                </label>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="border-t border-brand-plum/20 pt-5">
+          <h3 class="font-semibold text-brand-plum">Medical history</h3>
+
+          @if (!canViewHistory()) {
+            <p class="mt-2 text-sm text-brand-plum/60">Medical-history selection is unavailable because this patient context does not grant <code>history:view</code>.</p>
+          } @else if (medicalHistoryEntries().length === 0) {
+            <p class="mt-2 text-sm text-brand-plum/60">No active medical-history entries are available.</p>
+          } @else {
+            <div class="mt-3 space-y-3">
+              @for (entry of medicalHistoryEntries(); track entry.id) {
+                <label class="flex items-start gap-3 rounded-md border border-brand-plum/20 bg-white p-4">
+                  <input type="checkbox" class="mt-1" [checked]="selectedMedicalHistoryEntryIds().has(entry.id)" (change)="toggleMedicalHistoryEntry(entry.id, $event)" />
+                  <span>
+                    <span class="block font-semibold text-brand-plum">{{ entry.title }}</span>
+                    <span class="mt-1 block text-sm text-brand-plum/70">{{ entry.entryDate | date: 'd MMMM y' }}</span>
+                  </span>
+                </label>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="border-t border-brand-plum/20 pt-5">
+          <h3 class="font-semibold text-brand-plum">Blood tests</h3>
+
+          @if (!canViewBloodResults()) {
+            <p class="mt-2 text-sm text-brand-plum/60">Blood-test selection is unavailable because this patient context does not grant <code>blood-result:view</code>.</p>
+          } @else if (bloodTests().length === 0) {
+            <p class="mt-2 text-sm text-brand-plum/60">No active blood tests are available.</p>
+          } @else {
+            <div class="mt-3 grid gap-3 md:grid-cols-2">
+              @for (bloodTest of bloodTests(); track bloodTest.id) {
+                <label class="flex items-start gap-3 rounded-md border border-brand-plum/20 bg-white p-4">
+                  <input type="checkbox" class="mt-1" [checked]="selectedBloodTestIds().has(bloodTest.id)" (change)="toggleBloodTest(bloodTest.id, $event)" />
+                  <span>
+                    <span class="block font-semibold text-brand-plum">{{ bloodTest.title || 'Blood test' }}</span>
+                    <span class="mt-1 block text-sm text-brand-plum/70">{{ bloodTest.testDate | date: 'd MMMM y' }} · {{ bloodTest.results.length }} result{{ bloodTest.results.length === 1 ? '' : 's' }}</span>
+                  </span>
+                </label>
+              }
+            </div>
+          }
+        </div>
+      </section>
+
+      @if (selectionError()) {
+        <div class="rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral" role="alert">{{ selectionError() }}</div>
+      }
+
+      @if (actionError()) {
+        <div class="rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral" role="alert">{{ actionError() }}</div>
+      }
+
+      @if (successMessage()) {
+        <div class="rounded-lg border border-brand-mint bg-brand-off-white p-4 text-brand-plum" role="status">{{ successMessage() }}</div>
+      }
+
+      <div class="flex flex-wrap gap-3">
+        <button type="submit" class="btn btn-primary" [disabled]="isGenerating() || !canViewAppointments() || appointments().length === 0">
+          {{ isGenerating() ? 'Generating...' : 'Generate appointment pack' }}
+        </button>
+        <a routerLink="/appointment-packs" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  }
+</section>

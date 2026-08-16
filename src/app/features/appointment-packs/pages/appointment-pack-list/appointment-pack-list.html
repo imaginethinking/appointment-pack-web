@@ -1,0 +1,80 @@
+<section class="mx-auto max-w-5xl">
+  <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-brand-plum">Appointment packs</h1>
+
+      @if (selectedPatient(); as patient) {
+        <p class="mt-1 text-brand-plum/70">Generated appointment snapshots for <span class="font-semibold text-brand-plum">{{ getPatientContextName(patient) }}</span></p>
+      } @else {
+        <p class="mt-1 text-brand-plum/70">View generated packs for the selected patient.</p>
+      }
+    </div>
+
+    @if (canGeneratePacks()) {
+      <a routerLink="/appointment-packs/create" class="btn btn-primary">Generate appointment pack</a>
+    }
+  </div>
+
+  @if (status() === 'loading') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">Loading appointment packs...</div>
+  } @else if (status() === 'no-patient') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <h2 class="font-semibold text-brand-plum">No patient selected</h2>
+      <p class="mt-2 text-brand-plum/70">Select an accessible patient before viewing appointment packs.</p>
+    </div>
+  } @else if (status() === 'forbidden') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Appointment packs unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">You do not have permission to view appointment packs for this patient.</p>
+    </div>
+  } @else if (status() === 'error') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-coral">{{ errorMessage() }}</p>
+      <button type="button" class="btn btn-secondary mt-4" (click)="retry()">Try again</button>
+    </div>
+  } @else if (appointmentPacks().length === 0) {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+      <h2 class="font-semibold text-brand-plum">No appointment packs</h2>
+      <p class="mt-2 text-brand-plum/70">No appointment-pack snapshots have been generated for this patient.</p>
+
+      @if (canGeneratePacks()) {
+        <a routerLink="/appointment-packs/create" class="btn btn-primary mt-4">Generate first pack</a>
+      }
+    </div>
+  } @else {
+    <div class="space-y-4">
+      @for (appointmentPack of appointmentPacks(); track appointmentPack.id) {
+        <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div class="min-w-0">
+              <h2 class="break-words text-xl font-semibold text-brand-plum">{{ appointmentPack.title }}</h2>
+              <p class="mt-1 text-sm text-brand-plum/60">Generated {{ appointmentPack.generatedAt | date: 'd MMMM y, HH:mm' }}</p>
+            </div>
+
+            <span class="w-fit rounded-full bg-brand-mint px-3 py-1 text-sm font-semibold text-brand-plum">{{ appointmentPack.items.length }} optional item{{ appointmentPack.items.length === 1 ? '' : 's' }}</span>
+          </div>
+
+          @if (appointmentPack.notes) {
+            <p class="mt-4 whitespace-pre-wrap text-brand-plum/80">{{ appointmentPack.notes }}</p>
+          }
+
+          <dl class="mt-5 grid gap-4 border-t border-brand-plum/20 pt-4 text-sm sm:grid-cols-2">
+            <div>
+              <dt class="font-semibold text-brand-plum/70">File</dt>
+              <dd class="mt-1 break-all text-brand-plum">{{ appointmentPack.fileName }}</dd>
+            </div>
+
+            <div>
+              <dt class="font-semibold text-brand-plum/70">File size</dt>
+              <dd class="mt-1 text-brand-plum">{{ formatFileSize(appointmentPack.fileSize) }}</dd>
+            </div>
+          </dl>
+
+          <div class="mt-5 border-t border-brand-plum/20 pt-4">
+            <a [routerLink]="['/appointment-packs', appointmentPack.id]" class="text-sm font-semibold text-brand-plum underline">View appointment pack</a>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

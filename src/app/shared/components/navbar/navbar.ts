@@ -36,6 +36,11 @@ const NAVIGATION_ITEMS: readonly NavigationItem[] = [
     permission: 'appointment:view',
   },
   {
+    label: 'Appointment Packs',
+    route: '/appointment-packs',
+    permission: 'appointment-pack:view',
+  },
+  {
     label: 'Medications',
     route: '/medications',
     permission: 'medication:view',

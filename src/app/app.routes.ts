@@ -8,6 +8,9 @@ import { AppointmentCreate } from './features/appointments/pages/appointment-cre
 import { AppointmentDetails } from './features/appointments/pages/appointment-details/appointment-details';
 import { AppointmentEdit } from './features/appointments/pages/appointment-edit/appointment-edit';
 import { AppointmentList } from './features/appointments/pages/appointment-list/appointment-list';
+import { AppointmentPackCreate } from './features/appointment-packs/pages/appointment-pack-create/appointment-pack-create';
+import { AppointmentPackDetails } from './features/appointment-packs/pages/appointment-pack-details/appointment-pack-details';
+import { AppointmentPackList } from './features/appointment-packs/pages/appointment-pack-list/appointment-pack-list';
 import { ForgotPassword } from './features/auth/pages/forgot-password/forgot-password';
 import { Login } from './features/auth/pages/login/login';
 import { MfaLogin } from './features/auth/pages/mfa-login/mfa-login';
@@ -227,6 +230,39 @@ export const routes: Routes = [
         data: {
           permission: {
             resource: 'appointment',
+            action: 'view',
+          },
+        },
+      },
+      {
+        path: 'appointment-packs',
+        component: AppointmentPackList,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'appointment-pack',
+            action: 'view',
+          },
+        },
+      },
+      {
+        path: 'appointment-packs/create',
+        component: AppointmentPackCreate,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'appointment-pack',
+            action: 'create',
+          },
+        },
+      },
+      {
+        path: 'appointment-packs/:appointmentPackId',
+        component: AppointmentPackDetails,
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'appointment-pack',
             action: 'view',
           },
         },

@@ -1,0 +1,120 @@
+<section class="mx-auto max-w-5xl">
+  <div class="mb-6">
+    <a routerLink="/appointment-packs" class="text-sm font-semibold text-brand-plum underline">Back to appointment packs</a>
+    <h1 class="mt-4 text-3xl font-bold text-brand-plum">Appointment pack</h1>
+  </div>
+
+  @if (status() === 'loading') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">Loading appointment pack...</div>
+  } @else if (status() === 'not-found') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Appointment pack not found</h2>
+      <p class="mt-2 text-brand-plum/70">The pack does not exist, has been archived, or is no longer available.</p>
+    </div>
+  } @else if (status() === 'forbidden') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Appointment pack unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">You do not have permission to view this appointment pack.</p>
+    </div>
+  } @else if (status() === 'invalid') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-plum">{{ errorMessage() }}</p>
+      <a routerLink="/appointment-packs" class="btn btn-secondary mt-4">Return to appointment packs</a>
+    </div>
+  } @else if (status() === 'error') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-coral">{{ errorMessage() }}</p>
+      <button type="button" class="btn btn-secondary mt-4" (click)="retry()">Try again</button>
+    </div>
+  } @else if (appointmentPack(); as currentPack) {
+    <div class="space-y-6">
+      <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div class="min-w-0">
+            <h2 class="break-words text-2xl font-semibold text-brand-plum">{{ currentPack.title }}</h2>
+            <p class="mt-1 text-brand-plum/70">Generated {{ currentPack.generatedAt | date: 'd MMMM y, HH:mm' }}</p>
+          </div>
+
+          <span class="w-fit rounded-full bg-brand-mint px-3 py-1 text-sm font-semibold text-brand-plum">Immutable snapshot</span>
+        </div>
+
+        @if (currentPack.notes) {
+          <section class="mt-6 border-t border-brand-plum/20 pt-5">
+            <h3 class="font-semibold text-brand-plum">Pack notes</h3>
+            <p class="mt-2 whitespace-pre-wrap text-brand-plum">{{ currentPack.notes }}</p>
+          </section>
+        }
+
+        <dl class="mt-6 grid gap-5 border-t border-brand-plum/20 pt-5 text-sm sm:grid-cols-2">
+          <div>
+            <dt class="font-semibold text-brand-plum/70">File name</dt>
+            <dd class="mt-1 break-all text-brand-plum">{{ currentPack.fileName }}</dd>
+          </div>
+
+          <div>
+            <dt class="font-semibold text-brand-plum/70">File size</dt>
+            <dd class="mt-1 text-brand-plum">{{ formatFileSize(currentPack.fileSize) }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+        <h2 class="text-xl font-semibold text-brand-plum">Included appointment</h2>
+        <p class="mt-1 text-sm text-brand-plum/70">The pack contains the appointment snapshot captured when the PDF was generated.</p>
+
+        <div class="mt-4">
+          @if (canViewAppointment()) {
+            <a [routerLink]="['/appointments', currentPack.appointmentId]" class="font-semibold text-brand-plum underline">View current appointment record</a>
+          } @else {
+            <p class="text-sm text-brand-plum/60">The appointment is included in the PDF snapshot, but this patient context does not currently grant appointment viewing permission.</p>
+          }
+        </div>
+      </section>
+
+      <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+        <h2 class="text-xl font-semibold text-brand-plum">Optional included records</h2>
+        <p class="mt-1 text-sm text-brand-plum/70">These references identify the records that were captured into the immutable PDF at generation time. Opening a current record requires its normal patient permission.</p>
+
+        @if (currentPack.items.length === 0) {
+          <p class="mt-4 text-brand-plum/70">No optional clinical records were selected for this pack.</p>
+        } @else {
+          <div class="mt-5 space-y-5">
+            @for (itemType of itemTypes; track itemType) {
+              @if (itemsFor(itemType).length > 0) {
+                <div class="border-t border-brand-plum/20 pt-4 first:border-t-0 first:pt-0">
+                  <h3 class="font-semibold text-brand-plum">{{ getItemTypePluralLabel(itemType) }}</h3>
+
+                  <div class="mt-3 flex flex-wrap gap-2">
+                    @for (item of itemsFor(itemType); track item.resourceId) {
+                      @if (canOpenItem(item.resourceType)) {
+                        <a [routerLink]="itemRoute(item)" class="rounded-full border border-brand-plum/20 bg-white px-3 py-1 text-sm font-semibold text-brand-plum underline">Item {{ $index + 1 }}</a>
+                      } @else {
+                        <span class="rounded-full border border-brand-plum/20 bg-white px-3 py-1 text-sm text-brand-plum/60">Item {{ $index + 1 }}</span>
+                      }
+                    }
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        }
+      </section>
+
+      <div class="rounded-lg border border-brand-peach bg-brand-off-white p-4 text-sm text-brand-plum">
+        Appointment packs are snapshots. Changes to current appointments, medications, contacts, medical history or blood results do not alter this generated PDF. Generate a new pack when updated information is required.
+      </div>
+
+      @if (actionError()) {
+        <div class="rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral" role="alert">{{ actionError() }}</div>
+      }
+
+      <section class="flex flex-wrap gap-3">
+        <button type="button" class="btn btn-primary" [disabled]="isDownloading()" (click)="download()">{{ isDownloading() ? 'Downloading...' : 'Download PDF' }}</button>
+
+        @if (canArchive()) {
+          <button type="button" class="btn btn-danger" [disabled]="isArchiving()" (click)="archive()">{{ isArchiving() ? 'Archiving...' : 'Archive pack' }}</button>
+        }
+      </section>
+    </div>
+  }
+</section>
