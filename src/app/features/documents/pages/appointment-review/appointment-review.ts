@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { EMPTY, finalize, switchMap } from 'rxjs';
@@ -43,9 +43,11 @@ export class AppointmentReview implements OnInit {
     const document = this.document();
     const selectedPatient = this.selectedPatientState.selectedPatient();
 
-    return document !== null
-      && selectedPatient !== null
-      && document.patientRecordId === selectedPatient.patientRecordId;
+    return (
+      document !== null &&
+      selectedPatient !== null &&
+      document.patientRecordId === selectedPatient.patientRecordId
+    );
   });
 
   protected readonly canConfirm = computed(() => {
@@ -55,8 +57,10 @@ export class AppointmentReview implements OnInit {
 
     const selectedPatient = this.selectedPatientState.selectedPatient();
 
-    return this.authorisation.can(selectedPatient, 'document', 'edit')
-      && this.authorisation.can(selectedPatient, 'appointment', 'edit');
+    return (
+      this.authorisation.can(selectedPatient, 'document', 'edit') &&
+      this.authorisation.can(selectedPatient, 'appointment', 'edit')
+    );
   });
 
   protected readonly canReject = computed(() => {
@@ -66,6 +70,12 @@ export class AppointmentReview implements OnInit {
 
     return this.authorisation.can(this.selectedPatientState.selectedPatient(), 'document', 'edit');
   });
+
+  constructor() {
+    effect(() => {
+      this.redirectIfPatientContextChanged();
+    });
+  }
 
   ngOnInit(): void {
     const documentId = this.route.snapshot.paramMap.get('documentId');
@@ -100,12 +110,12 @@ export class AppointmentReview implements OnInit {
 
     this.isConfirming.set(true);
 
-    this.documentApi.confirmAppointment(document.id, mapAppointmentFormToRequest(this.form)).pipe(
-      finalize(() => this.isConfirming.set(false)),
-    ).subscribe({
-      next: () => void this.router.navigate(['/documents', document.id]),
-      error: (error: unknown) => this.handleConfirmError(error, document),
-    });
+    this.documentApi.confirmAppointment(document.id, mapAppointmentFormToRequest(this.form))
+      .pipe(finalize(() => this.isConfirming.set(false)))
+      .subscribe({
+        next: () => void this.router.navigate(['/documents', document.id]),
+        error: (error: unknown) => this.handleConfirmError(error, document),
+      });
   }
 
   protected reject(): void {
@@ -123,12 +133,12 @@ export class AppointmentReview implements OnInit {
 
     this.isRejecting.set(true);
 
-    this.documentApi.rejectAppointment(document.id).pipe(
-      finalize(() => this.isRejecting.set(false)),
-    ).subscribe({
-      next: () => void this.router.navigate(['/documents', document.id]),
-      error: (error: unknown) => this.handleRejectError(error, document),
-    });
+    this.documentApi.rejectAppointment(document.id)
+      .pipe(finalize(() => this.isRejecting.set(false)))
+      .subscribe({
+        next: () => void this.router.navigate(['/documents', document.id]),
+        error: (error: unknown) => this.handleRejectError(error, document),
+      });
   }
 
   protected retryLoad(): void {
@@ -147,46 +157,46 @@ export class AppointmentReview implements OnInit {
     this.processing.set(null);
 
     this.documentApi.getDocument(documentId).pipe(
-      switchMap((document) => {
-        this.document.set(document);
+        switchMap((document) => {
+          this.document.set(document);
 
-        const selectedPatient = this.selectedPatientState.selectedPatient();
+          const selectedPatient = this.selectedPatientState.selectedPatient();
 
-        if (selectedPatient === null || document.patientRecordId !== selectedPatient.patientRecordId) {
-          this.status.set('invalid');
-          this.errorMessage.set('This document is not available for the selected patient.');
-          return EMPTY;
-        }
+          if (selectedPatient === null || document.patientRecordId !== selectedPatient.patientRecordId) {
+            this.status.set('invalid');
+            this.errorMessage.set('This document is not available for the selected patient.');
+            return EMPTY;
+          }
 
-        if (document.documentType !== 'APPOINTMENT_LETTER' || document.status !== 'READY_FOR_APPOINTMENT_REVIEW') {
-          this.status.set('invalid');
-          this.errorMessage.set(conflictMessage ?? 'This document is not awaiting appointment review.');
-          return EMPTY;
-        }
+          if (document.documentType !== 'APPOINTMENT_LETTER' || document.status !== 'READY_FOR_APPOINTMENT_REVIEW') {
+            this.status.set('invalid');
+            this.errorMessage.set(conflictMessage ?? 'This document is not awaiting appointment review.',);
+            return EMPTY;
+          }
 
-        return this.documentApi.getDocumentProcessing(document.id);
-      }),
-    ).subscribe({
-      next: (processing) => {
-        const details = processing.appointmentDetails;
+          return this.documentApi.getDocumentProcessing(document.id);
+        }),
+      ).subscribe({
+        next: (processing) => {
+          const details = processing.appointmentDetails;
 
-        if (details === null) {
-          this.status.set('error');
-          this.errorMessage.set('The processing result does not contain appointment details.');
-          return;
-        }
+          if (details === null) {
+            this.status.set('error');
+            this.errorMessage.set('The processing result does not contain appointment details.');
+            return;
+          }
 
-        this.processing.set(processing);
+          this.processing.set(processing);
 
-        resetAppointmentForm(this.form, {
-          ...details,
-          notes: null,
-        });
+          resetAppointmentForm(this.form, {
+            ...details,
+            notes: null,
+          });
 
-        this.status.set('ready');
-      },
-      error: (error: unknown) => this.handleLoadError(error),
-    });
+          this.status.set('ready');
+        },
+        error: (error: unknown) => this.handleLoadError(error),
+      });
   }
 
   private handleLoadError(error: unknown): void {
@@ -261,6 +271,24 @@ export class AppointmentReview implements OnInit {
     this.actionError.set(getHttpErrorMessage(error, 'Unable to reject the appointment details.'));
   }
 
+  private redirectIfPatientContextChanged(): void {
+    const document = this.document();
+    const selectedPatient = this.selectedPatientState.selectedPatient();
+
+    if (
+      document === null ||
+      selectedPatient === null ||
+      document.patientRecordId === selectedPatient.patientRecordId
+    ) {
+      return;
+    }
+
+    this.document.set(null);
+    this.processing.set(null);
+    this.status.set('loading');
+    void this.router.navigate(['/documents']);
+  }
+
   private refreshPatientAccess(requireAppointmentEdit: boolean): void {
     const failedPatientRecordId = this.document()?.patientRecordId ?? null;
 
@@ -287,7 +315,7 @@ export class AppointmentReview implements OnInit {
       },
       error: (refreshError: unknown) => {
         this.status.set('error');
-        this.errorMessage.set(getHttpErrorMessage(refreshError, 'Unable to refresh your patient access.'));
+        this.errorMessage.set(getHttpErrorMessage(refreshError, 'Unable to refresh your patient access.'),);
       },
     });
   }

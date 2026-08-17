@@ -7,7 +7,7 @@ import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
 import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
 import { formatEnumLabel } from '../../../../shared/utils/formatting';
 import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import { createPatientRecordForm, mapPatientRecordFormToRequest } from '../../forms/patient-record-form';
+import { createPatientRecordForm, mapPatientRecordFormToRequest} from '../../forms/patient-record-form';
 import { BLOOD_TYPES, HEIGHT_UNITS, WEIGHT_UNITS } from '../../models/patient-record-model';
 import { PersonalPatientRecordState } from '../../services/personal-patient-record-state';
 
@@ -38,23 +38,27 @@ export class PatientRecordCreate {
       return;
     }
 
-    this.patientRecordState.createPatientRecord(mapPatientRecordFormToRequest(this.form)).subscribe({
-      next: () => {
-        this.selectedPatientState.revalidateSelection();
-        void this.router.navigate(['/patient']);
-      },
-      error: (error: unknown) => {
-        if (applyServerFieldErrors(this.form, error)) {
-          return;
-        }
+    this.patientRecordState.createPatientRecord(mapPatientRecordFormToRequest(this.form))
+      .subscribe({
+        next: (patientRecord) => {
+          if (!this.selectedPatientState.selectPatient(patientRecord.id)) {
+            this.selectedPatientState.revalidateSelection();
+          }
 
-        if (hasHttpStatus(error, 409)) {
-          this.errorMessage.set('A personal patient record already exists.');
-          return;
-        }
+          void this.router.navigate(['/patient']);
+        },
+        error: (error: unknown) => {
+          if (applyServerFieldErrors(this.form, error)) {
+            return;
+          }
 
-        this.errorMessage.set(getHttpErrorMessage(error, 'Unable to create your patient record.'));
-      },
-    });
+          if (hasHttpStatus(error, 409)) {
+            this.errorMessage.set('A personal patient record already exists.');
+            return;
+          }
+
+          this.errorMessage.set(getHttpErrorMessage(error, 'Unable to create your patient record.'));
+        },
+      });
   }
 }

@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { EMPTY, finalize, switchMap } from 'rxjs';
@@ -10,8 +10,8 @@ import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
 import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
 import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
 import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import { DOCUMENT_HISTORY_TITLE_MAX_LENGTH, DOCUMENT_REVIEWED_SUMMARY_MAX_LENGTH } from '../../models/document-constraints';
-import { DocumentProcessingResultResponse, DocumentResponse, getDocumentTypeLabel, getSummarySourceLabel } from '../../models/document-model';
+import { DOCUMENT_HISTORY_TITLE_MAX_LENGTH, DOCUMENT_REVIEWED_SUMMARY_MAX_LENGTH,} from '../../models/document-constraints';
+import { DocumentProcessingResultResponse, DocumentResponse, getDocumentTypeLabel, getSummarySourceLabel} from '../../models/document-model';
 import { DocumentApiService } from '../../services/document-api-service';
 
 type SummaryReviewStatus = 'loading' | 'ready' | 'failed' | 'invalid' | 'not-found' | 'forbidden' | 'error';
@@ -57,11 +57,20 @@ export class SummaryReview implements OnInit {
       Validators.required,
       Validators.maxLength(DOCUMENT_HISTORY_TITLE_MAX_LENGTH),
     ]),
-    historyDate: this.formBuilder.nonNullable.control('', [Validators.required, pastOrPresentDateValidator]),
+    historyDate: this.formBuilder.nonNullable.control('', [
+      Validators.required,
+      pastOrPresentDateValidator,
+    ]),
   });
 
   protected readonly getDocumentTypeLabel = getDocumentTypeLabel;
   protected readonly getSummarySourceLabel = getSummarySourceLabel;
+
+  constructor() {
+    effect(() => {
+      this.redirectIfPatientContextChanged();
+    });
+  }
 
   ngOnInit(): void {
     const documentId = this.route.snapshot.paramMap.get('documentId');
@@ -117,23 +126,31 @@ export class SummaryReview implements OnInit {
 
     this.isRetrying.set(true);
 
-    this.documentApi.summariseDocument(document.id, { approvedDeidentifiedText: approvedText }).pipe(
-      finalize(() => this.isRetrying.set(false)),
-    ).subscribe({
-      next: (processingResult) => {
-        if (processingResult.status !== 'READY_FOR_SUMMARY_REVIEW' || processingResult.generatedSummary === null || processingResult.generatedSummary.trim().length === 0) {
-          this.loadReview(document.id, 'A reviewable summary was not created. The latest document information has been loaded.');
-          return;
-        }
+    this.documentApi.summariseDocument(document.id, { approvedDeidentifiedText: approvedText })
+      .pipe(finalize(() => this.isRetrying.set(false)))
+      .subscribe({
+        next: (processingResult) => {
+          if (processingResult.status !== 'READY_FOR_SUMMARY_REVIEW' || processingResult.generatedSummary === null || processingResult.generatedSummary.trim().length === 0) {
+            this.loadReview(document.id, 'A reviewable summary was not created. The latest document information has been loaded.');
+            return;
+          }
 
-        this.processing.set(processingResult);
-        this.document.update((currentDocument) => currentDocument === null ? null : { ...currentDocument, status: processingResult.status });
-        this.manualSummaryMode.set(false);
-        this.form.reset({ reviewedSummary: processingResult.generatedSummary, historyTitle: '', historyDate: '' });
-        this.status.set('ready');
-      },
-      error: (error: unknown) => this.handleRetryError(error, document.id),
-    });
+          this.processing.set(processingResult);
+          this.document.update((currentDocument) =>
+            currentDocument === null
+              ? null
+              : { ...currentDocument, status: processingResult.status },
+          );
+          this.manualSummaryMode.set(false);
+          this.form.reset({
+            reviewedSummary: processingResult.generatedSummary,
+            historyTitle: '',
+            historyDate: '',
+          });
+          this.status.set('ready');
+        },
+        error: (error: unknown) => this.handleRetryError(error, document.id),
+      });
   }
 
   protected accept(): void {
@@ -164,15 +181,15 @@ export class SummaryReview implements OnInit {
     this.isAccepting.set(true);
 
     this.documentApi.acceptDocumentSummary(document.id, {
-      reviewedSummary: value.reviewedSummary.trim(),
-      historyTitle: value.historyTitle.trim(),
-      historyDate: value.historyDate,
-    }).pipe(
-      finalize(() => this.isAccepting.set(false)),
-    ).subscribe({
-      next: () => void this.router.navigate(['/documents', document.id]),
-      error: (error: unknown) => this.handleAcceptError(error, document.id),
-    });
+        reviewedSummary: value.reviewedSummary.trim(),
+        historyTitle: value.historyTitle.trim(),
+        historyDate: value.historyDate,
+      })
+      .pipe(finalize(() => this.isAccepting.set(false)))
+      .subscribe({
+        next: () => void this.router.navigate(['/documents', document.id]),
+        error: (error: unknown) => this.handleAcceptError(error, document.id),
+      });
   }
 
   protected reject(): void {
@@ -190,12 +207,12 @@ export class SummaryReview implements OnInit {
 
     this.isRejecting.set(true);
 
-    this.documentApi.rejectDocumentSummary(document.id).pipe(
-      finalize(() => this.isRejecting.set(false)),
-    ).subscribe({
-      next: () => void this.router.navigate(['/documents', document.id]),
-      error: (error: unknown) => this.handleRejectError(error, document.id),
-    });
+    this.documentApi.rejectDocumentSummary(document.id)
+      .pipe(finalize(() => this.isRejecting.set(false)))
+      .subscribe({
+        next: () => void this.router.navigate(['/documents', document.id]),
+        error: (error: unknown) => this.handleRejectError(error, document.id),
+      });
   }
 
   protected retryLoad(): void {
@@ -215,50 +232,50 @@ export class SummaryReview implements OnInit {
     this.manualSummaryMode.set(false);
 
     this.documentApi.getDocument(documentId).pipe(
-      switchMap((document) => {
-        this.document.set(document);
+        switchMap((document) => {
+          this.document.set(document);
 
-        const selectedPatient = this.selectedPatientState.selectedPatient();
+          const selectedPatient = this.selectedPatientState.selectedPatient();
 
-        if (selectedPatient === null || selectedPatient.patientRecordId !== document.patientRecordId) {
+          if (selectedPatient === null || selectedPatient.patientRecordId !== document.patientRecordId) {
+            this.status.set('invalid');
+            this.errorMessage.set('This document is not available for the selected patient.');
+            return EMPTY;
+          }
+
+          if (document.documentType !== 'CONSULTATION_OUTCOME_LETTER') {
+            this.status.set('invalid');
+            this.errorMessage.set('Summary review is not available for this document.');
+            return EMPTY;
+          }
+
+          if (document.status !== 'READY_FOR_SUMMARY_REVIEW' && document.status !== 'SUMMARISATION_FAILED') {
+            this.status.set('invalid');
+            this.errorMessage.set(actionMessage || 'This document is not currently ready for summary review.');
+            return EMPTY;
+          }
+
+          return this.documentApi.getDocumentProcessing(document.id);
+        }),
+      ).subscribe({
+        next: (processing) => {
+          this.processing.set(processing);
+
+          if (processing.status === 'READY_FOR_SUMMARY_REVIEW') {
+            this.prepareGeneratedSummary(processing);
+            return;
+          }
+
+          if (processing.status === 'SUMMARISATION_FAILED') {
+            this.prepareFailedSummary(processing);
+            return;
+          }
+
           this.status.set('invalid');
-          this.errorMessage.set('This document is not available for the selected patient.');
-          return EMPTY;
-        }
-
-        if (document.documentType !== 'CONSULTATION_OUTCOME_LETTER') {
-          this.status.set('invalid');
-          this.errorMessage.set('Summary review is not available for this document.');
-          return EMPTY;
-        }
-
-        if (document.status !== 'READY_FOR_SUMMARY_REVIEW' && document.status !== 'SUMMARISATION_FAILED') {
-          this.status.set('invalid');
-          this.errorMessage.set(actionMessage || 'This document is not currently ready for summary review.');
-          return EMPTY;
-        }
-
-        return this.documentApi.getDocumentProcessing(document.id);
-      }),
-    ).subscribe({
-      next: (processing) => {
-        this.processing.set(processing);
-
-        if (processing.status === 'READY_FOR_SUMMARY_REVIEW') {
-          this.prepareGeneratedSummary(processing);
-          return;
-        }
-
-        if (processing.status === 'SUMMARISATION_FAILED') {
-          this.prepareFailedSummary(processing);
-          return;
-        }
-
-        this.status.set('invalid');
-        this.errorMessage.set(actionMessage || 'This document was updated while the review was loading. Please try again.');
-      },
-      error: (error: unknown) => this.handleLoadError(error),
-    });
+          this.errorMessage.set(actionMessage || 'This document was updated while the review was loading. Please try again.');
+        },
+        error: (error: unknown) => this.handleLoadError(error),
+      });
   }
 
   private prepareGeneratedSummary(processing: DocumentProcessingResultResponse): void {
@@ -268,7 +285,7 @@ export class SummaryReview implements OnInit {
       return;
     }
 
-    this.form.reset({ reviewedSummary: processing.generatedSummary, historyTitle: '', historyDate: '' });
+    this.form.reset({ reviewedSummary: processing.generatedSummary, historyTitle: '', historyDate: ''});
     this.manualSummaryMode.set(false);
     this.status.set('ready');
   }
@@ -404,6 +421,24 @@ export class SummaryReview implements OnInit {
     }
 
     return getHttpErrorMessage(error, 'Unable to generate the consultation summary.');
+  }
+
+  private redirectIfPatientContextChanged(): void {
+    const document = this.document();
+    const selectedPatient = this.selectedPatientState.selectedPatient();
+
+    if (
+      document === null ||
+      selectedPatient === null ||
+      document.patientRecordId === selectedPatient.patientRecordId
+    ) {
+      return;
+    }
+
+    this.document.set(null);
+    this.processing.set(null);
+    this.status.set('loading');
+    void this.router.navigate(['/documents']);
   }
 
   private refreshPatientAccess(acceptanceAttempt: boolean): void {

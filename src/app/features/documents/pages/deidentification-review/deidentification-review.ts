@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { EMPTY, finalize, switchMap } from 'rxjs';
@@ -40,7 +40,11 @@ export class DeidentificationReview implements OnInit {
   protected readonly contextMatchesDocument = computed(() => {
     const document = this.document();
     const selectedPatient = this.selectedPatientState.selectedPatient();
-    return document !== null && selectedPatient !== null && document.patientRecordId === selectedPatient.patientRecordId;
+    return (
+      document !== null &&
+      selectedPatient !== null &&
+      document.patientRecordId === selectedPatient.patientRecordId
+    );
   });
 
   protected readonly form = this.formBuilder.group({
@@ -48,8 +52,17 @@ export class DeidentificationReview implements OnInit {
       Validators.required,
       Validators.maxLength(DOCUMENT_APPROVED_DEIDENTIFIED_TEXT_MAX_LENGTH),
     ]),
-    externalTransmissionApproved: this.formBuilder.nonNullable.control(false, Validators.requiredTrue),
+    externalTransmissionApproved: this.formBuilder.nonNullable.control(
+      false,
+      Validators.requiredTrue,
+    ),
   });
+
+  constructor() {
+    effect(() => {
+      this.redirectIfPatientContextChanged();
+    });
+  }
 
   ngOnInit(): void {
     const documentId = this.route.snapshot.paramMap.get('documentId');
@@ -93,12 +106,13 @@ export class DeidentificationReview implements OnInit {
 
     this.isSubmitting.set(true);
 
-    this.documentApi.summariseDocument(document.id, { approvedDeidentifiedText: approvedText }).pipe(
-      finalize(() => this.isSubmitting.set(false)),
-    ).subscribe({
-      next: () => void this.router.navigate(['/documents', document.id, 'summary-review']),
-      error: (error: unknown) => this.handleSubmissionError(error, document.id),
-    });
+    this.documentApi
+      .summariseDocument(document.id, { approvedDeidentifiedText: approvedText })
+      .pipe(finalize(() => this.isSubmitting.set(false)))
+      .subscribe({
+        next: () => void this.router.navigate(['/documents', document.id, 'summary-review']),
+        error: (error: unknown) => this.handleSubmissionError(error, document.id),
+      });
   }
 
   protected retryLoad(): void {
@@ -117,58 +131,58 @@ export class DeidentificationReview implements OnInit {
     this.processing.set(null);
 
     this.documentApi.getDocument(documentId).pipe(
-      switchMap((document) => {
-        this.document.set(document);
+        switchMap((document) => {
+          this.document.set(document);
 
-        const selectedPatient = this.selectedPatientState.selectedPatient();
+          const selectedPatient = this.selectedPatientState.selectedPatient();
 
-        if (selectedPatient === null || document.patientRecordId !== selectedPatient.patientRecordId) {
-          this.status.set('invalid');
-          this.errorMessage.set('This document is not available for the selected patient.');
-          return EMPTY;
-        }
+          if (selectedPatient === null || document.patientRecordId !== selectedPatient.patientRecordId) {
+            this.status.set('invalid');
+            this.errorMessage.set('This document is not available for the selected patient.');
+            return EMPTY;
+          }
 
-        if (document.documentType !== 'CONSULTATION_OUTCOME_LETTER') {
-          this.status.set('invalid');
-          this.errorMessage.set('Privacy review is not available for this document.');
-          return EMPTY;
-        }
+          if (document.documentType !== 'CONSULTATION_OUTCOME_LETTER') {
+            this.status.set('invalid');
+            this.errorMessage.set('Privacy review is not available for this document.');
+            return EMPTY;
+          }
 
-        if (document.status === 'SUMMARISATION_FAILED') {
-          this.status.set('recovery');
-          return EMPTY;
-        }
+          if (document.status === 'SUMMARISATION_FAILED') {
+            this.status.set('recovery');
+            return EMPTY;
+          }
 
-        if (document.status === 'READY_FOR_SUMMARY_REVIEW') {
-          void this.router.navigate(['/documents', document.id, 'summary-review']);
-          return EMPTY;
-        }
+          if (document.status === 'READY_FOR_SUMMARY_REVIEW') {
+            void this.router.navigate(['/documents', document.id, 'summary-review']);
+            return EMPTY;
+          }
 
-        if (document.status !== 'READY_FOR_DEIDENTIFICATION_REVIEW') {
-          this.status.set('invalid');
-          this.errorMessage.set(actionMessage || 'This document is not awaiting de-identification review.');
-          return EMPTY;
-        }
+          if (document.status !== 'READY_FOR_DEIDENTIFICATION_REVIEW') {
+            this.status.set('invalid');
+            this.errorMessage.set(actionMessage || 'This document is not awaiting de-identification review.',);
+            return EMPTY;
+          }
 
-        return this.documentApi.getDocumentProcessing(document.id);
-      }),
-    ).subscribe({
-      next: (processing) => {
-        if (processing.machineDeidentifiedText === null) {
-          this.status.set('error');
-          this.errorMessage.set('De-identified consultation text is not available for review.');
-          return;
-        }
+          return this.documentApi.getDocumentProcessing(document.id);
+        }),
+      ).subscribe({
+        next: (processing) => {
+          if (processing.machineDeidentifiedText === null) {
+            this.status.set('error');
+            this.errorMessage.set('De-identified consultation text is not available for review.');
+            return;
+          }
 
-        this.processing.set(processing);
-        this.form.reset({
-          approvedDeidentifiedText: processing.machineDeidentifiedText,
-          externalTransmissionApproved: false,
-        });
-        this.status.set('ready');
-      },
-      error: (error: unknown) => this.handleLoadError(error),
-    });
+          this.processing.set(processing);
+          this.form.reset({
+            approvedDeidentifiedText: processing.machineDeidentifiedText,
+            externalTransmissionApproved: false,
+          });
+          this.status.set('ready');
+        },
+        error: (error: unknown) => this.handleLoadError(error),
+      });
   }
 
   private handleLoadError(error: unknown): void {
@@ -184,7 +198,7 @@ export class DeidentificationReview implements OnInit {
     }
 
     this.status.set('error');
-    this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the de-identification review.'));
+    this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the de-identification review.'),);
   }
 
   private handleSubmissionError(error: unknown, documentId: string): void {
@@ -193,7 +207,7 @@ export class DeidentificationReview implements OnInit {
     }
 
     if (hasHttpStatus(error, 400)) {
-      this.actionError.set(getHttpErrorMessage(error, 'Check the de-identified text before continuing.'));
+      this.actionError.set(getHttpErrorMessage(error, 'Check the de-identified text before continuing.'),);
       return;
     }
 
@@ -266,6 +280,24 @@ export class DeidentificationReview implements OnInit {
     }
 
     return getHttpErrorMessage(error, 'Summarisation did not complete successfully.');
+  }
+
+  private redirectIfPatientContextChanged(): void {
+    const document = this.document();
+    const selectedPatient = this.selectedPatientState.selectedPatient();
+
+    if (
+      document === null ||
+      selectedPatient === null ||
+      document.patientRecordId === selectedPatient.patientRecordId
+    ) {
+      return;
+    }
+
+    this.document.set(null);
+    this.processing.set(null);
+    this.status.set('loading');
+    void this.router.navigate(['/documents']);
   }
 
   private refreshPatientAccess(): void {
