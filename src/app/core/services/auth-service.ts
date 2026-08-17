@@ -1,7 +1,15 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Observable, tap, throwError } from 'rxjs';
 
-import { LoginRequest, LoginResponse, MfaLoginRequest, MfaSetupResponse, UserRole } from '../models/auth-model';
+import {
+  AccountSecurityResponse,
+  LoginRequest,
+  LoginResponse,
+  MfaLoginRequest,
+  MfaSetupResponse,
+  PasswordChangeRequest,
+  UserRole,
+} from '../models/auth-model';
 import { AuthApiService } from './auth-api-service';
 
 interface JwtPayload {
@@ -17,7 +25,6 @@ export class AuthService {
 
   private readonly accessTokenKey = 'appointmentPack.accessToken';
   private readonly mfaChallengeIdKey = 'appointmentPack.mfaChallengeId';
-  private readonly mfaEnabledKey = 'appointmentPack.mfaEnabled';
 
   private readonly authenticatedValue = signal(false);
   private readonly rolesValue = signal<ReadonlySet<UserRole>>(new Set());
@@ -55,14 +62,24 @@ export class AuthService {
     );
   }
 
+  getAccountSecurity(): Observable<AccountSecurityResponse> {
+    return this.authApi.getAccountSecurity();
+  }
+
+  changePassword(request: PasswordChangeRequest): Observable<void> {
+    return this.authApi.changePassword(request);
+  }
+
   setupMfa(): Observable<MfaSetupResponse> {
     return this.authApi.setupMfa();
   }
 
   confirmMfa(code: string): Observable<void> {
-    return this.authApi.confirmMfa({ code }).pipe(
-      tap(() => sessionStorage.setItem(this.mfaEnabledKey, 'true')),
-    );
+    return this.authApi.confirmMfa({ code });
+  }
+
+  disableMfa(code: string): Observable<void> {
+    return this.authApi.disableMfa({ code });
   }
 
   getAccessToken(): string | null {
@@ -95,10 +112,6 @@ export class AuthService {
     return sessionStorage.getItem(this.mfaChallengeIdKey) !== null;
   }
 
-  isMfaEnabled(): boolean {
-    return sessionStorage.getItem(this.mfaEnabledKey) === 'true';
-  }
-
   cancelMfaLogin(): void {
     this.clearSession();
   }
@@ -114,7 +127,7 @@ export class AuthService {
           throw new Error('The server returned an invalid authenticated login response.');
         }
 
-        this.storeAuthenticatedSession(response.accessToken, false);
+        this.storeAuthenticatedSession(response.accessToken);
         return;
 
       case 'EMAIL_VERIFICATION_REQUIRED':
@@ -130,7 +143,6 @@ export class AuthService {
         }
 
         sessionStorage.setItem(this.mfaChallengeIdKey, response.mfaChallengeId);
-        sessionStorage.setItem(this.mfaEnabledKey, 'true');
         return;
     }
   }
@@ -145,10 +157,10 @@ export class AuthService {
       throw new Error('The server returned an invalid MFA login completion response.');
     }
 
-    this.storeAuthenticatedSession(response.accessToken, true);
+    this.storeAuthenticatedSession(response.accessToken);
   }
 
-  private storeAuthenticatedSession(accessToken: string, mfaEnabled: boolean): void {
+  private storeAuthenticatedSession(accessToken: string): void {
     const payload = this.decodeJwtPayload(accessToken);
 
     if (payload === null || this.isPayloadExpired(payload)) {
@@ -156,7 +168,6 @@ export class AuthService {
     }
 
     sessionStorage.setItem(this.accessTokenKey, accessToken);
-    sessionStorage.setItem(this.mfaEnabledKey, String(mfaEnabled));
     sessionStorage.removeItem(this.mfaChallengeIdKey);
 
     this.updateAuthenticatedState(payload);
@@ -189,7 +200,6 @@ export class AuthService {
   private clearSession(): void {
     sessionStorage.removeItem(this.accessTokenKey);
     sessionStorage.removeItem(this.mfaChallengeIdKey);
-    sessionStorage.removeItem(this.mfaEnabledKey);
 
     this.rolesValue.set(new Set());
     this.authenticatedValue.set(false);

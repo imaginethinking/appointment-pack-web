@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import {
+  AccountSecurityResponse,
   EmailVerificationConfirmRequest,
   EmailVerificationResendRequest,
   LoginRequest,
@@ -11,6 +12,7 @@ import {
   MfaConfirmRequest,
   MfaLoginRequest,
   MfaSetupResponse,
+  PasswordChangeRequest,
   PasswordResetConfirmRequest,
   PasswordResetRequest,
   RegisterRequest,
@@ -52,11 +54,23 @@ export class AuthApiService {
     return this.http.post<void>(`${this.authUrl}/password-reset/confirm`, request);
   }
 
+  getAccountSecurity(): Observable<AccountSecurityResponse> {
+    return this.http.get<AccountSecurityResponse>(`${this.authUrl}/security`);
+  }
+
+  changePassword(request: PasswordChangeRequest): Observable<void> {
+    return this.http.post<void>(`${this.authUrl}/password/change`, request);
+  }
+
   setupMfa(): Observable<MfaSetupResponse> {
     return this.http.post<MfaSetupResponse>(`${this.authUrl}/mfa/setup`, null);
   }
 
   confirmMfa(request: MfaConfirmRequest): Observable<void> {
     return this.http.post<void>(`${this.authUrl}/mfa/confirm`, request);
+  }
+
+  disableMfa(request: MfaConfirmRequest): Observable<void> {
+    return this.http.post<void>(`${this.authUrl}/mfa/disable`, request);
   }
 }

@@ -32,6 +32,16 @@ export interface LoginResponse {
   tokenType: 'Bearer' | null;
 }
 
+export interface AccountSecurityResponse {
+  mfaEnabled: boolean;
+}
+
+export interface PasswordChangeRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
 export interface MfaLoginRequest {
   mfaChallengeId: string;
   code: string;

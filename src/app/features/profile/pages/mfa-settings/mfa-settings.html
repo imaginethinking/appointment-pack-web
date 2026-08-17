@@ -1,71 +1,203 @@
-<section class="mx-auto max-w-xl p-8">
-  <h1 class="mb-3 text-2xl font-bold text-brand-plum">Multi-factor authentication</h1>
+<section class="mx-auto max-w-3xl">
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-brand-plum">Account security</h1>
+    <p class="mt-1 text-brand-plum/70">Manage your password and multi-factor authentication.</p>
+  </div>
 
-  @if (mfaEnabled()) {
-    <div class="rounded border border-brand-mint bg-brand-off-white p-4 text-brand-plum" role="status">
-      Multi-factor authentication is enabled.
+  @if (status() === 'loading') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">
+      Loading account security settings...
     </div>
-
-    <p class="mt-4 text-sm text-brand-plum/70">
-      MFA cannot currently be disabled through The Appointment Pack.
-    </p>
+  } @else if (status() === 'error') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-coral">{{ pageErrorMessage() }}</p>
+      <button type="button" class="btn btn-secondary mt-4" (click)="loadSecurityStatus()">Try again</button>
+    </div>
   } @else {
-    <p class="mb-6 text-brand-plum/70">
-      Scan the QR code with an authenticator application, then enter the generated six-digit code.
-    </p>
-
-    @if (!provisioningUri()) {
-      <button class="btn btn-primary w-full" type="button" [disabled]="isStartingSetup()" (click)="startSetup()">
-        {{ isStartingSetup() ? 'Starting setup...' : 'Set up MFA' }}
-      </button>
-    }
-
-    @if (provisioningUri(); as uri) {
-      <div class="mt-6 space-y-6">
-        <div class="inline-block rounded border bg-white p-4">
-          <qr-code [value]="uri" [size]="240" errorCorrectionLevel="M"></qr-code>
+    <div class="space-y-6">
+      <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+        <div>
+          <h2 class="text-xl font-semibold text-brand-plum">Password</h2>
+          <p class="mt-1 text-sm text-brand-plum/70">Change the password you use to sign in to your account.</p>
         </div>
 
-        <p class="text-sm text-brand-plum/70">
-          Do not refresh this page until setup has been confirmed.
-        </p>
-
-        <form class="space-y-4" [formGroup]="form" novalidate (ngSubmit)="confirmMfa()">
+        <form class="mt-5 space-y-4" [formGroup]="passwordForm" novalidate (ngSubmit)="changePassword()">
           <div>
-            <label class="mb-1 block font-medium text-brand-plum" for="mfaCode">Authentication code</label>
-
+            <label class="mb-1 block font-semibold text-brand-plum" for="currentPassword">Current password</label>
             <input
-              id="mfaCode"
-              class="w-full rounded border border-brand-plum/30 p-2 tracking-widest"
-              type="text"
-              inputmode="numeric"
-              autocomplete="one-time-code"
-              maxlength="6"
-              formControlName="code"
+              id="currentPassword"
+              class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+              type="password"
+              autocomplete="current-password"
+              maxlength="128"
+              formControlName="currentPassword"
             />
 
-            @if (form.controls.code.invalid && form.controls.code.touched) {
-              <p class="mt-1 text-sm text-brand-coral">Enter a six-digit numeric code.</p>
+            @if (passwordForm.controls.currentPassword.touched && passwordForm.controls.currentPassword.hasError('required')) {
+              <p class="mt-1 text-sm text-brand-coral">Enter your current password.</p>
+            } @else if (passwordForm.controls.currentPassword.errors?.['server']; as message) {
+              <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
             }
           </div>
 
-          <button class="btn btn-primary w-full" type="submit" [disabled]="isConfirming()">
-            {{ isConfirming() ? 'Confirming...' : 'Confirm MFA' }}
-          </button>
+          <div>
+            <label class="mb-1 block font-semibold text-brand-plum" for="newPassword">New password</label>
+            <input
+              id="newPassword"
+              class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+              type="password"
+              autocomplete="new-password"
+              maxlength="128"
+              formControlName="newPassword"
+            />
 
-          <button class="btn btn-danger w-full" type="button" [disabled]="isConfirming()" (click)="cancelSetup()">
-            Cancel
+            <p class="mt-1 text-sm text-brand-plum/70">Use 8–128 characters including an uppercase letter, lowercase letter, number and symbol.</p>
+
+            @if (passwordForm.controls.newPassword.touched && passwordForm.controls.newPassword.hasError('required')) {
+              <p class="mt-1 text-sm text-brand-coral">Enter a new password.</p>
+            } @else if (passwordForm.controls.newPassword.touched && passwordForm.controls.newPassword.hasError('strongPassword')) {
+              <p class="mt-1 text-sm text-brand-coral">The new password does not meet the password requirements.</p>
+            } @else if (passwordForm.controls.newPassword.errors?.['server']; as message) {
+              <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+            }
+          </div>
+
+          <div>
+            <label class="mb-1 block font-semibold text-brand-plum" for="confirmPassword">Confirm new password</label>
+            <input
+              id="confirmPassword"
+              class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+              type="password"
+              autocomplete="new-password"
+              maxlength="128"
+              formControlName="confirmPassword"
+            />
+
+            @if (passwordForm.controls.confirmPassword.touched && passwordForm.controls.confirmPassword.hasError('required')) {
+              <p class="mt-1 text-sm text-brand-coral">Confirm your new password.</p>
+            } @else if (passwordForm.hasError('passwordMismatch') && passwordForm.controls.confirmPassword.touched) {
+              <p class="mt-1 text-sm text-brand-coral">The new passwords do not match.</p>
+            } @else if (passwordForm.controls.confirmPassword.errors?.['server']; as message) {
+              <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+            }
+          </div>
+
+          @if (passwordSuccessMessage()) {
+            <div class="rounded-md border border-brand-mint bg-white p-4 text-brand-plum" role="status">{{ passwordSuccessMessage() }}</div>
+          }
+
+          @if (passwordErrorMessage()) {
+            <div class="rounded-md border border-brand-coral bg-white p-4 text-brand-coral" role="alert">{{ passwordErrorMessage() }}</div>
+          }
+
+          <button class="btn btn-primary" type="submit" [disabled]="isChangingPassword()">
+            {{ isChangingPassword() ? 'Changing password...' : 'Change password' }}
           </button>
         </form>
-      </div>
-    }
-  }
+      </section>
 
-  @if (successMessage()) {
-    <p class="mt-4 text-brand-plum" role="status">{{ successMessage() }}</p>
-  }
+      <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h2 class="text-xl font-semibold text-brand-plum">Multi-factor authentication</h2>
+            <p class="mt-1 text-sm text-brand-plum/70">Add an authenticator code as an additional sign-in check.</p>
+          </div>
 
-  @if (errorMessage()) {
-    <p class="mt-4 text-brand-coral" role="alert">{{ errorMessage() }}</p>
+          @if (mfaEnabled()) {
+            <span class="w-fit rounded-full bg-brand-mint px-3 py-1 text-sm font-semibold text-brand-plum">Enabled</span>
+          } @else {
+            <span class="w-fit rounded-full bg-brand-pink px-3 py-1 text-sm font-semibold text-brand-plum">Not enabled</span>
+          }
+        </div>
+
+        @if (mfaEnabled()) {
+          <div class="mt-5 rounded-md border border-brand-plum/20 bg-white p-4">
+            <p class="font-semibold text-brand-plum">Disable multi-factor authentication</p>
+            <p class="mt-1 text-sm text-brand-plum/70">Enter a current code from your authenticator app to confirm this change.</p>
+
+            <form class="mt-4 space-y-4" [formGroup]="disableMfaForm" novalidate (ngSubmit)="disableMfa()">
+              <div>
+                <label class="mb-1 block font-semibold text-brand-plum" for="disableMfaCode">Authentication code</label>
+                <input
+                  id="disableMfaCode"
+                  class="w-full rounded-md border border-brand-plum/30 bg-brand-off-white p-2 tracking-widest text-brand-plum sm:max-w-xs"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="one-time-code"
+                  maxlength="6"
+                  formControlName="code"
+                />
+
+                @if (disableMfaForm.controls.code.touched && (disableMfaForm.controls.code.hasError('required') || disableMfaForm.controls.code.hasError('pattern'))) {
+                  <p class="mt-1 text-sm text-brand-coral">Enter the six-digit code from your authenticator app.</p>
+                } @else if (disableMfaForm.controls.code.errors?.['server']; as message) {
+                  <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+                }
+              </div>
+
+              <button class="btn btn-danger" type="submit" [disabled]="isDisablingMfa()">
+                {{ isDisablingMfa() ? 'Disabling...' : 'Disable multi-factor authentication' }}
+              </button>
+            </form>
+          </div>
+        } @else if (!provisioningUri()) {
+          <div class="mt-5">
+            <p class="text-brand-plum/70">Set up multi-factor authentication using an authenticator app on your phone or another trusted device.</p>
+            <button class="btn btn-primary mt-4" type="button" [disabled]="isStartingSetup()" (click)="startSetup()">
+              {{ isStartingSetup() ? 'Starting setup...' : 'Set up multi-factor authentication' }}
+            </button>
+          </div>
+        }
+
+        @if (provisioningUri(); as uri) {
+          <div class="mt-6 space-y-5 rounded-md border border-brand-plum/20 bg-white p-5">
+            <div>
+              <h3 class="font-semibold text-brand-plum">Connect your authenticator app</h3>
+              <p class="mt-1 text-sm text-brand-plum/70">Scan this QR code, then enter the six-digit code shown in your authenticator app.</p>
+            </div>
+
+            <div class="inline-block rounded-md border border-brand-plum/20 bg-white p-4">
+              <qr-code [value]="uri" [size]="240" errorCorrectionLevel="M"></qr-code>
+            </div>
+
+            <form class="space-y-4" [formGroup]="setupForm" novalidate (ngSubmit)="confirmMfa()">
+              <div>
+                <label class="mb-1 block font-semibold text-brand-plum" for="setupMfaCode">Authentication code</label>
+                <input
+                  id="setupMfaCode"
+                  class="w-full rounded-md border border-brand-plum/30 bg-brand-off-white p-2 tracking-widest text-brand-plum sm:max-w-xs"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="one-time-code"
+                  maxlength="6"
+                  formControlName="code"
+                />
+
+                @if (setupForm.controls.code.touched && (setupForm.controls.code.hasError('required') || setupForm.controls.code.hasError('pattern'))) {
+                  <p class="mt-1 text-sm text-brand-coral">Enter the six-digit code from your authenticator app.</p>
+                } @else if (setupForm.controls.code.errors?.['server']; as message) {
+                  <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
+                }
+              </div>
+
+              <div class="flex flex-wrap gap-3">
+                <button class="btn btn-primary" type="submit" [disabled]="isConfirmingSetup()">
+                  {{ isConfirmingSetup() ? 'Confirming...' : 'Confirm setup' }}
+                </button>
+                <button class="btn btn-secondary" type="button" [disabled]="isConfirmingSetup()" (click)="cancelSetup()">Cancel</button>
+              </div>
+            </form>
+          </div>
+        }
+
+        @if (mfaSuccessMessage()) {
+          <div class="mt-5 rounded-md border border-brand-mint bg-white p-4 text-brand-plum" role="status">{{ mfaSuccessMessage() }}</div>
+        }
+
+        @if (mfaErrorMessage()) {
+          <div class="mt-5 rounded-md border border-brand-coral bg-white p-4 text-brand-coral" role="alert">{{ mfaErrorMessage() }}</div>
+        }
+      </section>
+    </div>
   }
 </section>
