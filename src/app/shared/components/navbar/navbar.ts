@@ -83,13 +83,15 @@ export class Navbar {
   private readonly authorisation = inject(PatientContextAuthorisation);
 
   protected readonly isAuthenticated = this.authService.authenticated;
+  protected readonly isAdmin = this.authService.isAdmin;
   protected readonly navigationItems = NAVIGATION_ITEMS;
 
   protected mobileMenuOpen = false;
   protected profileMenuOpen = false;
 
   protected canViewNavigationItem(item: NavigationItem): boolean {
-    return item.permission === undefined || this.authorisation.has(this.selectedPatientState.selectedPatient(), item.permission);
+    return item.permission === undefined
+      || this.authorisation.has(this.selectedPatientState.selectedPatient(), item.permission);
   }
 
   protected toggleMobileMenu(): void {

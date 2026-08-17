@@ -82,6 +82,18 @@
                   Security and MFA
                 </a>
 
+                @if (isAdmin()) {
+                  <div class="mt-2 border-t border-brand-peach pt-2">
+                    <a
+                      routerLink="/admin/analytics"
+                      class="block px-4 py-2 text-sm font-semibold hover:bg-brand-pink"
+                      (click)="closeMenus()"
+                    >
+                      Admin analytics
+                    </a>
+                  </div>
+                }
+
                 <div class="mt-2 border-t border-brand-peach px-2 pt-2">
                   <button type="button" class="btn btn-danger w-full" (click)="logout()">
                     Log out
@@ -105,7 +117,11 @@
     @if (isAuthenticated() && mobileMenuOpen) {
       <div id="mobile-navigation" class="border-t border-brand-peach/30 py-3 xl:hidden">
         <div class="mb-3 md:hidden">
-          <app-patient-context-selector selectId="mobilePatientContext" [showLabel]="true" [fullWidth]="true" />
+          <app-patient-context-selector
+            selectId="mobilePatientContext"
+            [showLabel]="true"
+            [fullWidth]="true"
+          />
         </div>
 
         <div class="flex flex-col gap-1">

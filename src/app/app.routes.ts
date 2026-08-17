@@ -1,9 +1,12 @@
 import { Routes } from '@angular/router';
 
+import { adminGuard } from './core/guards/admin-guard';
 import { authGuard } from './core/guards/auth-guard';
 import { mfaLoginGuard } from './core/guards/mfa-login-guard';
 import { patientContextLoadGuard } from './core/guards/patient-context-load-guard';
 import { selectedPatientPermissionGuard } from './core/guards/selected-patient-permission-guard';
+import { AdminAnalyticsEvents } from './features/admin-analytics/pages/admin-analytics-events/admin-analytics-events';
+import { AdminAnalyticsSummary } from './features/admin-analytics/pages/admin-analytics-summary/admin-analytics-summary';
 import { AppointmentPackCreate } from './features/appointment-packs/pages/appointment-pack-create/appointment-pack-create';
 import { AppointmentPackDetails } from './features/appointment-packs/pages/appointment-pack-details/appointment-pack-details';
 import { AppointmentPackList } from './features/appointment-packs/pages/appointment-pack-list/appointment-pack-list';
@@ -505,6 +508,16 @@ export const routes: Routes = [
             component: CarerAccess,
           },
         ],
+      },
+      {
+        path: 'admin/analytics/events',
+        component: AdminAnalyticsEvents,
+        canActivate: [adminGuard],
+      },
+      {
+        path: 'admin/analytics',
+        component: AdminAnalyticsSummary,
+        canActivate: [adminGuard],
       },
       {
         path: 'access-denied',

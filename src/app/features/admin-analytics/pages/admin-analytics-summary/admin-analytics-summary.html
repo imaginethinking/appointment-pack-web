@@ -1,0 +1,343 @@
+<section class="mx-auto max-w-7xl">
+  <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-brand-plum">Admin analytics</h1>
+      <p class="mt-1 text-brand-plum/70">
+        Operational application metrics. This area does not expose patient-record identifiers or clinical payloads.
+      </p>
+    </div>
+
+    <a routerLink="/admin/analytics/events" class="btn btn-secondary">View operational events</a>
+  </div>
+
+  <form
+    class="mb-6 rounded-lg border border-brand-plum/20 bg-brand-off-white p-5"
+    [formGroup]="rangeForm"
+    novalidate
+    (ngSubmit)="applyRange()"
+  >
+    <div class="grid gap-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
+      <div>
+        <label for="analyticsFrom" class="mb-1 block font-semibold text-brand-plum">From</label>
+        <input
+          id="analyticsFrom"
+          type="datetime-local"
+          class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+          formControlName="from"
+        />
+      </div>
+
+      <div>
+        <label for="analyticsTo" class="mb-1 block font-semibold text-brand-plum">To</label>
+        <input
+          id="analyticsTo"
+          type="datetime-local"
+          class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
+          formControlName="to"
+        />
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-primary">Apply range</button>
+        <button type="button" class="btn btn-secondary" (click)="resetRange()">Last 30 days</button>
+      </div>
+    </div>
+
+    <p class="mt-3 text-sm text-brand-plum/60">
+      Leave both fields blank to use Spring's default 30-day range. The start is inclusive and the end is exclusive.
+    </p>
+
+    @if (rangeForm.hasError('invalidAnalyticsRange') && rangeForm.touched) {
+      <p class="mt-2 text-sm text-brand-coral">The From time must be earlier than the To time.</p>
+    }
+  </form>
+
+  @if (status() === 'loading') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">
+      Loading admin analytics...
+    </div>
+  } @else if (status() === 'forbidden') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Admin analytics unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">The server did not authorize this account for admin analytics.</p>
+    </div>
+  } @else if (status() === 'error') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-coral">{{ errorMessage() }}</p>
+      <button type="button" class="btn btn-secondary mt-4" (click)="retry()">Try again</button>
+    </div>
+  } @else if (summary(); as currentSummary) {
+    <div class="space-y-8">
+      <section>
+        <div class="mb-4">
+          <h2 class="text-xl font-semibold text-brand-plum">Reporting range</h2>
+          <p class="mt-1 text-sm text-brand-plum/70">
+            {{ currentSummary.from | date: 'd MMMM y, HH:mm' }}
+            to
+            {{ currentSummary.to | date: 'd MMMM y, HH:mm' }}
+          </p>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5">
+            <p class="text-sm font-semibold text-brand-plum/70">Operational events</p>
+            <p class="mt-2 text-3xl font-bold text-brand-plum">{{ currentSummary.totalOperationalEvents }}</p>
+          </article>
+
+          <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5">
+            <p class="text-sm font-semibold text-brand-plum/70">Total users</p>
+            <p class="mt-2 text-3xl font-bold text-brand-plum">{{ currentSummary.users.totalUsers }}</p>
+          </article>
+
+          <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5">
+            <p class="text-sm font-semibold text-brand-plum/70">Active users in range</p>
+            <p class="mt-2 text-3xl font-bold text-brand-plum">{{ currentSummary.users.activeUsersInPeriod }}</p>
+          </article>
+
+          <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5">
+            <p class="text-sm font-semibold text-brand-plum/70">Page views</p>
+            <p class="mt-2 text-3xl font-bold text-brand-plum">{{ currentSummary.pageViews.total }}</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+        <h2 class="text-xl font-semibold text-brand-plum">Users</h2>
+
+        <dl class="mt-5 grid gap-5 sm:grid-cols-3">
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Total registered users</dt>
+            <dd class="mt-1 text-2xl font-semibold text-brand-plum">{{ currentSummary.users.totalUsers }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Registered in range</dt>
+            <dd class="mt-1 text-2xl font-semibold text-brand-plum">{{ currentSummary.users.registeredInPeriod }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Active in range</dt>
+            <dd class="mt-1 text-2xl font-semibold text-brand-plum">{{ currentSummary.users.activeUsersInPeriod }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+        <h2 class="text-xl font-semibold text-brand-plum">Authentication</h2>
+
+        <dl class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Login attempts</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.authentication.loginAttempts }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Authenticated sessions</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.authentication.authenticatedSessions }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Password login succeeded</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.authentication.passwordLoginSucceeded }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Login failed</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.authentication.loginFailed }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Login blocked</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.authentication.loginBlocked }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">MFA required</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.authentication.mfaRequired }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">MFA challenges created</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.authentication.mfaChallengesCreated }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">MFA login succeeded</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.authentication.mfaLoginSucceeded }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">MFA login failed</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.authentication.mfaLoginFailed }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">MFA setup enabled</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.authentication.mfaSetupEnabled }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Verification requested</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.authentication.emailVerificationRequested }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Verification resent</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.authentication.emailVerificationResent }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Verification succeeded</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.authentication.emailVerificationSucceeded }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Verification failed</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.authentication.emailVerificationFailed }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Password resets requested</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.authentication.passwordResetRequested }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Password resets succeeded</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.authentication.passwordResetSucceeded }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Password resets failed</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.authentication.passwordResetFailed }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+        <h2 class="text-xl font-semibold text-brand-plum">Document processing</h2>
+
+        <dl class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Extractions succeeded</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.documentProcessing.extractionSucceeded }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Extractions failed</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.documentProcessing.extractionFailed }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Average successful extraction</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">
+              {{ formatDuration(currentSummary.documentProcessing.averageSuccessfulExtractionDurationMs) }}
+            </dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">AI summaries succeeded</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.documentProcessing.aiSummarisationSucceeded }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">AI summaries failed</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.documentProcessing.aiSummarisationFailed }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Average successful AI summary</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">
+              {{ formatDuration(currentSummary.documentProcessing.averageSuccessfulAiSummarisationDurationMs) }}
+            </dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Timeout failures</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.documentProcessing.timeoutFailures }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Service unavailable</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.documentProcessing.serviceUnavailableFailures }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Processing errors</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.documentProcessing.processingErrorFailures }}</dd>
+          </div>
+
+          <div>
+            <dt class="text-sm font-semibold text-brand-plum/70">Unknown failures</dt>
+            <dd class="mt-1 text-xl font-semibold text-brand-plum">{{ currentSummary.documentProcessing.unknownFailures }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <div class="grid gap-6 lg:grid-cols-2">
+        <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+          <h2 class="text-xl font-semibold text-brand-plum">Patient activity</h2>
+          <p class="mt-1 text-sm text-brand-plum/70">
+            {{ currentSummary.patientActivity.total }} operational patient-activity events in the range.
+          </p>
+
+          @if (currentSummary.patientActivity.breakdown.length === 0) {
+            <p class="mt-4 text-brand-plum/60">No patient activity was recorded in this range.</p>
+          } @else {
+            <div class="mt-5 overflow-x-auto">
+              <table class="w-full min-w-[28rem] text-left text-sm">
+                <thead>
+                <tr class="border-b border-brand-plum/20 text-brand-plum/70">
+                  <th class="pb-2 pr-4 font-semibold">Resource</th>
+                  <th class="pb-2 pr-4 font-semibold">Action</th>
+                  <th class="pb-2 text-right font-semibold">Count</th>
+                </tr>
+                </thead>
+
+                <tbody class="divide-y divide-brand-plum/10">
+                  @for (item of currentSummary.patientActivity.breakdown; track item.resourceType + '-' + item.action) {
+                    <tr>
+                      <td class="py-2 pr-4 text-brand-plum">{{ getResourceTypeLabel(item.resourceType) }}</td>
+                      <td class="py-2 pr-4 text-brand-plum">{{ getPatientActionLabel(item.action) }}</td>
+                      <td class="py-2 text-right font-semibold text-brand-plum">{{ item.count }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </section>
+
+        <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
+          <h2 class="text-xl font-semibold text-brand-plum">Page views</h2>
+          <p class="mt-1 text-sm text-brand-plum/70">
+            {{ currentSummary.pageViews.total }} coarse application page views in the range.
+          </p>
+
+          @if (currentSummary.pageViews.breakdown.length === 0) {
+            <p class="mt-4 text-brand-plum/60">No page views were recorded in this range.</p>
+          } @else {
+            <div class="mt-5 overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead>
+                <tr class="border-b border-brand-plum/20 text-brand-plum/70">
+                  <th class="pb-2 pr-4 font-semibold">Page</th>
+                  <th class="pb-2 text-right font-semibold">Views</th>
+                </tr>
+                </thead>
+
+                <tbody class="divide-y divide-brand-plum/10">
+                  @for (item of currentSummary.pageViews.breakdown; track item.page) {
+                    <tr>
+                      <td class="py-2 pr-4 text-brand-plum">{{ getPageLabel(item.page) }}</td>
+                      <td class="py-2 text-right font-semibold text-brand-plum">{{ item.count }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </section>
+      </div>
+    </div>
+  }
+</section>
