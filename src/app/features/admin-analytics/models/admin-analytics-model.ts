@@ -15,8 +15,10 @@ export const AUTHENTICATION_ACTIONS = [
   'REGISTRATION',
   'EMAIL_VERIFICATION',
   'PASSWORD_RESET',
+  'PASSWORD_CHANGE',
   'LOGIN',
   'MFA_SETUP',
+  'MFA_DISABLE',
   'MFA_CHALLENGE',
   'MFA_LOGIN',
 ] as const;
@@ -32,6 +34,7 @@ export const AUTHENTICATION_OUTCOMES = [
   'FAILED',
   'BLOCKED',
   'ENABLED',
+  'DISABLED',
   'MFA_REQUIRED',
 ] as const;
 

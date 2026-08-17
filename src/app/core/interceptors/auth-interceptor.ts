@@ -11,6 +11,7 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const router = inject(Router);
 
   const authUrl = `${environment.apiBaseUrl}/auth`;
+  const pageViewsUrl = `${environment.apiBaseUrl}/analytics/page-views`;
 
   const publicAuthUrls = [
     `${authUrl}/register`,
@@ -24,6 +25,7 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
 
   const isApiRequest = request.url.startsWith(environment.apiBaseUrl);
   const isPublicAuthRequest = publicAuthUrls.includes(request.url);
+  const isOptionalAuthenticationRequest = request.url === pageViewsUrl;
   const accessToken = isApiRequest && !isPublicAuthRequest ? authService.getAccessToken() : null;
 
   const authenticatedRequest = accessToken === null
@@ -36,7 +38,12 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
 
   return next(authenticatedRequest).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401 && isApiRequest && !isPublicAuthRequest) {
+      if (
+        error.status === 401
+        && isApiRequest
+        && !isPublicAuthRequest
+        && !isOptionalAuthenticationRequest
+      ) {
         authService.logout();
         void router.navigate(['/login']);
       }
