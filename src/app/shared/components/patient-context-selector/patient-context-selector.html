@@ -1,34 +1,81 @@
-<label
-  [for]="selectId()"
-  [class.sr-only]="!showLabel()"
-  [class.mb-1]="showLabel()"
-  [class.block]="showLabel()"
-  [class.text-sm]="showLabel()"
-  [class.font-semibold]="showLabel()"
->
-  Patient
-</label>
-
-<select
-  [id]="selectId()"
-  class="rounded-md border border-brand-peach bg-brand-off-white px-3 py-2 text-sm font-medium text-brand-plum disabled:cursor-not-allowed disabled:opacity-60"
+<div
+  class="relative"
   [class.w-full]="fullWidth()"
-  [class.max-w-64]="!fullWidth()"
-  [ngModel]="selectedPatientRecordId() ?? ''"
-  [disabled]="isLoading() || loadFailed()"
-  (ngModelChange)="selectPatient($event)"
+  [class.max-w-72]="!fullWidth()"
+  (click)="$event.stopPropagation()"
 >
-  @if (isLoading()) {
-    <option value="">Loading patients...</option>
-  } @else if (loadFailed()) {
-    <option value="">Unable to load patients</option>
-  } @else if (patientContexts().length === 0) {
-    <option value="">No patient access</option>
-  } @else {
-    @for (context of patientContexts(); track context.patientRecordId) {
-      <option [value]="context.patientRecordId">
-        {{ patientContextLabel(context) }}
-      </option>
-    }
+  <label
+    [for]="selectId()"
+    [class.sr-only]="!showLabel()"
+    [class.mb-1]="showLabel()"
+    [class.block]="showLabel()"
+    [class.text-sm]="showLabel()"
+    [class.font-semibold]="showLabel()"
+  >
+    Patient
+  </label>
+
+  <button
+    type="button"
+    [id]="selectId()"
+    class="flex h-10 w-full items-center justify-between gap-3 rounded-md border border-brand-peach bg-brand-off-white px-4 text-sm font-medium text-brand-plum transition-colors hover:bg-brand-pink focus:outline-none focus:ring-2 focus:ring-brand-mint/50 disabled:cursor-not-allowed disabled:opacity-60"
+    aria-haspopup="listbox"
+    [attr.aria-expanded]="menuOpen()"
+    [attr.aria-controls]="selectId() + '-options'"
+    [disabled]="isLoading() || loadFailed() || patientContexts().length === 0"
+    (click)="toggleMenu($event)"
+  >
+    <span class="min-w-0 truncate text-left">{{ triggerLabel() }}</span>
+
+    <svg
+      class="h-4 w-4 shrink-0 transition-transform"
+      [class.rotate-180]="menuOpen()"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path
+        fill-rule="evenodd"
+        d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.51a.75.75 0 0 1-1.08 0l-4.25-4.51a.75.75 0 0 1 .02-1.06Z"
+        clip-rule="evenodd"
+      />
+    </svg>
+  </button>
+
+  @if (menuOpen()) {
+    <div
+      [id]="selectId() + '-options'"
+      role="listbox"
+      class="absolute right-0 z-50 mt-2 max-h-72 w-full min-w-72 overflow-y-auto rounded-md border border-brand-peach bg-brand-off-white py-2 text-brand-plum shadow-lg"
+    >
+      @for (context of patientContexts(); track context.patientRecordId) {
+        <button
+          type="button"
+          role="option"
+          class="flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-brand-pink focus:bg-brand-pink focus:outline-none"
+          [class.bg-brand-pink]="isSelected(context)"
+          [class.font-semibold]="isSelected(context)"
+          [attr.aria-selected]="isSelected(context)"
+          (click)="selectPatient(context.patientRecordId, $event)"
+        >
+          <span class="min-w-0">
+            <span class="block truncate">{{ patientName(context) }}</span>
+            <span class="mt-0.5 block text-xs font-normal text-brand-plum/60">
+              {{ context.contextType === 'SELF' ? 'Your record' : 'Carer access' }}
+            </span>
+          </span>
+
+          @if (isSelected(context)) {
+            <svg class="h-4 w-4 shrink-0 text-brand-plum" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path
+                fill-rule="evenodd"
+                d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.25 7.31a1 1 0 0 1-1.42.003l-3.75-3.75a1 1 0 1 1 1.414-1.414l3.04 3.04 6.543-6.598a1 1 0 0 1 1.417-.005Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          }
+        </button>
+      }
+    </div>
   }
-</select>
+</div>

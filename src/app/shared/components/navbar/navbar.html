@@ -3,24 +3,78 @@
     <div class="grid min-h-16 grid-cols-[1fr_auto_1fr] items-center gap-4 py-2">
       <a
         [routerLink]="isAuthenticated() ? '/home' : '/'"
-        class="col-start-1 justify-self-start text-lg font-bold text-brand-off-white"
+        class="col-start-1 shrink-0 justify-self-start"
+        aria-label="The Appointment Pack"
         (click)="closeMenus()"
       >
-        The Appointment Pack
+        <img
+          src="navbar-logo-on-plum.svg"
+          alt="The Appointment Pack"
+          class="h-12 w-auto object-contain"
+        >
       </a>
 
       @if (isAuthenticated()) {
         <div class="col-start-2 hidden items-center gap-1 justify-self-center xl:flex">
-          @for (item of navigationItems; track item.route) {
-            @if (canViewNavigationItem(item)) {
-              <a
-                [routerLink]="item.route"
-                routerLinkActive="bg-brand-pink text-brand-plum"
-                [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
-                class="btn btn-ghost"
-              >
-                {{ item.label }}
-              </a>
+          <a
+            [routerLink]="dashboardItem.route"
+            routerLinkActive="bg-brand-pink text-brand-plum"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="btn btn-ghost"
+            (click)="closeMenus()"
+          >
+            {{ dashboardItem.label }}
+          </a>
+
+          @for (group of navigationGroups; track group.key) {
+            @if (canViewNavigationGroup(group)) {
+              <div class="relative">
+                <button
+                  type="button"
+                  class="btn btn-ghost"
+                  [class.bg-brand-pink]="isNavigationGroupActive(group)"
+                  [class.text-brand-plum]="isNavigationGroupActive(group)"
+                  [attr.aria-expanded]="isNavigationGroupOpen(group)"
+                  [attr.aria-controls]="'desktop-navigation-' + group.key"
+                  (click)="toggleNavigationGroup(group)"
+                >
+                  <span>{{ group.label }}</span>
+                  <svg
+                    class="h-4 w-4 transition-transform"
+                    [class.rotate-180]="isNavigationGroupOpen(group)"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.51a.75.75 0 0 1-1.08 0l-4.25-4.51a.75.75 0 0 1 .02-1.06Z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </button>
+
+                @if (isNavigationGroupOpen(group)) {
+                  <div
+                    [id]="'desktop-navigation-' + group.key"
+                    class="absolute left-1/2 z-50 mt-2 w-56 -translate-x-1/2 rounded-md border border-brand-peach bg-brand-off-white py-2 text-brand-plum shadow-lg"
+                  >
+                    @for (item of group.items; track item.route) {
+                      @if (canViewNavigationItem(item)) {
+                        <a
+                          [routerLink]="item.route"
+                          routerLinkActive="bg-brand-pink font-semibold"
+                          [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+                          class="block px-4 py-2 text-sm hover:bg-brand-pink"
+                          (click)="closeMenus()"
+                        >
+                          {{ item.label }}
+                        </a>
+                      }
+                    }
+                  </div>
+                }
+              </div>
             }
           }
         </div>
@@ -125,7 +179,7 @@
         </div>
 
         <div class="flex flex-col gap-1">
-          @for (item of navigationItems; track item.route) {
+          @for (item of mobileNavigationItems; track item.route) {
             @if (canViewNavigationItem(item)) {
               <a
                 [routerLink]="item.route"

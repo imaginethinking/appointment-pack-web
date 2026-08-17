@@ -14,16 +14,25 @@ interface NavigationItem {
   exact?: boolean;
 }
 
-const NAVIGATION_ITEMS: readonly NavigationItem[] = [
+interface NavigationGroup {
+  key: NavigationGroupKey;
+  label: string;
+  items: readonly NavigationItem[];
+}
+
+type NavigationGroupKey = 'appointments' | 'health-record' | 'care';
+
+const DASHBOARD_ITEM: NavigationItem = {
+  label: 'Dashboard',
+  route: '/home',
+  exact: true,
+};
+
+const APPOINTMENT_NAVIGATION_ITEMS: readonly NavigationItem[] = [
   {
-    label: 'Dashboard',
-    route: '/home',
-    exact: true,
-  },
-  {
-    label: 'Patient Record',
-    route: '/patient',
-    permission: 'patient-record:view',
+    label: 'Appointments',
+    route: '/appointments',
+    permission: 'appointment:view',
   },
   {
     label: 'Documents',
@@ -31,24 +40,22 @@ const NAVIGATION_ITEMS: readonly NavigationItem[] = [
     permission: 'document:view',
   },
   {
-    label: 'Appointments',
-    route: '/appointments',
-    permission: 'appointment:view',
-  },
-  {
     label: 'Appointment Packs',
     route: '/appointment-packs',
     permission: 'appointment-pack:view',
+  },
+];
+
+const HEALTH_RECORD_NAVIGATION_ITEMS: readonly NavigationItem[] = [
+  {
+    label: 'Patient Record',
+    route: '/patient',
+    permission: 'patient-record:view',
   },
   {
     label: 'Medications',
     route: '/medications',
     permission: 'medication:view',
-  },
-  {
-    label: 'Contacts',
-    route: '/contacts',
-    permission: 'contact:view',
   },
   {
     label: 'Blood Results',
@@ -61,14 +68,47 @@ const NAVIGATION_ITEMS: readonly NavigationItem[] = [
     permission: 'history:view',
   },
   {
-    label: 'Activity History',
-    route: '/activity-history',
-    permission: 'audit:view',
+    label: 'Contacts',
+    route: '/contacts',
+    permission: 'contact:view',
   },
+];
+
+const CARE_NAVIGATION_ITEMS: readonly NavigationItem[] = [
   {
     label: 'Care Network',
     route: '/care-network',
   },
+  {
+    label: 'Activity History',
+    route: '/activity-history',
+    permission: 'audit:view',
+  },
+];
+
+const NAVIGATION_GROUPS: readonly NavigationGroup[] = [
+  {
+    key: 'appointments',
+    label: 'Appointments',
+    items: APPOINTMENT_NAVIGATION_ITEMS,
+  },
+  {
+    key: 'health-record',
+    label: 'Health Record',
+    items: HEALTH_RECORD_NAVIGATION_ITEMS,
+  },
+  {
+    key: 'care',
+    label: 'Care',
+    items: CARE_NAVIGATION_ITEMS,
+  },
+];
+
+const MOBILE_NAVIGATION_ITEMS: readonly NavigationItem[] = [
+  DASHBOARD_ITEM,
+  ...APPOINTMENT_NAVIGATION_ITEMS,
+  ...HEALTH_RECORD_NAVIGATION_ITEMS,
+  ...CARE_NAVIGATION_ITEMS,
 ];
 
 @Component({
@@ -84,29 +124,57 @@ export class Navbar {
 
   protected readonly isAuthenticated = this.authService.authenticated;
   protected readonly isAdmin = this.authService.isAdmin;
-  protected readonly navigationItems = NAVIGATION_ITEMS;
+  protected readonly dashboardItem = DASHBOARD_ITEM;
+  protected readonly navigationGroups = NAVIGATION_GROUPS;
+  protected readonly mobileNavigationItems = MOBILE_NAVIGATION_ITEMS;
 
   protected mobileMenuOpen = false;
   protected profileMenuOpen = false;
+  protected openNavigationGroup: NavigationGroupKey | null = null;
 
   protected canViewNavigationItem(item: NavigationItem): boolean {
     return item.permission === undefined
       || this.authorisation.has(this.selectedPatientState.selectedPatient(), item.permission);
   }
 
+  protected canViewNavigationGroup(group: NavigationGroup): boolean {
+    return group.items.some((item) => this.canViewNavigationItem(item));
+  }
+
+  protected isNavigationGroupOpen(group: NavigationGroup): boolean {
+    return this.openNavigationGroup === group.key;
+  }
+
+  protected isNavigationGroupActive(group: NavigationGroup): boolean {
+    const currentUrl = this.router.url.split('?')[0].split('#')[0];
+
+    return group.items
+      .filter((item) => this.canViewNavigationItem(item))
+      .some((item) => currentUrl === item.route || currentUrl.startsWith(`${item.route}/`));
+  }
+
+  protected toggleNavigationGroup(group: NavigationGroup): void {
+    this.openNavigationGroup = this.openNavigationGroup === group.key ? null : group.key;
+    this.mobileMenuOpen = false;
+    this.profileMenuOpen = false;
+  }
+
   protected toggleMobileMenu(): void {
     this.mobileMenuOpen = !this.mobileMenuOpen;
     this.profileMenuOpen = false;
+    this.openNavigationGroup = null;
   }
 
   protected toggleProfileMenu(): void {
     this.profileMenuOpen = !this.profileMenuOpen;
     this.mobileMenuOpen = false;
+    this.openNavigationGroup = null;
   }
 
   protected closeMenus(): void {
     this.mobileMenuOpen = false;
     this.profileMenuOpen = false;
+    this.openNavigationGroup = null;
   }
 
   protected logout(): void {

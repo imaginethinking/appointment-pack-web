@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 360" role="img" aria-label="The Appointment Pack">
+  <g transform="translate(30 30) scale(.586)">
+    <rect x="78" y="94" width="252" height="324" rx="30" fill="#F3CEB9"/>
+    <rect x="119" y="94" width="252" height="324" rx="30" fill="#F9CDDB"/>
+    <rect x="160" y="94" width="252" height="324" rx="30" fill="#FFF8F2"/>
+    <rect x="378" y="117" width="12" height="44" rx="6" fill="#6AD7AE"/>
+    <text x="286" y="287" text-anchor="middle" dominant-baseline="middle"
+          font-family="Inter Display, Inter, Arial, sans-serif"
+          font-size="102" font-weight="700" fill="#3A303B">AP</text>
+  </g>
+  <text x="355" y="185" dominant-baseline="middle"
+        font-family="Inter Display, Inter, Arial, sans-serif"
+        font-size="112" font-weight="700" fill="#FFF8F2">The Appointment Pack</text>
+</svg>
