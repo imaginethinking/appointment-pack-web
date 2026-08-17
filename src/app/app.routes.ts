@@ -43,6 +43,7 @@ import { SummaryReview } from './features/documents/pages/summary-review/summary
 import { AccessDenied } from './features/errors/pages/access-denied/access-denied';
 import { NotFound } from './features/errors/pages/not-found/not-found';
 import { Home } from './features/home/pages/home/home';
+import { Landing } from './features/landing/pages/landing/landing';
 import { MedicalHistoryCreate } from './features/medical-history/pages/medical-history-create/medical-history-create';
 import { MedicalHistoryDetails } from './features/medical-history/pages/medical-history-details/medical-history-details';
 import { MedicalHistoryEdit } from './features/medical-history/pages/medical-history-edit/medical-history-edit';
@@ -62,7 +63,7 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'login',
+    component: Landing,
   },
   {
     path: 'register',

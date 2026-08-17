@@ -14,9 +14,9 @@
   class="rounded-md border border-brand-peach bg-brand-off-white px-3 py-2 text-sm font-medium text-brand-plum disabled:cursor-not-allowed disabled:opacity-60"
   [class.w-full]="fullWidth()"
   [class.max-w-64]="!fullWidth()"
-  [value]="selectedPatientRecordId() ?? ''"
+  [ngModel]="selectedPatientRecordId() ?? ''"
   [disabled]="isLoading() || loadFailed()"
-  (change)="selectPatient($event)"
+  (ngModelChange)="selectPatient($event)"
 >
   @if (isLoading()) {
     <option value="">Loading patients...</option>

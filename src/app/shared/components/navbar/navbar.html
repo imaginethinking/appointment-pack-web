@@ -2,7 +2,7 @@
   <div class="w-full px-4 sm:px-6 lg:px-8">
     <div class="grid min-h-16 grid-cols-[1fr_auto_1fr] items-center gap-4 py-2">
       <a
-        [routerLink]="isAuthenticated() ? '/home' : '/login'"
+        [routerLink]="isAuthenticated() ? '/home' : '/'"
         class="col-start-1 justify-self-start text-lg font-bold text-brand-off-white"
         (click)="closeMenus()"
       >
@@ -108,7 +108,7 @@
           </a>
 
           <a routerLink="/register" routerLinkActive="bg-brand-pink text-brand-plum" class="btn btn-secondary">
-            Register
+            Create account
           </a>
         }
       </div>

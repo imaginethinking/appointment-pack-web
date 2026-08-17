@@ -17,7 +17,9 @@ export class SelectedPatientState {
   private readonly authorisation = inject(PatientContextAuthorisation);
 
   private readonly selectedPatientRecordIdKey = 'appointmentPack.selectedPatientRecordId';
-  private readonly selectedPatientRecordIdValue = signal<string | null>(null);
+  private readonly selectedPatientRecordIdValue = signal<string | null>(
+    sessionStorage.getItem(this.selectedPatientRecordIdKey),
+  );
 
   readonly selectedPatientRecordId = this.selectedPatientRecordIdValue.asReadonly();
 
@@ -87,9 +89,7 @@ export class SelectedPatientState {
 
   revalidateSelection(): void {
     const contexts = this.contexts();
-    const selectedPatientRecordId = this.selectedPatientRecordIdValue();
-    const storedPatientRecordId = sessionStorage.getItem(this.selectedPatientRecordIdKey);
-    const preferredPatientRecordId = selectedPatientRecordId ?? storedPatientRecordId;
+    const preferredPatientRecordId = this.selectedPatientRecordIdValue();
 
     const preferredContext = contexts.find(
       (context) => context.patientRecordId === preferredPatientRecordId && this.canSelect(context),

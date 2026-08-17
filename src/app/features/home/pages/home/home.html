@@ -1,209 +1,198 @@
-<section class="app-page">
-  <div class="mb-8">
-    <h1 class="text-3xl font-bold text-brand-plum">
-      Dashboard
-    </h1>
-
-    @if (profile(); as currentProfile) {
-      <p class="mt-1 text-brand-plum/70">
-        Welcome,
-        {{ currentProfile.firstName }}
-        {{ currentProfile.lastName }}.
-      </p>
-    } @else {
-      <p class="mt-1 text-brand-plum/70">
-        Review your account, patient records and care network.
-      </p>
-    }
-  </div>
-
+<section class="app-page space-y-7">
   @if (isLoading()) {
-    <div
-      class="mb-6 rounded-lg border border-brand-plum/20 bg-brand-off-white p-4 text-brand-plum"
-      role="status"
-    >
-      Loading your account information...
+    <div class="rounded-xl border border-brand-plum/15 bg-brand-off-white p-4 text-brand-plum" role="status">
+      Loading your information...
     </div>
   }
 
   @if (loadFailed()) {
-    <div
-      class="mb-6 rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral"
-      role="alert"
-    >
-      Some patient information could not be loaded. You can still use the other areas of your account.
+    <div class="rounded-xl border border-brand-coral bg-brand-off-white p-4 text-brand-coral" role="alert">
+      Some information could not be loaded. Try refreshing the page.
     </div>
   }
 
-  <div class="grid gap-6 md:grid-cols-2">
-    <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
-      <h2 class="text-xl font-semibold text-brand-plum">
-        Selected patient
-      </h2>
+  <section class="relative overflow-hidden rounded-3xl bg-brand-plum p-7 text-brand-off-white shadow-sm sm:p-9">
+    <div class="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-brand-pink/15 blur-3xl" aria-hidden="true"></div>
+    <div class="pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full bg-brand-mint/10 blur-3xl" aria-hidden="true"></div>
 
-      @if (selectedPatient()) {
-        <p class="mt-3 text-lg font-medium text-brand-plum">
-          {{ selectedPatientName() }}
-        </p>
-
-        <p class="mt-1 text-sm text-brand-plum/70">
-          {{ selectedPatientContextLabel() }}
-        </p>
-
-        @if (canOpenSelectedPatient()) {
-          <a
-            routerLink="/patient"
-            class="btn btn-primary mt-5"
-          >
-            Open record
-          </a>
+    <div class="relative grid gap-7 lg:grid-cols-[1fr_auto] lg:items-end">
+      <div>
+        @if (profile(); as currentProfile) {
+          <p class="text-sm font-semibold text-brand-pink">Welcome back, {{ currentProfile.firstName }}</p>
         } @else {
-          <p class="mt-4 text-sm text-brand-plum/70">
-            This patient record is not available with your current access.
-          </p>
+          <p class="text-sm font-semibold text-brand-pink">Dashboard</p>
         }
-      } @else {
-        <p class="mt-3 text-brand-plum/70">
-          No patient record is currently selected.
+        <h1 class="mt-2 text-3xl font-bold sm:text-4xl">Prepare for care</h1>
+        <p class="mt-3 max-w-2xl leading-7 text-brand-off-white/75">
+          Keep appointment information and healthcare records organised for the patient currently selected.
         </p>
-      }
-    </article>
-
-    <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
-      <h2 class="text-xl font-semibold text-brand-plum">
-        Your patient record
-      </h2>
-
-      @if (personalPatientRecord()) {
-        <p class="mt-3 text-brand-plum/70">
-          Your patient record is ready to use.
-        </p>
-
-        <a
-          routerLink="/patient"
-          class="btn btn-primary mt-5"
-        >
-          Open record
-        </a>
-      } @else {
-        <p class="mt-3 text-brand-plum/70">
-          Create your patient record to keep key healthcare information in one place.
-        </p>
-
-        <a
-          routerLink="/patient/create"
-          class="btn btn-primary mt-5"
-        >
-          Create record
-        </a>
-      }
-    </article>
-
-    <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
-      <div class="flex items-start justify-between gap-4">
-        <h2 class="text-xl font-semibold text-brand-plum">
-          Patient invitations
-        </h2>
-
-        @if (pendingInvitations().length > 0) {
-          <span class="rounded-full bg-brand-peach px-3 py-1 text-sm font-semibold text-brand-plum">
-            {{ pendingInvitations().length }}
-          </span>
-        }
       </div>
 
-      @if (pendingInvitations().length === 0) {
-        <p class="mt-3 text-brand-plum/70">
-          You have no invitations waiting for review.
-        </p>
+      @if (selectedPatient()) {
+        <div class="min-w-64 rounded-2xl border border-brand-off-white/15 bg-brand-off-white/10 p-5">
+          <p class="text-sm text-brand-off-white/65">Selected patient</p>
+          <p class="mt-1 text-xl font-semibold">{{ selectedPatientName() }}</p>
+          <span class="mt-3 inline-flex rounded-full bg-brand-mint px-3 py-1 text-xs font-semibold text-brand-plum">
+            {{ selectedPatientContextLabel() }}
+          </span>
+
+          @if (canOpenSelectedPatient()) {
+            <div class="mt-4">
+              <a routerLink="/patient" class="text-sm font-semibold text-brand-off-white underline decoration-brand-pink decoration-2 underline-offset-4">View record</a>
+            </div>
+          }
+        </div>
       } @else {
-        <p class="mt-3 text-brand-plum/70">
-          You have
-          {{ pendingInvitations().length }}
-          pending
-          {{
-            pendingInvitations().length === 1
-              ? 'invitation'
-              : 'invitations'
-          }}
-          to review.
-        </p>
+        <div class="min-w-64 rounded-2xl border border-brand-off-white/15 bg-brand-off-white/10 p-5">
+          <p class="text-sm text-brand-off-white/65">Selected patient</p>
+          <p class="mt-1 font-semibold">No patient selected</p>
+          <p class="mt-2 text-sm text-brand-off-white/70">Choose a patient from the navigation bar to continue.</p>
+        </div>
       }
+    </div>
+  </section>
 
-      <a
-        routerLink="/care-network/patients"
-        class="btn btn-primary mt-5"
-      >
-        Review access
-      </a>
-    </article>
-
-    <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
-      <h2 class="text-xl font-semibold text-brand-plum">
-        Your care network
-      </h2>
-
-      @if (personalPatientRecord()) {
-        <p class="mt-3 text-brand-plum/70">
-          Invite people who support you and choose the information they can access.
+  @if (!personalPatientRecord()) {
+    <section class="rounded-3xl border border-brand-mint/70 bg-brand-mint/25 p-6 shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-8 sm:p-7">
+      <div class="max-w-3xl">
+        <span class="inline-flex rounded-full bg-brand-off-white px-3 py-1 text-xs font-semibold text-brand-plum">Your healthcare</span>
+        <h2 class="mt-3 text-2xl font-bold text-brand-plum">Create your patient record</h2>
+        <p class="mt-2 leading-7 text-brand-plum/70">
+          Create your own record to manage your appointments and healthcare information. Your record is separate from any patients you support as a carer.
         </p>
-      } @else {
-        <p class="mt-3 text-brand-plum/70">
-          Create your patient record before adding people to your care network.
-        </p>
-      }
+      </div>
 
-      <a
-        routerLink="/care-network/carers"
-        class="btn btn-primary mt-5"
-      >
-        Manage network
-      </a>
-    </article>
+      <a routerLink="/patient/create" class="btn btn-primary mt-5 shrink-0 sm:mt-0">Create record</a>
+    </section>
+  }
 
-    <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
-      <h2 class="text-xl font-semibold text-brand-plum">
-        Profile
-      </h2>
-
-      @if (profile(); as currentProfile) {
-        <p class="mt-3 font-medium text-brand-plum">
-          {{ currentProfile.firstName }}
-          {{ currentProfile.lastName }}
-        </p>
-
+  @if (pendingInvitations().length > 0) {
+    <section class="rounded-2xl border border-brand-pink bg-brand-pink/40 p-5 sm:flex sm:items-center sm:justify-between sm:gap-6">
+      <div>
+        <p class="font-semibold text-brand-plum">New care invitation{{ pendingInvitations().length === 1 ? '' : 's' }}</p>
         <p class="mt-1 text-sm text-brand-plum/70">
-          Review and update your personal details.
+          {{ pendingInvitations().length }} invitation{{ pendingInvitations().length === 1 ? ' is' : 's are' }} waiting for your response.
         </p>
+      </div>
+      <a routerLink="/care-network/patients" class="btn btn-primary mt-4 sm:mt-0">Review invites</a>
+    </section>
+  }
+
+  @if (selectedPatient()) {
+    <section>
+      <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p class="text-sm font-semibold text-brand-plum/60">Appointment preparation</p>
+          <h2 class="mt-1 text-2xl font-bold text-brand-plum">Prepare for an appointment</h2>
+        </div>
+        <p class="text-sm text-brand-plum/60">For {{ selectedPatientName() }}</p>
+      </div>
+
+      @if (appointmentFeatures().length === 0) {
+        <div class="rounded-2xl border border-brand-plum/15 bg-brand-off-white p-5 text-brand-plum/70">
+          Appointment preparation is not available with your current access.
+        </div>
       } @else {
-        <p class="mt-3 text-brand-plum/70">
-          Your profile information could not be displayed.
-        </p>
+        <div class="grid gap-4 lg:grid-cols-3">
+          @for (feature of appointmentFeatures(); track feature.route) {
+            @if (feature.featured) {
+              <a
+                [routerLink]="feature.route"
+                class="group flex min-h-52 flex-col rounded-2xl border border-brand-plum bg-brand-plum p-6 text-brand-off-white transition hover:-translate-y-0.5 hover:shadow-md"
+              >
+                <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-mint text-brand-plum" aria-hidden="true">
+                  <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 5h14v16H5V5Zm4-2h6v4H9V3Zm0 8h6m-6 4h6" /></svg>
+                </span>
+                <h3 class="mt-5 text-xl font-semibold">{{ feature.title }}</h3>
+                <p class="mt-2 flex-1 leading-6 text-brand-off-white/75">{{ feature.description }}</p>
+                <span class="mt-5 text-sm font-semibold text-brand-pink">Open <span aria-hidden="true">→</span></span>
+              </a>
+            } @else {
+              <a
+                [routerLink]="feature.route"
+                class="group flex min-h-52 flex-col rounded-2xl border border-brand-plum/15 bg-brand-off-white p-6 transition hover:-translate-y-0.5 hover:border-brand-plum/30 hover:shadow-md"
+              >
+                <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-pink text-brand-plum" aria-hidden="true">
+                  @if (feature.route === '/appointments') {
+                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 2v3m8-3v3M4 9h16M5 4h14a1 1 0 0 1 1 1v15H4V5a1 1 0 0 1 1-1Z" /></svg>
+                  } @else {
+                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 3h7l4 4v14H7V3Zm7 0v5h5M10 12h5m-5 4h5" /></svg>
+                  }
+                </span>
+                <h3 class="mt-5 text-xl font-semibold text-brand-plum">{{ feature.title }}</h3>
+                <p class="mt-2 flex-1 leading-6 text-brand-plum/70">{{ feature.description }}</p>
+                <span class="mt-5 text-sm font-semibold text-brand-plum">Open <span aria-hidden="true">→</span></span>
+              </a>
+            }
+          }
+        </div>
       }
+    </section>
 
-      <a
-        routerLink="/profile"
-        class="btn btn-secondary mt-5"
-      >
-        Open profile
-      </a>
-    </article>
+    <section>
+      <div class="mb-4">
+        <p class="text-sm font-semibold text-brand-plum/60">Patient information</p>
+        <h2 class="mt-1 text-2xl font-bold text-brand-plum">Health record</h2>
+      </div>
 
-    <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
-      <h2 class="text-xl font-semibold text-brand-plum">
-        Account security
-      </h2>
+      @if (healthRecordFeatures().length === 0) {
+        <div class="rounded-2xl border border-brand-plum/15 bg-brand-off-white p-5 text-brand-plum/70">
+          Health record information is not available with your current access.
+        </div>
+      } @else {
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          @for (feature of healthRecordFeatures(); track feature.route) {
+            <a
+              [routerLink]="feature.route"
+              class="group flex min-h-44 flex-col rounded-2xl border border-brand-plum/15 bg-brand-off-white p-5 transition hover:-translate-y-0.5 hover:border-brand-plum/30 hover:shadow-sm"
+            >
+              <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-mint/30 text-brand-plum" aria-hidden="true">
+                @if (feature.route === '/medications') {
+                  <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m8 16 8-8a4.24 4.24 0 0 0-6-6L2 10a4.24 4.24 0 0 0 6 6Zm-2-8 6 6" /></svg>
+                } @else if (feature.route === '/blood-results') {
+                  <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3s5 5.5 5 10a5 5 0 0 1-10 0c0-4.5 5-10 5-10Zm-2 11a2 2 0 0 0 2 2" /></svg>
+                } @else if (feature.route === '/medical-history') {
+                  <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 21s-8-4.8-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.2-8 11-8 11Zm0-10v5m-2.5-2.5h5" /></svg>
+                } @else {
+                  <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 5h10v14H7V5Zm3-2h4v4h-4V3Zm-1 8h6m-6 4h4" /></svg>
+                }
+              </span>
+              <h3 class="mt-4 text-lg font-semibold text-brand-plum">{{ feature.title }}</h3>
+              <p class="mt-2 flex-1 text-sm leading-6 text-brand-plum/70">{{ feature.description }}</p>
+              <span class="mt-4 text-sm font-semibold text-brand-plum">Open <span aria-hidden="true">→</span></span>
+            </a>
+          }
+        </div>
+      }
+    </section>
+  }
 
-      <p class="mt-3 text-brand-plum/70">
-        Manage your password and multi-factor authentication.
-      </p>
+  <section class="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
+    <div class="rounded-3xl border border-brand-plum/15 bg-brand-off-white p-6 shadow-sm">
+      <p class="text-sm font-semibold text-brand-plum/60">Access and activity</p>
+      <h2 class="mt-1 text-2xl font-bold text-brand-plum">Care network</h2>
+      <p class="mt-3 leading-7 text-brand-plum/70">Manage people who support your care and the patients you support.</p>
 
-      <a
-        routerLink="/profile/settings/mfa"
-        class="btn btn-secondary mt-5"
-      >
-        Open security
-      </a>
-    </article>
-  </div>
+      <div class="mt-5 flex flex-wrap gap-3">
+        <a routerLink="/care-network" class="btn btn-primary">Care network</a>
+        @if (canViewActivityHistory()) {
+          <a routerLink="/activity-history" class="btn btn-secondary">Activity history</a>
+        }
+      </div>
+    </div>
+
+    <div class="rounded-3xl border border-brand-plum/15 bg-brand-off-white p-6 shadow-sm">
+      <p class="text-sm font-semibold text-brand-plum/60">Your account</p>
+      <h2 class="mt-1 text-2xl font-bold text-brand-plum">Profile and security</h2>
+      <p class="mt-3 leading-7 text-brand-plum/70">Keep your personal details and sign-in security up to date.</p>
+
+      <div class="mt-5 flex flex-wrap gap-3">
+        <a routerLink="/profile" class="btn btn-primary">Profile</a>
+        <a routerLink="/profile/settings/mfa" class="btn btn-secondary">Security</a>
+        @if (isAdmin()) {
+          <a routerLink="/admin/analytics" class="btn btn-secondary">Analytics</a>
+        }
+      </div>
+    </div>
+  </section>
 </section>

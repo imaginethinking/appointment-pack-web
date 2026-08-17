@@ -1,4 +1,5 @@
 import { Component, inject, input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 import { getPatientContextName, SelectedPatientContext } from '../../../features/patient-context/models/selected-patient-context';
 import { PatientContextCoordinator } from '../../../features/patient-context/services/patient-context-coordinator';
@@ -6,6 +7,7 @@ import { SelectedPatientState } from '../../../features/patient-context/services
 
 @Component({
   selector: 'app-patient-context-selector',
+  imports: [FormsModule],
   templateUrl: './patient-context-selector.html',
 })
 export class PatientContextSelector {
@@ -26,9 +28,7 @@ export class PatientContextSelector {
     return `${getPatientContextName(context)} — ${relationshipLabel}`;
   }
 
-  protected selectPatient(event: Event): void {
-    const patientRecordId = (event.target as HTMLSelectElement).value;
-
+  protected selectPatient(patientRecordId: string): void {
     if (patientRecordId.length > 0) {
       this.selectedPatientState.selectPatient(patientRecordId);
     }

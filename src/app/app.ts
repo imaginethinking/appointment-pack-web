@@ -19,10 +19,19 @@ export class App {
   constructor() {
     this.pageTelemetryService.start();
 
-    effect(() => {
+    effect((onCleanup) => {
       if (!this.authService.authenticated()) {
         this.patientContextCoordinator.reset();
+        return;
       }
+
+      const subscription = this.patientContextCoordinator.load().subscribe({
+        error: () => {
+          // Patient-context load errors are exposed through coordinator state.
+        },
+      });
+
+      onCleanup(() => subscription.unsubscribe());
     });
   }
 }
