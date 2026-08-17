@@ -30,23 +30,23 @@ const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
 };
 
 const DOCUMENT_STATUS_LABELS: Record<DocumentStatus, string> = {
-  UPLOADED: 'Awaiting processing',
-  EXTRACTING: 'Extracting',
-  READY_FOR_APPOINTMENT_REVIEW: 'Awaiting appointment review',
-  READY_FOR_DEIDENTIFICATION_REVIEW: 'Awaiting de-identification review',
-  SUMMARISING: 'Generating summary',
-  READY_FOR_SUMMARY_REVIEW: 'Awaiting summary review',
-  EXTRACTION_FAILED: 'Extraction failed',
-  SUMMARISATION_FAILED: 'Summary unavailable',
-  ACCEPTED: 'Accepted',
+  UPLOADED: 'Ready to process',
+  EXTRACTING: 'Processing',
+  READY_FOR_APPOINTMENT_REVIEW: 'Ready for appointment review',
+  READY_FOR_DEIDENTIFICATION_REVIEW: 'Ready for privacy review',
+  SUMMARISING: 'Preparing summary',
+  READY_FOR_SUMMARY_REVIEW: 'Ready for summary review',
+  EXTRACTION_FAILED: 'Processing failed',
+  SUMMARISATION_FAILED: 'Summary generation failed',
+  ACCEPTED: 'Completed',
   REJECTED: 'Rejected',
   ARCHIVED: 'Archived',
 };
 
 const SUMMARY_SOURCE_LABELS: Record<SummarySource, string> = {
-  DETERMINISTIC: 'Deterministic',
-  OPENAI: 'OpenAI',
-  MANUAL: 'Manual',
+  DETERMINISTIC: 'Automatically generated',
+  OPENAI: 'AI-assisted',
+  MANUAL: 'Entered manually',
 };
 
 export interface DocumentResponse {
