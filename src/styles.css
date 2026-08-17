@@ -47,6 +47,12 @@
 }
 
 @layer components {
+  .app-page {
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+  }
+
   .btn {
     display: inline-flex;
     min-height: 2.5rem;
