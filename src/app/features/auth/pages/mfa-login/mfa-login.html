@@ -2,7 +2,7 @@
   <h1 class="mb-3 text-2xl font-bold text-brand-plum">Multi-factor authentication</h1>
 
   <p class="mb-6 text-brand-plum/70">
-    Enter the six-digit code from your authenticator application.
+    Enter the six-digit code from your authenticator app to complete sign in.
   </p>
 
   <form class="space-y-4" [formGroup]="form" novalidate (ngSubmit)="completeLogin()">
@@ -25,7 +25,7 @@
     </div>
 
     <button class="btn btn-primary w-full" type="submit" [disabled]="isSubmitting()">
-      {{ isSubmitting() ? 'Verifying...' : 'Verify and login' }}
+      {{ isSubmitting() ? 'Verifying...' : 'Verify' }}
     </button>
 
     <button class="btn btn-secondary w-full" type="button" [disabled]="isSubmitting()" (click)="cancel()">

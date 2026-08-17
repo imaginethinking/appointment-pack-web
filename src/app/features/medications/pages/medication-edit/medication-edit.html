@@ -1,9 +1,9 @@
 <section class="app-page">
   <div class="mb-6">
     @if (medication(); as currentMedication) {
-      <a [routerLink]="['/medications', currentMedication.id]" class="text-sm font-semibold text-brand-plum underline">Back to medication</a>
+      <a [routerLink]="['/medications', currentMedication.id]" class="text-sm font-semibold text-brand-plum underline">Back</a>
     } @else {
-      <a routerLink="/medications" class="text-sm font-semibold text-brand-plum underline">Back to medications</a>
+      <a routerLink="/medications" class="text-sm font-semibold text-brand-plum underline">Back</a>
     }
 
     <h1 class="mt-4 text-3xl font-bold text-brand-plum">Edit medication</h1>
@@ -19,12 +19,12 @@
   } @else if (status() === 'forbidden') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
       <h2 class="font-semibold text-brand-plum">Editing unavailable</h2>
-      <p class="mt-2 text-brand-plum/70">You do not have permission to edit this medication.</p>
+      <p class="mt-2 text-brand-plum/70">Your current access does not allow changes to this medication.</p>
     </div>
   } @else if (status() === 'invalid') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
       <p class="text-brand-plum">{{ errorMessage() }}</p>
-      <a routerLink="/medications" class="btn btn-secondary mt-4">Return to medications</a>
+      <a routerLink="/medications" class="btn btn-secondary mt-4">Back</a>
     </div>
   } @else if (status() === 'error') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
@@ -40,7 +40,7 @@
       }
 
       <div class="flex flex-wrap gap-3">
-        <button type="submit" class="btn btn-primary" [disabled]="isSaving()">{{ isSaving() ? 'Saving...' : 'Save medication' }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving()">{{ isSaving() ? 'Saving...' : 'Save' }}</button>
         <a [routerLink]="['/medications', currentMedication.id]" class="btn btn-secondary">Cancel</a>
       </div>
     </form>

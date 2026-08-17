@@ -143,7 +143,7 @@ export class DocumentDetails implements OnInit, OnDestroy {
       return;
     }
 
-    if (!window.confirm('Archive this document? It will no longer appear in the normal document list.')) {
+    if (!window.confirm('Archive this document? It will no longer appear in the document list.')) {
       return;
     }
 
@@ -167,7 +167,7 @@ export class DocumentDetails implements OnInit, OnDestroy {
         }
 
         if (hasHttpStatus(error, 409)) {
-          this.actionError.set('The document state changed before it could be archived. The latest state has been reloaded.');
+          this.actionError.set('This document was updated while you were working. The latest version has been loaded.');
           this.loadDocument(document.id, true);
           return;
         }
@@ -222,37 +222,38 @@ export class DocumentDetails implements OnInit, OnDestroy {
 
   protected workflowMessage(): string {
     const document = this.document();
+
     if (document === null) {
       return '';
     }
 
     switch (document.status) {
       case 'UPLOADED':
-        return 'The document has been uploaded and is ready for processing.';
+        return 'This document is ready to be processed.';
       case 'EXTRACTING':
-        return 'Text is currently being extracted from the document.';
+        return 'This document is being processed.';
       case 'READY_FOR_APPOINTMENT_REVIEW':
-        return 'Appointment details have been extracted and are ready for review.';
+        return 'The appointment details are ready to review.';
       case 'READY_FOR_DEIDENTIFICATION_REVIEW':
-        return 'The consultation text has been de-identified locally and is ready for review.';
+        return 'The consultation text is ready for privacy review.';
       case 'SUMMARISING':
-        return 'The approved de-identified consultation text is being summarised.';
+        return 'A consultation summary is being prepared.';
       case 'READY_FOR_SUMMARY_REVIEW':
-        return 'The consultation summary is ready for review.';
+        return 'The consultation summary is ready to review.';
       case 'EXTRACTION_FAILED':
-        return 'Text extraction did not complete successfully. You can retry without uploading the document again.';
+        return 'The document could not be processed. You can try again without uploading it again.';
       case 'SUMMARISATION_FAILED':
-        return 'External summarisation did not complete successfully. The approved de-identified text has been retained. You can retry summarisation or enter a manual summary.';
+        return 'The consultation summary could not be generated. You can try again or enter it manually.';
       case 'ACCEPTED':
         return document.documentType === 'APPOINTMENT_LETTER'
-          ? 'The appointment has been confirmed from this document.'
-          : 'The reviewed consultation summary has been accepted into medical history.';
+          ? 'The appointment details from this document have been confirmed.'
+          : 'The consultation summary has been added to medical history.';
       case 'REJECTED':
         return document.documentType === 'APPOINTMENT_LETTER'
-          ? 'The extracted appointment details were rejected and no appointment was created.'
-          : 'The consultation summary was rejected and no medical-history entry was created.';
+          ? 'The appointment details from this document were not added.'
+          : 'The consultation summary was not added to medical history.';
       case 'ARCHIVED':
-        return 'The document has been archived.';
+        return 'This document has been archived.';
     }
   }
 
@@ -302,7 +303,7 @@ export class DocumentDetails implements OnInit, OnDestroy {
     }
 
     if (hasHttpStatus(error, 409)) {
-      this.actionError.set('The document state changed before extraction could begin. The latest state has been reloaded.');
+      this.actionError.set('This document was updated while you were working. The latest version has been loaded.');
     } else if (hasHttpStatus(error, 413)) {
       this.actionError.set('The document is too large to process.');
     } else if (hasHttpStatus(error, 415)) {
@@ -310,13 +311,13 @@ export class DocumentDetails implements OnInit, OnDestroy {
     } else if (hasHttpStatus(error, 422)) {
       this.actionError.set('Text could not be extracted from the document.');
     } else if (hasHttpStatus(error, 502)) {
-      this.actionError.set('The document-processing service returned an invalid response.');
+      this.actionError.set('The document could not be processed. Please try again.');
     } else if (hasHttpStatus(error, 503)) {
-      this.actionError.set('Document processing is currently unavailable.');
+      this.actionError.set('Document processing is temporarily unavailable. Please try again later.');
     } else if (hasHttpStatus(error, 504)) {
-      this.actionError.set('Document processing timed out.');
+      this.actionError.set('Document processing took too long. Please try again.');
     } else {
-      this.actionError.set(getHttpErrorMessage(error, 'Document processing failed.'));
+      this.actionError.set(getHttpErrorMessage(error, 'Unable to process the document.'));
     }
 
     this.loadDocument(document.id, true);
@@ -352,7 +353,7 @@ export class DocumentDetails implements OnInit, OnDestroy {
       },
       error: (error: unknown) => {
         this.status.set('error');
-        this.errorMessage.set(getHttpErrorMessage(error, 'Unable to refresh your patient access.'));
+        this.errorMessage.set(getHttpErrorMessage(error, 'Unable to refresh your access.'));
       },
     });
   }

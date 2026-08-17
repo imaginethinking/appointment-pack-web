@@ -74,7 +74,7 @@ export class BloodTestDetails implements OnInit {
       return;
     }
 
-    if (!window.confirm('Archive this blood test? It will no longer appear in the normal blood-results list.')) {
+    if (!window.confirm('Archive this blood test? It will no longer appear in the blood results list.')) {
       return;
     }
 
@@ -102,7 +102,7 @@ export class BloodTestDetails implements OnInit {
 
         if (selectedPatient === null || bloodTest.patientRecordId !== selectedPatient.patientRecordId) {
           this.status.set('invalid');
-          this.errorMessage.set('This blood test does not belong to the currently selected patient.');
+          this.errorMessage.set('This blood test is not available for the selected patient.');
           return;
         }
 

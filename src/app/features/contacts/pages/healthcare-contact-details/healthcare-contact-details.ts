@@ -74,7 +74,7 @@ export class HealthcareContactDetails implements OnInit {
       return;
     }
 
-    if (!window.confirm('Archive this healthcare contact? It will no longer appear in the normal contacts list.')) {
+    if (!window.confirm('Archive this healthcare contact? It will no longer appear in the contacts list.')) {
       return;
     }
 
@@ -102,7 +102,7 @@ export class HealthcareContactDetails implements OnInit {
 
         if (selectedPatient === null || contact.patientRecordId !== selectedPatient.patientRecordId) {
           this.status.set('invalid');
-          this.errorMessage.set('This healthcare contact does not belong to the currently selected patient.');
+          this.errorMessage.set('This healthcare contact is not available for the selected patient.');
           return;
         }
 

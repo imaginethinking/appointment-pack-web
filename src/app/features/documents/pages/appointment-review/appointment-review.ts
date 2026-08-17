@@ -89,7 +89,7 @@ export class AppointmentReview implements OnInit {
     }
 
     if (!this.canConfirm()) {
-      this.actionError.set('You do not have permission to confirm appointments for this patient.');
+      this.actionError.set('Your current access does not allow an appointment to be added.');
       return;
     }
 
@@ -154,7 +154,7 @@ export class AppointmentReview implements OnInit {
 
         if (selectedPatient === null || document.patientRecordId !== selectedPatient.patientRecordId) {
           this.status.set('invalid');
-          this.errorMessage.set('This document does not belong to the currently selected patient.');
+          this.errorMessage.set('This document is not available for the selected patient.');
           return EMPTY;
         }
 
@@ -230,7 +230,7 @@ export class AppointmentReview implements OnInit {
     if (hasHttpStatus(error, 409)) {
       this.loadReview(
         document.id,
-        'The document state changed or an appointment already exists for this document. The latest document state has been reloaded.',
+        'This document was updated while you were working. The latest version has been loaded.',
       );
       return;
     }
@@ -253,7 +253,7 @@ export class AppointmentReview implements OnInit {
     if (hasHttpStatus(error, 409)) {
       this.loadReview(
         document.id,
-        'The document state changed before the appointment details could be rejected. The latest document state has been reloaded.',
+        'This document was updated while you were working. The latest version has been loaded.',
       );
       return;
     }
@@ -279,11 +279,11 @@ export class AppointmentReview implements OnInit {
         }
 
         if (requireAppointmentEdit && !this.authorisation.can(selectedPatient, 'appointment', 'edit')) {
-          this.actionError.set('You no longer have permission to confirm appointments for this patient.');
+          this.actionError.set('Your current access does not allow an appointment to be added.');
           return;
         }
 
-        this.actionError.set('Your patient access changed. Reload the document before continuing.');
+        this.actionError.set('Your access has changed. Reload the document before continuing.');
       },
       error: (refreshError: unknown) => {
         this.status.set('error');

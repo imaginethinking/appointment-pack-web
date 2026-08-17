@@ -29,7 +29,7 @@ import { AppointmentPackApiService } from '../../services/appointment-pack-api-s
 
 type AppointmentPackCreateStatus = 'loading' | 'ready' | 'no-patient' | 'forbidden' | 'error';
 
-type SelectionCategory = 'medications' | 'healthcare contacts' | 'emergency contacts' | 'medical-history entries' | 'blood tests';
+type SelectionCategory = 'medications' | 'healthcare contacts' | 'emergency contacts' | 'medical history entries' | 'blood tests';
 
 @Component({
   selector: 'app-appointment-pack-create',
@@ -164,7 +164,7 @@ export class AppointmentPackCreate {
   }
 
   protected toggleMedicalHistoryEntry(id: string, event: Event): void {
-    this.updateSelection(this.selectedMedicalHistoryEntryIds, id, this.isChecked(event), 'medical-history entries');
+    this.updateSelection(this.selectedMedicalHistoryEntryIds, id, this.isChecked(event), 'medical history entries');
   }
 
   protected toggleBloodTest(id: string, event: Event): void {
@@ -180,12 +180,12 @@ export class AppointmentPackCreate {
     const selectedPatient = this.selectedPatient();
 
     if (selectedPatient === null || !this.canCreatePack()) {
-      this.actionError.set('You do not have permission to generate appointment packs for the selected patient.');
+      this.actionError.set('Your current access does not allow appointment packs to be created.');
       return;
     }
 
     if (!this.canViewAppointments()) {
-      this.actionError.set('Generating an appointment pack also requires permission to view the selected patient’s appointments.');
+      this.actionError.set('Appointment information is not available with your current access.');
       return;
     }
 
@@ -264,7 +264,7 @@ export class AppointmentPackCreate {
     }
 
     this.status.set('error');
-    this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load appointment-pack source data.'));
+    this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load appointment pack information.'));
   }
 
   private handleGenerateError(error: unknown, failedPatientRecordId: string): void {
@@ -302,11 +302,11 @@ export class AppointmentPackCreate {
 
         if (failedPatientRecordId === null) {
           this.status.set('error');
-          this.errorMessage.set('Your patient permissions changed while appointment-pack source data was loading. Try again to reload the available information.');
+          this.errorMessage.set('Your access changed while the appointment information was loading. Please try again.');
           return;
         }
 
-        this.actionError.set('Your patient access or one of the selected resources changed. Reload the generator before trying again.');
+        this.actionError.set('Your access or selected information changed. Reload the page before trying again.');
       },
       error: (refreshError: unknown) => {
         if (failedPatientRecordId === null) {

@@ -52,7 +52,7 @@ export class MedicalHistoryCreate {
     const selectedPatient = this.selectedPatient();
 
     if (selectedPatient === null || !this.canEdit()) {
-      this.errorMessage.set('You do not have permission to add medical-history entries for the selected patient.');
+      this.errorMessage.set('Your current access does not allow new medical history entries.');
       return;
     }
 
@@ -81,7 +81,7 @@ export class MedicalHistoryCreate {
       return;
     }
 
-    this.errorMessage.set(getHttpErrorMessage(error, 'Unable to create the medical-history entry.'));
+    this.errorMessage.set(getHttpErrorMessage(error, 'Unable to add the medical history entry.'));
   }
 
   private refreshPatientAccess(failedPatientRecordId: string): void {
@@ -96,8 +96,8 @@ export class MedicalHistoryCreate {
 
         this.errorMessage.set(
           this.canEdit()
-            ? 'The medical-history entry could not be created because the patient record is no longer available.'
-            : 'You no longer have permission to add medical-history entries for this patient.',
+            ? 'The medical history entry could not be added because the patient record is no longer available.'
+            : 'Your current access does not allow new medical history entries.',
         );
       },
       error: (refreshError: unknown) => {

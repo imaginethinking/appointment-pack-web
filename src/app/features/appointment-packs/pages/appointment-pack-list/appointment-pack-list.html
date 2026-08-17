@@ -4,14 +4,14 @@
       <h1 class="text-3xl font-bold text-brand-plum">Appointment packs</h1>
 
       @if (selectedPatient(); as patient) {
-        <p class="mt-1 text-brand-plum/70">Generated appointment snapshots for <span class="font-semibold text-brand-plum">{{ getPatientContextName(patient) }}</span></p>
+        <p class="mt-1 text-brand-plum/70">Appointment packs for <span class="font-semibold text-brand-plum">{{ getPatientContextName(patient) }}</span></p>
       } @else {
         <p class="mt-1 text-brand-plum/70">View generated packs for the selected patient.</p>
       }
     </div>
 
     @if (canGeneratePacks()) {
-      <a routerLink="/appointment-packs/create" class="btn btn-primary">Generate appointment pack</a>
+      <a routerLink="/appointment-packs/create" class="btn btn-primary">Create pack</a>
     }
   </div>
 
@@ -20,12 +20,12 @@
   } @else if (status() === 'no-patient') {
     <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
       <h2 class="font-semibold text-brand-plum">No patient selected</h2>
-      <p class="mt-2 text-brand-plum/70">Select an accessible patient before viewing appointment packs.</p>
+      <p class="mt-2 text-brand-plum/70">Select a patient to view appointment packs.</p>
     </div>
   } @else if (status() === 'forbidden') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
       <h2 class="font-semibold text-brand-plum">Appointment packs unavailable</h2>
-      <p class="mt-2 text-brand-plum/70">You do not have permission to view appointment packs for this patient.</p>
+      <p class="mt-2 text-brand-plum/70">Appointment packs are not available with your current access.</p>
     </div>
   } @else if (status() === 'error') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
@@ -35,10 +35,10 @@
   } @else if (appointmentPacks().length === 0) {
     <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
       <h2 class="font-semibold text-brand-plum">No appointment packs</h2>
-      <p class="mt-2 text-brand-plum/70">No appointment-pack snapshots have been generated for this patient.</p>
+      <p class="mt-2 text-brand-plum/70">No appointment packs have been created yet.</p>
 
       @if (canGeneratePacks()) {
-        <a routerLink="/appointment-packs/create" class="btn btn-primary mt-4">Generate first pack</a>
+        <a routerLink="/appointment-packs/create" class="btn btn-primary mt-4">Create pack</a>
       }
     </div>
   } @else {
@@ -71,7 +71,7 @@
           </dl>
 
           <div class="mt-5 border-t border-brand-plum/20 pt-4">
-            <a [routerLink]="['/appointment-packs', appointmentPack.id]" class="text-sm font-semibold text-brand-plum underline">View appointment pack</a>
+            <a [routerLink]="['/appointment-packs', appointmentPack.id]" class="text-sm font-semibold text-brand-plum underline">View pack</a>
           </div>
         </article>
       }

@@ -52,7 +52,7 @@ export class HealthcareContactCreate {
     const selectedPatient = this.selectedPatient();
 
     if (selectedPatient === null || !this.canEdit()) {
-      this.errorMessage.set('You do not have permission to add healthcare contacts for the selected patient.');
+      this.errorMessage.set('Your current access does not allow new healthcare contacts to be added.');
       return;
     }
 
@@ -96,7 +96,7 @@ export class HealthcareContactCreate {
 
         this.errorMessage.set(this.canEdit()
           ? 'The healthcare contact could not be created because the patient record is no longer available.'
-          : 'You no longer have permission to add contacts for this patient.');
+          : 'Your current access does not allow new contacts to be added.');
       },
       error: (refreshError: unknown) => this.errorMessage.set(getHttpErrorMessage(refreshError, 'Unable to refresh patient access.')),
     });

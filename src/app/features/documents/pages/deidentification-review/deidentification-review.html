@@ -1,13 +1,13 @@
 <section class="app-page">
   <div class="mb-6">
     @if (document(); as currentDocument) {
-      <a [routerLink]="['/documents', currentDocument.id]" class="text-sm font-semibold text-brand-plum underline">Back to document</a>
+      <a [routerLink]="['/documents', currentDocument.id]" class="text-sm font-semibold text-brand-plum underline">Back</a>
     } @else {
-      <a routerLink="/documents" class="text-sm font-semibold text-brand-plum underline">Back to documents</a>
+      <a routerLink="/documents" class="text-sm font-semibold text-brand-plum underline">Back</a>
     }
 
-    <h1 class="mt-4 text-3xl font-bold text-brand-plum">Review de-identified text</h1>
-    <p class="mt-1 text-brand-plum/70">Check the locally de-identified consultation text before approving it for external summarisation.</p>
+    <h1 class="mt-4 text-3xl font-bold text-brand-plum">Privacy review</h1>
+    <p class="mt-1 text-brand-plum/70">Review the de-identified consultation text carefully before generating a summary.</p>
   </div>
 
   @if (status() === 'loading') {
@@ -20,21 +20,21 @@
   } @else if (status() === 'forbidden') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
       <h2 class="font-semibold text-brand-plum">Review unavailable</h2>
-      <p class="mt-2 text-brand-plum/70">You do not have permission to review this document.</p>
+      <p class="mt-2 text-brand-plum/70">This document is not available with your current access.</p>
     </div>
   } @else if (status() === 'recovery') {
     @if (document(); as currentDocument) {
       <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6">
-        <h2 class="text-xl font-semibold text-brand-plum">Summarisation requires recovery</h2>
-        <p class="mt-2 text-brand-plum/70">The approved de-identified text has already been persisted by Spring and cannot be changed for a retry.</p>
+        <h2 class="text-xl font-semibold text-brand-plum">Summary generation needs attention</h2>
+        <p class="mt-2 text-brand-plum/70">The text you previously approved has been saved and cannot be edited for this retry.</p>
 
         @if (actionError()) {
           <p class="mt-4 text-brand-coral" role="alert">{{ actionError() }}</p>
         }
 
         <div class="mt-5 flex flex-wrap gap-3">
-          <a [routerLink]="['/documents', currentDocument.id, 'summary-review']" class="btn btn-primary">Open summary recovery</a>
-          <a [routerLink]="['/documents', currentDocument.id]" class="btn btn-secondary">Return to document</a>
+          <a [routerLink]="['/documents', currentDocument.id, 'summary-review']" class="btn btn-primary">Summary options</a>
+          <a [routerLink]="['/documents', currentDocument.id]" class="btn btn-secondary">Back</a>
         </div>
       </div>
     }
@@ -43,7 +43,7 @@
       <p class="text-brand-plum">{{ errorMessage() }}</p>
 
       @if (document(); as currentDocument) {
-        <a [routerLink]="['/documents', currentDocument.id]" class="btn btn-secondary mt-4">Return to document details</a>
+        <a [routerLink]="['/documents', currentDocument.id]" class="btn btn-secondary mt-4">Back</a>
       }
     </div>
   } @else if (status() === 'error') {
@@ -54,8 +54,8 @@
   } @else if (status() === 'ready' && processing(); as currentProcessing) {
     <form class="space-y-6" [formGroup]="form" novalidate (ngSubmit)="submit()">
       <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
-        <h2 class="text-xl font-semibold text-brand-plum">Approved de-identified consultation text</h2>
-        <p class="mt-1 text-sm text-brand-plum/70">Correct any residual identifiers or excessive redaction before approving this exact text for external transmission.</p>
+        <h2 class="text-xl font-semibold text-brand-plum">De-identified consultation text</h2>
+        <p class="mt-1 text-sm text-brand-plum/70">Check that personal identifiers have been removed and that the clinical meaning remains clear.</p>
 
         <textarea
           id="approvedDeidentifiedText"
@@ -66,7 +66,7 @@
         ></textarea>
 
         <div class="mt-1 flex flex-wrap justify-between gap-2 text-sm text-brand-plum/60">
-          <span>The submitted text is persisted exactly and becomes immutable for summarisation retries.</span>
+          <span>This text will be used to generate the consultation summary.</span>
           <span>{{ form.controls.approvedDeidentifiedText.value.length }} / {{ approvedTextMaximumLength }}</span>
         </div>
 
@@ -80,7 +80,7 @@
 
         @if (currentProcessing.processingWarning; as warning) {
           <div class="mt-4 rounded-md border border-brand-coral/50 bg-brand-peach/30 p-4">
-            <p class="font-semibold text-brand-plum">Processing warning</p>
+            <p class="font-semibold text-brand-plum">Review note</p>
             <p class="mt-1 text-sm text-brand-plum/80">{{ warning }}</p>
           </div>
         }
@@ -91,13 +91,13 @@
           <input id="externalTransmissionApproved" type="checkbox" class="mt-1" formControlName="externalTransmissionApproved" />
 
           <span>
-            <span class="block font-semibold text-brand-plum">Approve this text for external summarisation</span>
-            <span class="mt-1 block text-sm text-brand-plum/70">I have reviewed the de-identified text and approve this exact version for transmission to the external summarisation service.</span>
+            <span class="block font-semibold text-brand-plum">Approve for summarisation</span>
+            <span class="mt-1 block text-sm text-brand-plum/70">I have reviewed the de-identified text and approve it for AI-assisted summarisation.</span>
           </span>
         </label>
 
         @if (form.controls.externalTransmissionApproved.touched && form.controls.externalTransmissionApproved.hasError('required')) {
-          <p class="mt-2 text-sm text-brand-coral">Explicit approval is required before summarisation.</p>
+          <p class="mt-2 text-sm text-brand-coral">Confirm that you have reviewed the text before continuing.</p>
         }
       </section>
 
@@ -106,7 +106,7 @@
       }
 
       <div class="flex flex-wrap gap-3">
-        <button type="submit" class="btn btn-primary" [disabled]="isSubmitting()">{{ isSubmitting() ? 'Summarising...' : 'Approve and summarise' }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="isSubmitting()">{{ isSubmitting() ? 'Generating...' : 'Generate summary' }}</button>
 
         @if (document(); as currentDocument) {
           <a [routerLink]="['/documents', currentDocument.id]" class="btn btn-secondary">Cancel</a>

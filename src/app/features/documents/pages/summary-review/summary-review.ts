@@ -111,7 +111,7 @@ export class SummaryReview implements OnInit {
 
     if (approvedText === null || approvedText.length === 0) {
       this.status.set('error');
-      this.errorMessage.set('The approved de-identified text required for retry is not available.');
+      this.errorMessage.set('The previously approved consultation text is not available.');
       return;
     }
 
@@ -122,7 +122,7 @@ export class SummaryReview implements OnInit {
     ).subscribe({
       next: (processingResult) => {
         if (processingResult.status !== 'READY_FOR_SUMMARY_REVIEW' || processingResult.generatedSummary === null || processingResult.generatedSummary.trim().length === 0) {
-          this.loadReview(document.id, 'Summarisation completed without a reviewable summary. The latest document state has been reloaded.');
+          this.loadReview(document.id, 'A reviewable summary was not created. The latest document information has been loaded.');
           return;
         }
 
@@ -184,7 +184,7 @@ export class SummaryReview implements OnInit {
       return;
     }
 
-    if (!window.confirm('Reject this summary? No medical-history entry will be created.')) {
+    if (!window.confirm('Reject this summary? It will not be added to medical history.')) {
       return;
     }
 
@@ -222,19 +222,19 @@ export class SummaryReview implements OnInit {
 
         if (selectedPatient === null || selectedPatient.patientRecordId !== document.patientRecordId) {
           this.status.set('invalid');
-          this.errorMessage.set('This document does not belong to the currently selected patient.');
+          this.errorMessage.set('This document is not available for the selected patient.');
           return EMPTY;
         }
 
         if (document.documentType !== 'CONSULTATION_OUTCOME_LETTER') {
           this.status.set('invalid');
-          this.errorMessage.set('Only consultation outcome letters use summary review.');
+          this.errorMessage.set('Summary review is not available for this document.');
           return EMPTY;
         }
 
         if (document.status !== 'READY_FOR_SUMMARY_REVIEW' && document.status !== 'SUMMARISATION_FAILED') {
           this.status.set('invalid');
-          this.errorMessage.set(actionMessage || 'This consultation document is not awaiting summary review or summarisation recovery.');
+          this.errorMessage.set(actionMessage || 'This document is not currently ready for summary review.');
           return EMPTY;
         }
 
@@ -255,7 +255,7 @@ export class SummaryReview implements OnInit {
         }
 
         this.status.set('invalid');
-        this.errorMessage.set(actionMessage || 'The document processing state changed while the review was loading.');
+        this.errorMessage.set(actionMessage || 'This document was updated while the review was loading. Please try again.');
       },
       error: (error: unknown) => this.handleLoadError(error),
     });
@@ -264,7 +264,7 @@ export class SummaryReview implements OnInit {
   private prepareGeneratedSummary(processing: DocumentProcessingResultResponse): void {
     if (processing.generatedSummary === null || processing.generatedSummary.trim().length === 0) {
       this.status.set('error');
-      this.errorMessage.set('The processing result does not contain a generated summary.');
+      this.errorMessage.set('A consultation summary is not available for review.');
       return;
     }
 
@@ -276,7 +276,7 @@ export class SummaryReview implements OnInit {
   private prepareFailedSummary(processing: DocumentProcessingResultResponse): void {
     if (processing.approvedDeidentifiedText === null || processing.approvedDeidentifiedText.length === 0) {
       this.status.set('error');
-      this.errorMessage.set('The approved de-identified text required for recovery is not available.');
+      this.errorMessage.set('The previously approved consultation text is not available.');
       return;
     }
 
@@ -314,7 +314,7 @@ export class SummaryReview implements OnInit {
     }
 
     this.status.set('error');
-    this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the summary review.'));
+    this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the consultation summary.'));
   }
 
   private handleRetryError(error: unknown, documentId: string): void {
@@ -337,7 +337,7 @@ export class SummaryReview implements OnInit {
     }
 
     if (hasHttpStatus(error, 400)) {
-      this.actionError.set(getHttpErrorMessage(error, 'The summary acceptance details are invalid.'));
+      this.actionError.set(getHttpErrorMessage(error, 'Check the summary and medical history details before continuing.'));
       return;
     }
 
@@ -352,11 +352,11 @@ export class SummaryReview implements OnInit {
     }
 
     if (hasHttpStatus(error, 409)) {
-      this.loadReview(documentId, 'The document state changed or a medical-history entry already exists for this document. The latest document state has been reloaded.');
+      this.loadReview(documentId, 'This document was updated while you were working. The latest version has been loaded.');
       return;
     }
 
-    this.actionError.set(getHttpErrorMessage(error, 'Unable to accept the summary.'));
+    this.actionError.set(getHttpErrorMessage(error, 'Unable to add the summary to medical history.'));
   }
 
   private handleRejectError(error: unknown, documentId: string): void {
@@ -371,7 +371,7 @@ export class SummaryReview implements OnInit {
     }
 
     if (hasHttpStatus(error, 409)) {
-      this.loadReview(documentId, 'The document state changed before the summary could be rejected. The latest document state has been reloaded.');
+      this.loadReview(documentId, 'This document was updated while you were working. The latest version has been loaded.');
       return;
     }
 
@@ -380,30 +380,30 @@ export class SummaryReview implements OnInit {
 
   private getRetryFailureMessage(error: unknown): string {
     if (hasHttpStatus(error, 409)) {
-      return 'The document state or approved de-identified snapshot changed before summarisation could be retried. The latest document state has been reloaded.';
+      return 'This document was updated while you were working. The latest version has been loaded.';
     }
 
     if (hasHttpStatus(error, 413)) {
-      return 'The approved de-identified text is too large for the processing service. The failed state has been reloaded.';
+      return 'The consultation text is too long to generate a summary.';
     }
 
     if (hasHttpStatus(error, 422)) {
-      return 'The approved de-identified text could not be processed. The failed state has been reloaded.';
+      return 'A summary could not be generated from the approved consultation text.';
     }
 
     if (hasHttpStatus(error, 502)) {
-      return 'The external summarisation service returned an invalid response. You can retry again or enter a manual summary.';
+      return 'The summary could not be generated. Try again or enter it manually.';
     }
 
     if (hasHttpStatus(error, 503)) {
-      return 'External summarisation is currently unavailable. You can retry later or enter a manual summary.';
+      return 'Summary generation is temporarily unavailable. Try again later or enter it manually.';
     }
 
     if (hasHttpStatus(error, 504)) {
-      return 'External summarisation timed out. You can retry again or enter a manual summary.';
+      return 'Summary generation took too long. Try again or enter it manually.';
     }
 
-    return getHttpErrorMessage(error, 'Unable to retry summarisation.');
+    return getHttpErrorMessage(error, 'Unable to generate the consultation summary.');
   }
 
   private refreshPatientAccess(acceptanceAttempt: boolean): void {
@@ -417,15 +417,15 @@ export class SummaryReview implements OnInit {
         }
 
         if (acceptanceAttempt && !this.authorisation.can(selectedPatient, 'history', 'edit')) {
-          this.actionError.set('You no longer have permission to add entries to this patient’s medical history.');
+          this.actionError.set('Your current access does not allow this summary to be added to medical history.');
           return;
         }
 
-        this.actionError.set('Your patient access changed. Reload this document before continuing.');
+        this.actionError.set('Your access has changed. Reload this document before continuing.');
       },
       error: (refreshError: unknown) => {
         this.status.set('error');
-        this.errorMessage.set(getHttpErrorMessage(refreshError, 'Unable to refresh your patient access.'));
+        this.errorMessage.set(getHttpErrorMessage(refreshError, 'Unable to refresh your access.'));
       },
     });
   }

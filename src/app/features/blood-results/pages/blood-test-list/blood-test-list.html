@@ -4,14 +4,14 @@
       <h1 class="text-3xl font-bold text-brand-plum">Blood results</h1>
 
       @if (selectedPatient(); as patient) {
-        <p class="mt-1 text-brand-plum/70">Manually recorded blood tests for <span class="font-semibold text-brand-plum">{{ getPatientContextName(patient) }}</span></p>
+        <p class="mt-1 text-brand-plum/70">Blood tests and results for <span class="font-semibold text-brand-plum">{{ getPatientContextName(patient) }}</span></p>
       } @else {
-        <p class="mt-1 text-brand-plum/70">View blood results for the selected patient.</p>
+        <p class="mt-1 text-brand-plum/70">Review blood tests and results for the selected patient.</p>
       }
     </div>
 
     @if (canEditBloodResults()) {
-      <a routerLink="/blood-results/create" class="btn btn-primary">Add blood test</a>
+      <a routerLink="/blood-results/create" class="btn btn-primary">Add test</a>
     }
   </div>
 
@@ -20,12 +20,12 @@
   } @else if (status() === 'no-patient') {
     <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
       <h2 class="font-semibold text-brand-plum">No patient selected</h2>
-      <p class="mt-2 text-brand-plum/70">Select an accessible patient before viewing blood results.</p>
+      <p class="mt-2 text-brand-plum/70">Select a patient to view blood results.</p>
     </div>
   } @else if (status() === 'forbidden') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
       <h2 class="font-semibold text-brand-plum">Blood results unavailable</h2>
-      <p class="mt-2 text-brand-plum/70">You do not have permission to view blood results for this patient.</p>
+      <p class="mt-2 text-brand-plum/70">Blood results are not available with your current access.</p>
     </div>
   } @else if (status() === 'error') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
@@ -35,10 +35,10 @@
   } @else if (bloodTests().length === 0) {
     <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
       <h2 class="font-semibold text-brand-plum">No blood tests</h2>
-      <p class="mt-2 text-brand-plum/70">There are no manually recorded blood tests for this patient.</p>
+      <p class="mt-2 text-brand-plum/70">No blood tests have been added yet.</p>
 
       @if (canEditBloodResults()) {
-        <a routerLink="/blood-results/create" class="btn btn-primary mt-4">Add blood test</a>
+        <a routerLink="/blood-results/create" class="btn btn-primary mt-4">Add test</a>
       }
     </div>
   } @else {

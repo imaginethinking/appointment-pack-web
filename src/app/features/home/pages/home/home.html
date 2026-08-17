@@ -31,7 +31,7 @@
       class="mb-6 rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral"
       role="alert"
     >
-      Some patient-context information could not be loaded. Other account features remain available.
+      Some patient information could not be loaded. You can still use the other areas of your account.
     </div>
   }
 
@@ -55,16 +55,16 @@
             routerLink="/patient"
             class="btn btn-primary mt-5"
           >
-            Open patient record
+            Open record
           </a>
         } @else {
           <p class="mt-4 text-sm text-brand-plum/70">
-            Patient-record viewing permission has not been granted.
+            This patient record is not available with your current access.
           </p>
         }
       } @else {
         <p class="mt-3 text-brand-plum/70">
-          No accessible patient record is currently selected.
+          No patient record is currently selected.
         </p>
       }
     </article>
@@ -76,25 +76,25 @@
 
       @if (personalPatientRecord()) {
         <p class="mt-3 text-brand-plum/70">
-          Your personal patient record has been created.
+          Your patient record is ready to use.
         </p>
 
         <a
           routerLink="/patient"
           class="btn btn-primary mt-5"
         >
-          View patient record
+          Open record
         </a>
       } @else {
         <p class="mt-3 text-brand-plum/70">
-          Create a patient record to store healthcare identifiers and measurements.
+          Create your patient record to keep key healthcare information in one place.
         </p>
 
         <a
           routerLink="/patient/create"
           class="btn btn-primary mt-5"
         >
-          Create patient record
+          Create record
         </a>
       }
     </article>
@@ -114,7 +114,7 @@
 
       @if (pendingInvitations().length === 0) {
         <p class="mt-3 text-brand-plum/70">
-          You have no pending invitations from patients.
+          You have no invitations waiting for review.
         </p>
       } @else {
         <p class="mt-3 text-brand-plum/70">
@@ -134,7 +134,7 @@
         routerLink="/care-network/patients"
         class="btn btn-primary mt-5"
       >
-        Review patient access
+        Review access
       </a>
     </article>
 
@@ -145,11 +145,11 @@
 
       @if (personalPatientRecord()) {
         <p class="mt-3 text-brand-plum/70">
-          Invite carers and control their access to your patient record.
+          Invite people who support you and choose the information they can access.
         </p>
       } @else {
         <p class="mt-3 text-brand-plum/70">
-          A personal patient record is required before you can invite carers.
+          Create your patient record before adding people to your care network.
         </p>
       }
 
@@ -157,7 +157,7 @@
         routerLink="/care-network/carers"
         class="btn btn-primary mt-5"
       >
-        Manage care network
+        Manage network
       </a>
     </article>
 
@@ -173,7 +173,7 @@
         </p>
 
         <p class="mt-1 text-sm text-brand-plum/70">
-          Review and update your general account details.
+          Review and update your personal details.
         </p>
       } @else {
         <p class="mt-3 text-brand-plum/70">
@@ -185,24 +185,24 @@
         routerLink="/profile"
         class="btn btn-secondary mt-5"
       >
-        View profile
+        Open profile
       </a>
     </article>
 
     <article class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
       <h2 class="text-xl font-semibold text-brand-plum">
-        Security
+        Account security
       </h2>
 
       <p class="mt-3 text-brand-plum/70">
-        Review and configure multi-factor authentication for your account.
+        Manage your password and multi-factor authentication.
       </p>
 
       <a
         routerLink="/profile/settings/mfa"
         class="btn btn-secondary mt-5"
       >
-        MFA settings
+        Open security
       </a>
     </article>
   </div>

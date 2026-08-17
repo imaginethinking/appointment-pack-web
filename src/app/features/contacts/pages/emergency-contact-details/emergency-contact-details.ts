@@ -72,7 +72,7 @@ export class EmergencyContactDetails implements OnInit {
       return;
     }
 
-    if (!window.confirm('Archive this emergency contact? It will no longer appear in the normal contacts list.')) {
+    if (!window.confirm('Archive this emergency contact? It will no longer appear in the contacts list.')) {
       return;
     }
 
@@ -100,7 +100,7 @@ export class EmergencyContactDetails implements OnInit {
 
         if (selectedPatient === null || contact.patientRecordId !== selectedPatient.patientRecordId) {
           this.status.set('invalid');
-          this.errorMessage.set('This emergency contact does not belong to the currently selected patient.');
+          this.errorMessage.set('This emergency contact is not available for the selected patient.');
           return;
         }
 

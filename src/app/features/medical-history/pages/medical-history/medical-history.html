@@ -13,7 +13,7 @@
     </div>
 
     @if (canEditHistory()) {
-      <a routerLink="/medical-history/create" class="btn btn-primary">Add history entry</a>
+      <a routerLink="/medical-history/create" class="btn btn-primary">Add entry</a>
     }
   </div>
 
@@ -24,12 +24,12 @@
   } @else if (status() === 'no-patient') {
     <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
       <h2 class="font-semibold text-brand-plum">No patient selected</h2>
-      <p class="mt-2 text-brand-plum/70">Select an accessible patient before viewing medical history.</p>
+      <p class="mt-2 text-brand-plum/70">Select a patient to view medical history.</p>
     </div>
   } @else if (status() === 'forbidden') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
       <h2 class="font-semibold text-brand-plum">Medical history unavailable</h2>
-      <p class="mt-2 text-brand-plum/70">You do not have permission to view medical history for this patient.</p>
+      <p class="mt-2 text-brand-plum/70">Medical history is not available with your current access.</p>
     </div>
   } @else if (status() === 'error') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
@@ -38,13 +38,12 @@
     </div>
   } @else if (entries().length === 0) {
     <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
-      <h2 class="font-semibold text-brand-plum">No medical-history entries</h2>
-      <p class="mt-2 text-brand-plum/70">There are no medical-history entries for this patient yet.</p>
-      <p class="mt-2 text-sm text-brand-plum/60">Entries can be added manually or created from accepted consultation summaries.</p>
+      <h2 class="font-semibold text-brand-plum">No medical history</h2>
+      <p class="mt-2 text-brand-plum/70">No medical history entries have been added yet.</p>
 
       <div class="mt-4 flex flex-wrap gap-3">
         @if (canEditHistory()) {
-          <a routerLink="/medical-history/create" class="btn btn-primary">Add history entry</a>
+          <a routerLink="/medical-history/create" class="btn btn-primary">Add entry</a>
         }
 
         <a routerLink="/documents" class="btn btn-secondary">View documents</a>
@@ -74,10 +73,10 @@
               <p class="mt-5 whitespace-pre-wrap leading-relaxed text-brand-plum">{{ entry.summary }}</p>
 
               <div class="mt-5 flex flex-wrap items-center gap-4 border-t border-brand-plum/20 pt-4">
-                <a [routerLink]="['/medical-history', entry.id]" class="text-sm font-semibold text-brand-plum underline">View entry</a>
+                <a [routerLink]="['/medical-history', entry.id]" class="text-sm font-semibold text-brand-plum underline">View</a>
 
                 @if (canEditHistory()) {
-                  <a [routerLink]="['/medical-history', entry.id, 'edit']" class="text-sm font-semibold text-brand-plum underline">Edit entry</a>
+                  <a [routerLink]="['/medical-history', entry.id, 'edit']" class="text-sm font-semibold text-brand-plum underline">Edit</a>
                 }
 
                 @if (entry.sourceDocumentId) {

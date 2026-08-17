@@ -124,13 +124,13 @@ export class DeidentificationReview implements OnInit {
 
         if (selectedPatient === null || document.patientRecordId !== selectedPatient.patientRecordId) {
           this.status.set('invalid');
-          this.errorMessage.set('This document does not belong to the currently selected patient.');
+          this.errorMessage.set('This document is not available for the selected patient.');
           return EMPTY;
         }
 
         if (document.documentType !== 'CONSULTATION_OUTCOME_LETTER') {
           this.status.set('invalid');
-          this.errorMessage.set('Only consultation outcome letters use de-identification review.');
+          this.errorMessage.set('Privacy review is not available for this document.');
           return EMPTY;
         }
 
@@ -156,7 +156,7 @@ export class DeidentificationReview implements OnInit {
       next: (processing) => {
         if (processing.machineDeidentifiedText === null) {
           this.status.set('error');
-          this.errorMessage.set('The processing result does not contain de-identified text.');
+          this.errorMessage.set('De-identified consultation text is not available for review.');
           return;
         }
 
@@ -193,7 +193,7 @@ export class DeidentificationReview implements OnInit {
     }
 
     if (hasHttpStatus(error, 400)) {
-      this.actionError.set(getHttpErrorMessage(error, 'The approved de-identified text is invalid.'));
+      this.actionError.set(getHttpErrorMessage(error, 'Check the de-identified text before continuing.'));
       return;
     }
 
@@ -242,27 +242,27 @@ export class DeidentificationReview implements OnInit {
 
   private getSummarisationFailureMessage(error: unknown): string {
     if (hasHttpStatus(error, 409)) {
-      return 'The document state changed while summarisation was starting. The latest document state has been reloaded.';
+      return 'This document was updated while you were working. The latest version has been loaded.';
     }
 
     if (hasHttpStatus(error, 413)) {
-      return 'The approved consultation text could not be summarised because the processing input was too large.';
+      return 'The consultation text is too long to generate a summary.';
     }
 
     if (hasHttpStatus(error, 422)) {
-      return 'The approved consultation text could not be processed for summarisation.';
+      return 'A summary could not be generated from the approved consultation text.';
     }
 
     if (hasHttpStatus(error, 502)) {
-      return 'The external summarisation service returned an invalid response.';
+      return 'The summary could not be generated. Please try again.';
     }
 
     if (hasHttpStatus(error, 503)) {
-      return 'External summarisation is currently unavailable.';
+      return 'Summary generation is temporarily unavailable. Please try again later.';
     }
 
     if (hasHttpStatus(error, 504)) {
-      return 'External summarisation timed out.';
+      return 'Summary generation took too long. Please try again.';
     }
 
     return getHttpErrorMessage(error, 'Summarisation did not complete successfully.');
@@ -279,7 +279,7 @@ export class DeidentificationReview implements OnInit {
       },
       error: (error: unknown) => {
         this.status.set('error');
-        this.errorMessage.set(getHttpErrorMessage(error, 'Unable to refresh your patient access.'));
+        this.errorMessage.set(getHttpErrorMessage(error, 'Unable to refresh your access.'));
       },
     });
   }

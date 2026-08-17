@@ -48,7 +48,7 @@ export function getAppointmentPackItemTypePluralLabel(itemType: AppointmentPackI
     case 'EMERGENCY_CONTACT':
       return 'Emergency contacts';
     case 'MEDICAL_HISTORY':
-      return 'Medical-history entries';
+      return 'Medical history entries';
     case 'BLOOD_TEST':
       return 'Blood tests';
   }

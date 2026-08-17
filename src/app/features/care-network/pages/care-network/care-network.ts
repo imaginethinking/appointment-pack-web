@@ -86,7 +86,7 @@ export class CareNetwork implements OnInit {
         }
 
         if (hasHttpStatus(error, 404)) {
-          this.errorMessage.set('No registered account was found for that email address.');
+          this.errorMessage.set('No Appointment Pack account was found for that email address.');
           return;
         }
 
@@ -137,10 +137,10 @@ export class CareNetwork implements OnInit {
       next: () => {
         this.editingAccessId.set(null);
         this.editingPermissionsValue.set(new Set());
-        this.successMessage.set('Carer permissions have been updated.');
+        this.successMessage.set('Carer access has been updated.');
       },
       error: (error: unknown) => {
-        this.errorMessage.set(getHttpErrorMessage(error, 'Unable to update carer permissions.'));
+        this.errorMessage.set(getHttpErrorMessage(error, 'Unable to update carer access.'));
       },
     });
   }

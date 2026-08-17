@@ -86,7 +86,7 @@ export class DocumentUpload {
     const file = this.selectedFile();
 
     if (selectedPatient === null || !this.canUpload()) {
-      this.errorMessage.set('You do not have permission to upload documents for the selected patient.');
+      this.errorMessage.set('Your current access does not allow document uploads.');
       return;
     }
 
@@ -143,12 +143,12 @@ export class DocumentUpload {
     }
 
     if (hasHttpStatus(error, 415)) {
-      this.errorMessage.set('The uploaded file contents are not a supported PDF, JPEG or PNG document.');
+      this.errorMessage.set('This file type is not supported. Upload a PDF, JPEG or PNG file.');
       return;
     }
 
     if (hasHttpStatus(error, 422)) {
-      this.errorMessage.set('The selected document could not be read.');
+      this.errorMessage.set('The document could not be read. Check the file and try again.');
       return;
     }
 
@@ -166,16 +166,16 @@ export class DocumentUpload {
         const selectedPatient = this.selectedPatient();
 
         if (selectedPatient?.patientRecordId !== failedPatientRecordId) {
-          this.errorMessage.set('Your patient access changed. Select the appropriate patient before uploading again.');
+          this.errorMessage.set('Your access has changed. Select the patient again before uploading.');
           return;
         }
 
         if (!this.canUpload()) {
-          this.errorMessage.set('You no longer have permission to upload documents for this patient.');
+          this.errorMessage.set('Your current access does not allow document uploads.');
           return;
         }
 
-        this.errorMessage.set('The selected patient record is no longer available for this upload.');
+        this.errorMessage.set('This patient record is no longer available.');
       },
       error: (refreshError: unknown) => this.errorMessage.set(getHttpErrorMessage(refreshError, 'Unable to refresh your patient access.')),
     });

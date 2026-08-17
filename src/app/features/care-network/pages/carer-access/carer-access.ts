@@ -73,7 +73,7 @@ export class CarerAccess {
     this.clearMessages();
 
     if (!this.selectedPatientState.selectPatient(relationship.patient.patientRecordId)) {
-      this.errorMessage.set('You do not have permission to view this patient record.');
+      this.errorMessage.set('This patient record is not available with your current access.');
       return;
     }
 

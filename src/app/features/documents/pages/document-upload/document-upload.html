@@ -1,6 +1,6 @@
 <section class="app-page">
   <div class="mb-6">
-    <a routerLink="/documents" class="text-sm font-semibold text-brand-plum underline">Back to documents</a>
+    <a routerLink="/documents" class="text-sm font-semibold text-brand-plum underline">Back</a>
     <h1 class="mt-4 text-3xl font-bold text-brand-plum">Upload document</h1>
 
     @if (selectedPatient()) {
@@ -11,12 +11,12 @@
   @if (!selectedPatient()) {
     <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
       <h2 class="font-semibold text-brand-plum">No patient selected</h2>
-      <p class="mt-2 text-brand-plum/70">Select an accessible patient before uploading a document.</p>
+      <p class="mt-2 text-brand-plum/70">Select a patient before uploading a document.</p>
     </div>
   } @else if (!canUpload()) {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
       <h2 class="font-semibold text-brand-plum">Document upload unavailable</h2>
-      <p class="mt-2 text-brand-plum/70">You do not have permission to upload documents for this patient.</p>
+      <p class="mt-2 text-brand-plum/70">Your current access does not allow document uploads.</p>
     </div>
   } @else {
     <form class="space-y-6" [formGroup]="form" novalidate (ngSubmit)="upload()">
@@ -49,7 +49,7 @@
           />
 
           <p class="mt-2 text-sm text-brand-plum/60">
-            PDF, JPEG or PNG. Maximum file size 10 MB. Spring verifies the actual file signature after upload rather than trusting the filename or browser MIME type.
+            PDF, JPEG or PNG, up to 10 MB.
           </p>
 
           @if (fileError()) {
@@ -70,7 +70,7 @@
       }
 
       <div class="flex flex-wrap gap-3">
-        <button type="submit" class="btn btn-primary" [disabled]="isUploading()">{{ isUploading() ? 'Uploading...' : 'Upload document' }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="isUploading()">{{ isUploading() ? 'Uploading...' : 'Upload' }}</button>
         <a routerLink="/documents" class="btn btn-secondary">Cancel</a>
       </div>
     </form>

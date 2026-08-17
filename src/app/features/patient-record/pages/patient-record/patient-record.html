@@ -22,7 +22,7 @@
         routerLink="/patient/edit"
         class="btn btn-primary"
       >
-        Edit patient record
+        Edit
       </a>
     }
   </div>
@@ -41,7 +41,7 @@
       </h2>
 
       <p class="mx-auto mt-2 max-w-lg text-brand-plum/70">
-        You do not currently have an accessible patient record selected.
+        Select a patient record to continue, or create your own patient record.
       </p>
 
       <div class="mt-6 flex flex-wrap justify-center gap-3">
@@ -49,14 +49,14 @@
           routerLink="/home"
           class="btn btn-secondary"
         >
-          Return to dashboard
+          Dashboard
         </a>
 
         <a
           routerLink="/patient/create"
           class="btn btn-primary"
         >
-          Create your patient record
+          Create record
         </a>
       </div>
     </div>
@@ -70,7 +70,7 @@
       </h2>
 
       <p class="mx-auto mt-2 max-w-lg text-brand-plum/70">
-        Your access to this patient record has been removed or no longer includes viewing permission.
+        This patient record is no longer available with your current access.
       </p>
 
       <div class="mt-6 flex flex-wrap justify-center gap-3">
@@ -78,14 +78,14 @@
           routerLink="/care-network/patients"
           class="btn btn-secondary"
         >
-          Review patient access
+          Patient access
         </a>
 
         <a
           routerLink="/home"
           class="btn btn-primary"
         >
-          Return to dashboard
+          Dashboard
         </a>
       </div>
     </div>
@@ -99,14 +99,14 @@
       </h2>
 
       <p class="mx-auto mt-2 max-w-lg text-brand-plum/70">
-        The selected patient record no longer exists or is no longer available.
+        This patient record is no longer available.
       </p>
 
       <a
         routerLink="/home"
         class="btn btn-primary mt-6"
       >
-        Return to dashboard
+        Dashboard
       </a>
     </div>
   } @else if (status() === 'error') {

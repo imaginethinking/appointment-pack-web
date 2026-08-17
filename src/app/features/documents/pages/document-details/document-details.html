@@ -1,6 +1,6 @@
 <section class="app-page">
   <div class="mb-6">
-    <a routerLink="/documents" class="text-sm font-semibold text-brand-plum underline">Back to documents</a>
+    <a routerLink="/documents" class="text-sm font-semibold text-brand-plum underline">Back</a>
     <h1 class="mt-4 text-3xl font-bold text-brand-plum">Document details</h1>
   </div>
 
@@ -16,7 +16,7 @@
   } @else if (status() === 'forbidden') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
       <h2 class="font-semibold text-brand-plum">Document access unavailable</h2>
-      <p class="mt-2 text-brand-plum/70">You do not have permission to view this document.</p>
+      <p class="mt-2 text-brand-plum/70">This document is not available with your current access.</p>
     </div>
   } @else if (status() === 'error') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
@@ -27,12 +27,12 @@
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
       <h2 class="font-semibold text-brand-plum">Different patient selected</h2>
       <p class="mt-2 text-brand-plum/70">This document does not belong to the currently selected patient.</p>
-      <a routerLink="/documents" class="btn btn-secondary mt-4">Return to selected patient</a>
+      <a routerLink="/documents" class="btn btn-secondary mt-4">Back</a>
     </div>
   } @else if (!canViewDocument()) {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
       <h2 class="font-semibold text-brand-plum">Document access unavailable</h2>
-      <p class="mt-2 text-brand-plum/70">You no longer have permission to view documents for this patient.</p>
+      <p class="mt-2 text-brand-plum/70">Documents are not available with your current access.</p>
     </div>
   } @else if (document(); as currentDocument) {
     <div class="space-y-6">
@@ -89,37 +89,37 @@
 
       <section class="flex flex-wrap gap-3">
         <button type="button" class="btn btn-secondary" [disabled]="isDownloading()" (click)="download()">
-          {{ isDownloading() ? 'Downloading...' : 'Download original' }}
+          {{ isDownloading() ? 'Downloading...' : 'Download' }}
         </button>
 
         @if (currentDocument.status === 'EXTRACTING' || currentDocument.status === 'SUMMARISING') {
-          <button type="button" class="btn btn-secondary" (click)="retryLoad()">Refresh processing status</button>
+          <button type="button" class="btn btn-secondary" (click)="retryLoad()">Refresh</button>
         }
 
         @if (canExtract()) {
           <button type="button" class="btn btn-primary" [disabled]="isExtracting()" (click)="extract()">
             @if (currentDocument.status === 'EXTRACTION_FAILED') {
-              {{ isExtracting() ? 'Retrying...' : 'Retry extraction' }}
+              {{ isExtracting() ? 'Retrying...' : 'Retry' }}
             } @else {
-              {{ isExtracting() ? 'Processing...' : 'Start processing' }}
+              {{ isExtracting() ? 'Processing...' : 'Process' }}
             }
           </button>
         }
 
         @if (currentDocument.documentType === 'APPOINTMENT_LETTER' && currentDocument.status === 'READY_FOR_APPOINTMENT_REVIEW' && canEditDocument()) {
-          <a [routerLink]="['/documents', currentDocument.id, 'appointment-review']" class="btn btn-primary">Review appointment</a>
+          <a [routerLink]="['/documents', currentDocument.id, 'appointment-review']" class="btn btn-primary">Review</a>
         }
 
         @if (currentDocument.documentType === 'CONSULTATION_OUTCOME_LETTER' && currentDocument.status === 'READY_FOR_DEIDENTIFICATION_REVIEW' && canEditDocument()) {
-          <a [routerLink]="['/documents', currentDocument.id, 'deidentification-review']" class="btn btn-primary">Review de-identified text</a>
+          <a [routerLink]="['/documents', currentDocument.id, 'deidentification-review']" class="btn btn-primary">Privacy review</a>
         }
 
         @if (canOpenSummaryReview()) {
           <a [routerLink]="['/documents', currentDocument.id, 'summary-review']" class="btn btn-primary">
             @if (currentDocument.status === 'SUMMARISATION_FAILED') {
-              Resolve summary
+              Summary options
             } @else {
-              Review summary
+              Summary review
             }
           </a>
         }

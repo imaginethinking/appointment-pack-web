@@ -1,24 +1,24 @@
 <section class="app-page">
   <div class="mb-6">
-    <a routerLink="/appointment-packs" class="text-sm font-semibold text-brand-plum underline">Back to appointment packs</a>
-    <h1 class="mt-4 text-3xl font-bold text-brand-plum">Generate appointment pack</h1>
+    <a routerLink="/appointment-packs" class="text-sm font-semibold text-brand-plum underline">Back</a>
+    <h1 class="mt-4 text-3xl font-bold text-brand-plum">Create appointment pack</h1>
 
     @if (selectedPatient()) {
-      <p class="mt-1 text-brand-plum/70">Create an immutable appointment snapshot for <span class="font-semibold text-brand-plum">{{ selectedPatientName() }}</span>.</p>
+      <p class="mt-1 text-brand-plum/70">Prepare an appointment pack for <span class="font-semibold text-brand-plum">{{ selectedPatientName() }}</span>.</p>
     }
   </div>
 
   @if (status() === 'loading') {
-    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">Loading available appointment-pack information...</div>
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">Loading appointment information...</div>
   } @else if (status() === 'no-patient') {
     <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
       <h2 class="font-semibold text-brand-plum">No patient selected</h2>
-      <p class="mt-2 text-brand-plum/70">Select an accessible patient before generating an appointment pack.</p>
+      <p class="mt-2 text-brand-plum/70">Select a patient before creating an appointment pack.</p>
     </div>
   } @else if (status() === 'forbidden') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
-      <h2 class="font-semibold text-brand-plum">Pack generation unavailable</h2>
-      <p class="mt-2 text-brand-plum/70">You do not have permission to generate appointment packs for this patient.</p>
+      <h2 class="font-semibold text-brand-plum">Appointment pack unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">Your current access does not allow appointment packs to be created.</p>
     </div>
   } @else if (status() === 'error') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
@@ -27,28 +27,24 @@
     </div>
   } @else {
     <form class="space-y-6" [formGroup]="form" novalidate (ngSubmit)="generate()">
-      <div class="rounded-lg border border-brand-peach bg-brand-off-white p-4 text-sm text-brand-plum">
-        Each generated pack is an immutable PDF snapshot. If the appointment or selected clinical information changes later, generate a new pack rather than editing the existing one.
-      </div>
-
       <section class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
         <div>
           <h2 class="text-xl font-semibold text-brand-plum">Appointment</h2>
-          <p class="mt-1 text-sm text-brand-plum/70">Every appointment pack automatically includes the selected appointment and the patient profile/patient-record information supported by Spring.</p>
+          <p class="mt-1 text-sm text-brand-plum/70">The pack includes the selected appointment and the patient’s key personal and healthcare information.</p>
         </div>
 
         @if (!canViewAppointments()) {
           <div class="rounded-md border border-brand-coral bg-white p-4" role="alert">
             <p class="font-semibold text-brand-plum">Appointment access required</p>
-            <p class="mt-1 text-sm text-brand-plum/70">Generating a pack also requires <code>appointment:view</code> so that an appointment can be selected.</p>
+            <p class="mt-1 text-sm text-brand-plum/70">Appointment information is not available with your current access.</p>
           </div>
         } @else if (appointments().length === 0) {
           <div class="rounded-md border border-brand-plum/20 bg-white p-4">
             <p class="font-semibold text-brand-plum">No active appointments</p>
-            <p class="mt-1 text-sm text-brand-plum/70">Create or confirm an appointment before generating an appointment pack.</p>
+            <p class="mt-1 text-sm text-brand-plum/70">Add or confirm an appointment before creating a pack.</p>
 
             @if (canEditAppointments()) {
-              <a routerLink="/appointments/create" class="btn btn-secondary mt-4">Create appointment</a>
+              <a routerLink="/appointments/create" class="btn btn-secondary mt-4">Add appointment</a>
             }
           </div>
         } @else {
@@ -76,7 +72,7 @@
       <section class="space-y-5 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
         <div>
           <h2 class="text-xl font-semibold text-brand-plum">Pack details</h2>
-          <p class="mt-1 text-sm text-brand-plum/70">Both fields are optional. If the title is blank, Spring creates one from the selected appointment service and date.</p>
+          <p class="mt-1 text-sm text-brand-plum/70">Title and notes are optional. If the title is blank, one will be created from the appointment details.</p>
         </div>
 
         <div>
@@ -107,16 +103,16 @@
       <section class="space-y-6 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
         <div>
           <h2 class="text-xl font-semibold text-brand-plum">Optional clinical information</h2>
-          <p class="mt-1 text-sm text-brand-plum/70">Select only the information that is useful for this appointment. Original uploaded documents are not embedded in appointment packs.</p>
+          <p class="mt-1 text-sm text-brand-plum/70">Choose the information that will be useful during this appointment.</p>
         </div>
 
         <div class="border-t border-brand-plum/20 pt-5">
           <h3 class="font-semibold text-brand-plum">Medications</h3>
 
           @if (!canViewMedications()) {
-            <p class="mt-2 text-sm text-brand-plum/60">Medication selection is unavailable because this patient context does not grant <code>medication:view</code>.</p>
+            <p class="mt-2 text-sm text-brand-plum/60">Medication information is not available with your current access.</p>
           } @else if (medications().length === 0) {
-            <p class="mt-2 text-sm text-brand-plum/60">No active medications are available.</p>
+            <p class="mt-2 text-sm text-brand-plum/60">No medications have been added yet.</p>
           } @else {
             <div class="mt-3 grid gap-3 md:grid-cols-2">
               @for (medication of medications(); track medication.id) {
@@ -138,9 +134,9 @@
           <h3 class="font-semibold text-brand-plum">Healthcare contacts</h3>
 
           @if (!canViewContacts()) {
-            <p class="mt-2 text-sm text-brand-plum/60">Contact selection is unavailable because this patient context does not grant <code>contact:view</code>.</p>
+            <p class="mt-2 text-sm text-brand-plum/60">Contact information is not available with your current access.</p>
           } @else if (healthcareContacts().length === 0) {
-            <p class="mt-2 text-sm text-brand-plum/60">No active healthcare contacts are available.</p>
+            <p class="mt-2 text-sm text-brand-plum/60">No healthcare contacts have been added yet.</p>
           } @else {
             <div class="mt-3 grid gap-3 md:grid-cols-2">
               @for (contact of healthcareContacts(); track contact.id) {
@@ -162,9 +158,9 @@
           <h3 class="font-semibold text-brand-plum">Emergency contacts</h3>
 
           @if (!canViewContacts()) {
-            <p class="mt-2 text-sm text-brand-plum/60">Contact selection is unavailable because this patient context does not grant <code>contact:view</code>.</p>
+            <p class="mt-2 text-sm text-brand-plum/60">Contact information is not available with your current access.</p>
           } @else if (emergencyContacts().length === 0) {
-            <p class="mt-2 text-sm text-brand-plum/60">No active emergency contacts are available.</p>
+            <p class="mt-2 text-sm text-brand-plum/60">No emergency contacts have been added yet.</p>
           } @else {
             <div class="mt-3 grid gap-3 md:grid-cols-2">
               @for (contact of emergencyContacts(); track contact.id) {
@@ -184,9 +180,9 @@
           <h3 class="font-semibold text-brand-plum">Medical history</h3>
 
           @if (!canViewHistory()) {
-            <p class="mt-2 text-sm text-brand-plum/60">Medical-history selection is unavailable because this patient context does not grant <code>history:view</code>.</p>
+            <p class="mt-2 text-sm text-brand-plum/60">Medical history is not available with your current access.</p>
           } @else if (medicalHistoryEntries().length === 0) {
-            <p class="mt-2 text-sm text-brand-plum/60">No active medical-history entries are available.</p>
+            <p class="mt-2 text-sm text-brand-plum/60">No medical history entries have been added yet.</p>
           } @else {
             <div class="mt-3 space-y-3">
               @for (entry of medicalHistoryEntries(); track entry.id) {
@@ -206,9 +202,9 @@
           <h3 class="font-semibold text-brand-plum">Blood tests</h3>
 
           @if (!canViewBloodResults()) {
-            <p class="mt-2 text-sm text-brand-plum/60">Blood-test selection is unavailable because this patient context does not grant <code>blood-result:view</code>.</p>
+            <p class="mt-2 text-sm text-brand-plum/60">Blood results are not available with your current access.</p>
           } @else if (bloodTests().length === 0) {
-            <p class="mt-2 text-sm text-brand-plum/60">No active blood tests are available.</p>
+            <p class="mt-2 text-sm text-brand-plum/60">No blood tests have been added yet.</p>
           } @else {
             <div class="mt-3 grid gap-3 md:grid-cols-2">
               @for (bloodTest of bloodTests(); track bloodTest.id) {
@@ -239,7 +235,7 @@
 
       <div class="flex flex-wrap gap-3">
         <button type="submit" class="btn btn-primary" [disabled]="isGenerating() || !canViewAppointments() || appointments().length === 0">
-          {{ isGenerating() ? 'Generating...' : 'Generate appointment pack' }}
+          {{ isGenerating() ? 'Creating...' : 'Create pack' }}
         </button>
         <a routerLink="/appointment-packs" class="btn btn-secondary">Cancel</a>
       </div>

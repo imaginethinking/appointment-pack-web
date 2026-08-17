@@ -1,16 +1,16 @@
 <section class="app-page">
   <div class="mb-6">
     @if (entry(); as currentEntry) {
-      <a [routerLink]="['/medical-history', currentEntry.id]" class="text-sm font-semibold text-brand-plum underline">Back to history entry</a>
+      <a [routerLink]="['/medical-history', currentEntry.id]" class="text-sm font-semibold text-brand-plum underline">Back</a>
     } @else {
-      <a routerLink="/medical-history" class="text-sm font-semibold text-brand-plum underline">Back to medical history</a>
+      <a routerLink="/medical-history" class="text-sm font-semibold text-brand-plum underline">Back</a>
     }
 
-    <h1 class="mt-4 text-3xl font-bold text-brand-plum">Edit medical-history entry</h1>
+    <h1 class="mt-4 text-3xl font-bold text-brand-plum">Edit history entry</h1>
   </div>
 
   @if (status() === 'loading') {
-    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">Loading medical-history entry...</div>
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">Loading medical history entry...</div>
   } @else if (status() === 'not-found') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
       <h2 class="font-semibold text-brand-plum">History entry not found</h2>
@@ -19,12 +19,12 @@
   } @else if (status() === 'forbidden') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
       <h2 class="font-semibold text-brand-plum">Editing unavailable</h2>
-      <p class="mt-2 text-brand-plum/70">You do not have permission to edit this medical-history entry.</p>
+      <p class="mt-2 text-brand-plum/70">Your current access does not allow changes to this medical history entry.</p>
     </div>
   } @else if (status() === 'invalid') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
       <p class="text-brand-plum">{{ errorMessage() }}</p>
-      <a routerLink="/medical-history" class="btn btn-secondary mt-4">Return to medical history</a>
+      <a routerLink="/medical-history" class="btn btn-secondary mt-4">Back</a>
     </div>
   } @else if (status() === 'error') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
@@ -61,7 +61,7 @@
 
       <div class="flex flex-wrap gap-3">
         <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
-          {{ isSaving() ? 'Saving...' : 'Save history entry' }}
+          {{ isSaving() ? 'Saving...' : 'Save' }}
         </button>
 
         <a [routerLink]="['/medical-history', currentEntry.id]" class="btn btn-secondary">Cancel</a>

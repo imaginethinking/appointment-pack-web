@@ -114,7 +114,7 @@ export class MedicalHistoryEdit implements OnInit {
 
         if (selectedPatient === null || entry.patientRecordId !== selectedPatient.patientRecordId) {
           this.status.set('invalid');
-          this.errorMessage.set('This medical-history entry does not belong to the currently selected patient.');
+          this.errorMessage.set('This medical history entry is not available for the selected patient.');
           return;
         }
 
@@ -143,7 +143,7 @@ export class MedicalHistoryEdit implements OnInit {
     }
 
     this.status.set('error');
-    this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the medical-history entry for editing.'));
+    this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the medical history entry.'));
   }
 
   private handleSaveError(error: unknown, entry: MedicalHistoryEntryResponse): void {
@@ -161,7 +161,7 @@ export class MedicalHistoryEdit implements OnInit {
       return;
     }
 
-    this.errorMessage.set(getHttpErrorMessage(error, 'Unable to update the medical-history entry.'));
+    this.errorMessage.set(getHttpErrorMessage(error, 'Unable to save the medical history entry.'));
   }
 
   private recoverPatientAccess(failedPatientRecordId: string | null, fallbackStatus: 'forbidden' | 'not-found'): void {

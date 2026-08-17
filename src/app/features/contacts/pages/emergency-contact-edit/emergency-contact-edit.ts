@@ -110,7 +110,7 @@ export class EmergencyContactEdit implements OnInit {
 
         if (selectedPatient === null || contact.patientRecordId !== selectedPatient.patientRecordId) {
           this.status.set('invalid');
-          this.errorMessage.set('This emergency contact does not belong to the currently selected patient.');
+          this.errorMessage.set('This emergency contact is not available for the selected patient.');
           return;
         }
 

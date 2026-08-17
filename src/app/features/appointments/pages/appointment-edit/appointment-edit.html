@@ -2,10 +2,10 @@
   <div class="mb-6">
     @if (appointment(); as currentAppointment) {
       <a [routerLink]="['/appointments', currentAppointment.id]" class="text-sm font-semibold text-brand-plum underline">
-        Back to appointment
+        Back
       </a>
     } @else {
-      <a routerLink="/appointments" class="text-sm font-semibold text-brand-plum underline">Back to appointments</a>
+      <a routerLink="/appointments" class="text-sm font-semibold text-brand-plum underline">Back</a>
     }
 
     <h1 class="mt-4 text-3xl font-bold text-brand-plum">Edit appointment</h1>
@@ -23,12 +23,12 @@
   } @else if (status() === 'forbidden') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
       <h2 class="font-semibold text-brand-plum">Editing unavailable</h2>
-      <p class="mt-2 text-brand-plum/70">You do not have permission to edit this appointment.</p>
+      <p class="mt-2 text-brand-plum/70">Your current access does not allow changes to this appointment.</p>
     </div>
   } @else if (status() === 'invalid') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
       <p class="text-brand-plum">{{ errorMessage() }}</p>
-      <a routerLink="/appointments" class="btn btn-secondary mt-4">Return to appointments</a>
+      <a routerLink="/appointments" class="btn btn-secondary mt-4">Back</a>
     </div>
   } @else if (status() === 'error') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
@@ -39,7 +39,7 @@
     <form class="space-y-6" [formGroup]="form" novalidate (ngSubmit)="save()">
       @if (currentAppointment.sourceDocumentId) {
         <div class="rounded-lg border border-brand-peach bg-brand-off-white p-4 text-brand-plum">
-          This appointment was created from an appointment letter. Editing the appointment does not modify the source document.
+          This appointment was created from an uploaded appointment letter.
         </div>
       }
 
@@ -53,7 +53,7 @@
 
       <div class="flex flex-wrap gap-3">
         <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
-          {{ isSaving() ? 'Saving...' : 'Save appointment' }}
+          {{ isSaving() ? 'Saving...' : 'Save' }}
         </button>
 
         <a [routerLink]="['/appointments', currentAppointment.id]" class="btn btn-secondary">Cancel</a>

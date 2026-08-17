@@ -75,11 +75,7 @@ export class MedicalHistoryDetails implements OnInit {
       return;
     }
 
-    const sourceMessage = entry.sourceType === 'DOCUMENT_SUMMARY'
-      ? ' The source document will not be changed.'
-      : '';
-
-    if (!window.confirm(`Archive this medical-history entry? It will no longer appear in the normal history list.${sourceMessage}`)) {
+    if (!window.confirm('Archive this medical history entry? It will no longer appear in medical history.')) {
       return;
     }
 
@@ -107,7 +103,7 @@ export class MedicalHistoryDetails implements OnInit {
 
         if (selectedPatient === null || entry.patientRecordId !== selectedPatient.patientRecordId) {
           this.status.set('invalid');
-          this.errorMessage.set('This medical-history entry does not belong to the currently selected patient.');
+          this.errorMessage.set('This medical history entry is not available for the selected patient.');
           return;
         }
 
@@ -130,7 +126,7 @@ export class MedicalHistoryDetails implements OnInit {
     }
 
     this.status.set('error');
-    this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the medical-history entry.'));
+    this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the medical history entry.'));
   }
 
   private handleArchiveError(error: unknown, entry: MedicalHistoryEntryResponse): void {
@@ -144,7 +140,7 @@ export class MedicalHistoryDetails implements OnInit {
       return;
     }
 
-    this.actionError.set(getHttpErrorMessage(error, 'Unable to archive the medical-history entry.'));
+    this.actionError.set(getHttpErrorMessage(error, 'Unable to archive the medical history entry.'));
   }
 
   private recoverPatientAccess(failedPatientRecordId: string | null, fallbackStatus: 'forbidden' | 'not-found'): void {

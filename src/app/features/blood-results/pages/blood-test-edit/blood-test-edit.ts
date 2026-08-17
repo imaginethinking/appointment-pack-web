@@ -110,7 +110,7 @@ export class BloodTestEdit implements OnInit {
 
         if (selectedPatient === null || bloodTest.patientRecordId !== selectedPatient.patientRecordId) {
           this.status.set('invalid');
-          this.errorMessage.set('This blood test does not belong to the currently selected patient.');
+          this.errorMessage.set('This blood test is not available for the selected patient.');
           return;
         }
 

@@ -1,7 +1,7 @@
 <section class="app-page">
   <div class="mb-6">
     <a routerLink="/patient" class="mb-5 inline-flex text-brand-plum underline">
-      Back to patient record
+      Back
     </a>
 
     <h1 class="text-3xl font-bold text-brand-plum">Edit patient record</h1>
@@ -18,20 +18,20 @@
   } @else if (status() === 'no-selection') {
     <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-8 text-center">
       <h2 class="text-xl font-semibold text-brand-plum">No patient selected</h2>
-      <p class="mt-2 text-brand-plum/70">Select an accessible patient before editing a patient record.</p>
-      <a routerLink="/patient" class="btn btn-primary mt-6">Return to patient record</a>
+      <p class="mt-2 text-brand-plum/70">Select a patient before editing the patient record.</p>
+      <a routerLink="/patient" class="btn btn-primary mt-6">Back</a>
     </div>
   } @else if (status() === 'forbidden') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-8 text-center" role="alert">
       <h2 class="text-xl font-semibold text-brand-plum">Editing unavailable</h2>
-      <p class="mt-2 text-brand-plum/70">You no longer have permission to edit this patient record.</p>
-      <a routerLink="/patient" class="btn btn-primary mt-6">Return to patient record</a>
+      <p class="mt-2 text-brand-plum/70">Your current access does not allow changes to this patient record.</p>
+      <a routerLink="/patient" class="btn btn-primary mt-6">Back</a>
     </div>
   } @else if (status() === 'not-found') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-8 text-center" role="alert">
       <h2 class="text-xl font-semibold text-brand-plum">Patient record not found</h2>
       <p class="mt-2 text-brand-plum/70">The selected patient record no longer exists or is no longer available.</p>
-      <a routerLink="/patient" class="btn btn-primary mt-6">Return to patient record</a>
+      <a routerLink="/patient" class="btn btn-primary mt-6">Back</a>
     </div>
   } @else if (status() === 'error') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-8 text-center" role="alert">
@@ -238,7 +238,7 @@
 
       <div class="flex flex-wrap gap-3">
         <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
-          {{ isSaving() ? 'Saving...' : 'Save patient record' }}
+          {{ isSaving() ? 'Saving...' : 'Save' }}
         </button>
 
         <a routerLink="/patient" class="btn btn-secondary">Cancel</a>

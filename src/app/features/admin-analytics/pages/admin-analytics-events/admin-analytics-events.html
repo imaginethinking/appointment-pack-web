@@ -1,11 +1,11 @@
 <section class="app-page">
   <div class="mb-6">
     <a routerLink="/admin/analytics" class="text-sm font-semibold text-brand-plum underline">
-      Back to analytics summary
+      Back
     </a>
 
-    <h1 class="mt-4 text-3xl font-bold text-brand-plum">Operational events</h1>
-    <p class="mt-1 text-brand-plum/70">Raw operational analytics events, newest first. Event fields vary by category.</p>
+    <h1 class="mt-4 text-3xl font-bold text-brand-plum">Application activity</h1>
+    <p class="mt-1 text-brand-plum/70">Review detailed application activity, shown newest first.</p>
   </div>
 
   <form
@@ -52,13 +52,13 @@
       </div>
 
       <div class="flex flex-wrap gap-2">
-        <button type="submit" class="btn btn-primary">Apply filters</button>
+        <button type="submit" class="btn btn-primary">Apply</button>
         <button type="button" class="btn btn-secondary" (click)="resetFilters()">Reset</button>
       </div>
     </div>
 
     <p class="mt-3 text-sm text-brand-plum/60">
-      Blank dates use Spring's default 30-day range. Page size is 50 events.
+      Leave the dates blank to view the previous 30 days. Results are shown 50 at a time.
     </p>
 
     @if (filterForm.hasError('invalidAnalyticsRange') && filterForm.touched) {
@@ -72,7 +72,7 @@
     </div>
   } @else if (status() === 'forbidden') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
-      <h2 class="font-semibold text-brand-plum">Operational events unavailable</h2>
+      <h2 class="font-semibold text-brand-plum">Application activity unavailable</h2>
       <p class="mt-2 text-brand-plum/70">The server did not authorize this account for admin analytics.</p>
     </div>
   } @else if (status() === 'error') {
@@ -83,7 +83,7 @@
   } @else if (eventPage(); as currentPage) {
     @if (currentPage.events.length === 0) {
       <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
-        <h2 class="font-semibold text-brand-plum">No operational events</h2>
+        <h2 class="font-semibold text-brand-plum">No application activity</h2>
         <p class="mt-2 text-brand-plum/70">No events match the selected range and category.</p>
       </div>
     } @else {

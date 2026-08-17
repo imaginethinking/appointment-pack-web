@@ -52,7 +52,7 @@ export class MedicationCreate {
     const selectedPatient = this.selectedPatient();
 
     if (selectedPatient === null || !this.canEdit()) {
-      this.errorMessage.set('You do not have permission to add medications for the selected patient.');
+      this.errorMessage.set('Your current access does not allow new medications to be added.');
       return;
     }
 
@@ -97,7 +97,7 @@ export class MedicationCreate {
         this.errorMessage.set(
           this.canEdit()
             ? 'The medication could not be created because the patient record is no longer available.'
-            : 'You no longer have permission to add medications for this patient.',
+            : 'Your current access does not allow new medications to be added.',
         );
       },
       error: (refreshError: unknown) => {

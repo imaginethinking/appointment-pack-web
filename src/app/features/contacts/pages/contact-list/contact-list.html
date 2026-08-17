@@ -12,8 +12,8 @@
 
     @if (canEditContacts()) {
       <div class="flex flex-wrap gap-3">
-        <a routerLink="/contacts/healthcare/create" class="btn btn-primary">Add healthcare contact</a>
-        <a routerLink="/contacts/emergency/create" class="btn btn-secondary">Add emergency contact</a>
+        <a routerLink="/contacts/healthcare/create" class="btn btn-primary">Add healthcare</a>
+        <a routerLink="/contacts/emergency/create" class="btn btn-secondary">Add emergency</a>
       </div>
     }
   </div>
@@ -23,12 +23,12 @@
   } @else if (status() === 'no-patient') {
     <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
       <h2 class="font-semibold text-brand-plum">No patient selected</h2>
-      <p class="mt-2 text-brand-plum/70">Select an accessible patient before viewing contacts.</p>
+      <p class="mt-2 text-brand-plum/70">Select a patient to view contacts.</p>
     </div>
   } @else if (status() === 'forbidden') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
       <h2 class="font-semibold text-brand-plum">Contacts unavailable</h2>
-      <p class="mt-2 text-brand-plum/70">You do not have permission to view contacts for this patient.</p>
+      <p class="mt-2 text-brand-plum/70">Contacts are not available with your current access.</p>
     </div>
   } @else if (status() === 'error') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
@@ -45,7 +45,7 @@
           </div>
 
           @if (canEditContacts()) {
-            <a routerLink="/contacts/healthcare/create" class="text-sm font-semibold text-brand-plum underline">Add healthcare contact</a>
+            <a routerLink="/contacts/healthcare/create" class="text-sm font-semibold text-brand-plum underline">Add healthcare</a>
           }
         </div>
 
@@ -118,7 +118,7 @@
           </div>
 
           @if (canEditContacts()) {
-            <a routerLink="/contacts/emergency/create" class="text-sm font-semibold text-brand-plum underline">Add emergency contact</a>
+            <a routerLink="/contacts/emergency/create" class="text-sm font-semibold text-brand-plum underline">Add emergency</a>
           }
         </div>
 

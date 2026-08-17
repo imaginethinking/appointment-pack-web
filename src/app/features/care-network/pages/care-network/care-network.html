@@ -2,7 +2,7 @@
   <div class="mb-6">
     <h1 class="text-3xl font-bold text-brand-plum">Care network</h1>
     <p class="mt-1 text-brand-plum/70">
-      Manage your carers and review patients who have shared access with you.
+      Manage who can support you and review patients who have shared their record with you.
     </p>
   </div>
 
@@ -12,18 +12,18 @@
     <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-8 text-center">
       <h2 class="text-xl font-semibold text-brand-plum">Patient record required</h2>
       <p class="mx-auto mt-2 max-w-lg text-brand-plum/70">
-        You must create a patient record before inviting carers.
+        Create your patient record before adding people to your care network.
       </p>
-      <a routerLink="/patient/create" class="btn btn-primary mt-6">Create patient record</a>
+      <a routerLink="/patient/create" class="btn btn-primary mt-6">Create record</a>
     </div>
   } @else {
     <div class="mb-8 rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
-      <h2 class="text-xl font-semibold text-brand-plum">Invite a carer</h2>
+      <h2 class="text-xl font-semibold text-brand-plum">Add a carer</h2>
 
       <form class="mt-5 space-y-6" [formGroup]="invitationForm" novalidate (ngSubmit)="inviteCarer()">
         <div>
           <label for="carerEmail" class="mb-1 block font-semibold text-brand-plum">
-            Registered carer email
+            Carer email address
           </label>
 
           <input
@@ -33,6 +33,8 @@
             class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
             formControlName="carerEmail"
           />
+
+          <p class="mt-1 text-sm text-brand-plum/60">The person must already have an Appointment Pack account.</p>
 
           @if (invitationForm.controls.carerEmail.touched && invitationForm.controls.carerEmail.hasError('required')) {
             <p class="mt-1 text-sm text-brand-coral">Carer email is required.</p>
@@ -50,7 +52,7 @@
         />
 
         <button type="submit" class="btn btn-primary" [disabled]="isInviting()">
-          {{ isInviting() ? 'Sending invitation...' : 'Invite carer' }}
+          {{ isInviting() ? 'Sending...' : 'Send invite' }}
         </button>
       </form>
     </div>
@@ -114,7 +116,7 @@
                         [disabled]="isBusy(relationship.id)"
                         (click)="savePermissions()"
                       >
-                        {{ isBusy(relationship.id) ? 'Saving...' : 'Save permissions' }}
+                        {{ isBusy(relationship.id) ? 'Saving...' : 'Save access' }}
                       </button>
 
                       <button
@@ -135,7 +137,7 @@
                       [disabled]="busyAccessId() !== null"
                       (click)="startPermissionEdit(relationship)"
                     >
-                      Edit permissions
+                      Edit access
                     </button>
 
                     <button
@@ -144,7 +146,7 @@
                       [disabled]="busyAccessId() !== null"
                       (click)="cancelInvitation(relationship)"
                     >
-                      {{ isBusy(relationship.id) ? 'Cancelling...' : 'Cancel invitation' }}
+                      {{ isBusy(relationship.id) ? 'Cancelling...' : 'Cancel invite' }}
                     </button>
                   </div>
                 }
@@ -192,7 +194,7 @@
                         [disabled]="isBusy(relationship.id)"
                         (click)="savePermissions()"
                       >
-                        {{ isBusy(relationship.id) ? 'Saving...' : 'Save permissions' }}
+                        {{ isBusy(relationship.id) ? 'Saving...' : 'Save access' }}
                       </button>
 
                       <button
@@ -213,7 +215,7 @@
                       [disabled]="busyAccessId() !== null"
                       (click)="startPermissionEdit(relationship)"
                     >
-                      Edit permissions
+                      Edit access
                     </button>
 
                     <button
@@ -237,7 +239,7 @@
 
         @if (inactiveRelationships().length === 0) {
           <p class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-5 text-brand-plum/70">
-            There is no inactive relationship history.
+            No previous care network relationships are recorded.
           </p>
         } @else {
           <div class="space-y-4">

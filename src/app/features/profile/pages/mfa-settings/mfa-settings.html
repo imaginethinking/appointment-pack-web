@@ -6,7 +6,7 @@
 
   @if (status() === 'loading') {
     <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">
-      Loading account security settings...
+      Loading account security...
     </div>
   } @else if (status() === 'error') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
@@ -14,11 +14,11 @@
       <button type="button" class="btn btn-secondary mt-4" (click)="loadSecurityStatus()">Try again</button>
     </div>
   } @else {
-    <div class="space-y-6">
+    <div class="grid gap-6 lg:grid-cols-2 lg:items-start">
       <section class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
         <div>
           <h2 class="text-xl font-semibold text-brand-plum">Password</h2>
-          <p class="mt-1 text-sm text-brand-plum/70">Change the password you use to sign in to your account.</p>
+          <p class="mt-1 text-sm text-brand-plum/70">Change the password you use to sign in.</p>
         </div>
 
         <form class="mt-5 space-y-4" [formGroup]="passwordForm" novalidate (ngSubmit)="changePassword()">
@@ -51,7 +51,7 @@
               formControlName="newPassword"
             />
 
-            <p class="mt-1 text-sm text-brand-plum/70">Use 8–128 characters including an uppercase letter, lowercase letter, number and symbol.</p>
+            <p class="mt-1 text-sm text-brand-plum/70">Use 8–128 characters with uppercase, lowercase, number and symbol.</p>
 
             @if (passwordForm.controls.newPassword.touched && passwordForm.controls.newPassword.hasError('required')) {
               <p class="mt-1 text-sm text-brand-coral">Enter a new password.</p>
@@ -63,7 +63,7 @@
           </div>
 
           <div>
-            <label class="mb-1 block font-semibold text-brand-plum" for="confirmPassword">Confirm new password</label>
+            <label class="mb-1 block font-semibold text-brand-plum" for="confirmPassword">Confirm password</label>
             <input
               id="confirmPassword"
               class="w-full rounded-md border border-brand-plum/30 bg-white p-2 text-brand-plum"
@@ -91,7 +91,7 @@
           }
 
           <button class="btn btn-primary" type="submit" [disabled]="isChangingPassword()">
-            {{ isChangingPassword() ? 'Changing password...' : 'Change password' }}
+            {{ isChangingPassword() ? 'Saving...' : 'Change password' }}
           </button>
         </form>
       </section>
@@ -100,7 +100,7 @@
         <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h2 class="text-xl font-semibold text-brand-plum">Multi-factor authentication</h2>
-            <p class="mt-1 text-sm text-brand-plum/70">Add an authenticator code as an additional sign-in check.</p>
+            <p class="mt-1 text-sm text-brand-plum/70">Use an authenticator app for extra protection when signing in.</p>
           </div>
 
           @if (mfaEnabled()) {
@@ -112,8 +112,8 @@
 
         @if (mfaEnabled()) {
           <div class="mt-5 rounded-md border border-brand-plum/20 bg-white p-4">
-            <p class="font-semibold text-brand-plum">Disable multi-factor authentication</p>
-            <p class="mt-1 text-sm text-brand-plum/70">Enter a current code from your authenticator app to confirm this change.</p>
+            <h3 class="font-semibold text-brand-plum">Disable MFA</h3>
+            <p class="mt-1 text-sm text-brand-plum/70">Enter a current code from your authenticator app to confirm.</p>
 
             <form class="mt-4 space-y-4" [formGroup]="disableMfaForm" novalidate (ngSubmit)="disableMfa()">
               <div>
@@ -136,15 +136,15 @@
               </div>
 
               <button class="btn btn-danger" type="submit" [disabled]="isDisablingMfa()">
-                {{ isDisablingMfa() ? 'Disabling...' : 'Disable multi-factor authentication' }}
+                {{ isDisablingMfa() ? 'Disabling...' : 'Disable MFA' }}
               </button>
             </form>
           </div>
         } @else if (!provisioningUri()) {
           <div class="mt-5">
-            <p class="text-brand-plum/70">Set up multi-factor authentication using an authenticator app on your phone or another trusted device.</p>
+            <p class="text-brand-plum/70">Connect an authenticator app to protect your account with a six-digit sign-in code.</p>
             <button class="btn btn-primary mt-4" type="button" [disabled]="isStartingSetup()" (click)="startSetup()">
-              {{ isStartingSetup() ? 'Starting setup...' : 'Set up multi-factor authentication' }}
+              {{ isStartingSetup() ? 'Starting...' : 'Set up MFA' }}
             </button>
           </div>
         }
@@ -152,8 +152,8 @@
         @if (provisioningUri(); as uri) {
           <div class="mt-6 space-y-5 rounded-md border border-brand-plum/20 bg-white p-5">
             <div>
-              <h3 class="font-semibold text-brand-plum">Connect your authenticator app</h3>
-              <p class="mt-1 text-sm text-brand-plum/70">Scan this QR code, then enter the six-digit code shown in your authenticator app.</p>
+              <h3 class="font-semibold text-brand-plum">Connect your app</h3>
+              <p class="mt-1 text-sm text-brand-plum/70">Scan the QR code, then enter the six-digit code shown in your authenticator app.</p>
             </div>
 
             <div class="inline-block rounded-md border border-brand-plum/20 bg-white p-4">
@@ -182,7 +182,7 @@
 
               <div class="flex flex-wrap gap-3">
                 <button class="btn btn-primary" type="submit" [disabled]="isConfirmingSetup()">
-                  {{ isConfirmingSetup() ? 'Confirming...' : 'Confirm setup' }}
+                  {{ isConfirmingSetup() ? 'Confirming...' : 'Confirm' }}
                 </button>
                 <button class="btn btn-secondary" type="button" [disabled]="isConfirmingSetup()" (click)="cancelSetup()">Cancel</button>
               </div>

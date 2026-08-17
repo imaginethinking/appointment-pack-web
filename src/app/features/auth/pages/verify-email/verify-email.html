@@ -11,12 +11,12 @@
     </div>
 
     <a class="btn btn-primary mt-6 w-full" routerLink="/login" [queryParams]="{ returnUrl: returnUrl }">
-      Continue to login
+      Sign in
     </a>
   } @else {
     @if (state() === 'pending') {
       <p class="mb-6 text-brand-plum/70">
-        Check your email and open the verification link before logging in. If required, you can request another verification email below.
+        Check your email and open the verification link before signing in. You can request another email below if needed.
       </p>
     }
 
@@ -51,7 +51,7 @@
       </div>
 
       <button class="btn btn-secondary w-full" type="submit" [disabled]="isResending()">
-        {{ isResending() ? 'Requesting...' : 'Resend verification email' }}
+        {{ isResending() ? 'Sending...' : 'Resend email' }}
       </button>
     </form>
 
@@ -66,7 +66,7 @@
     }
 
     <a class="btn btn-ghost mt-6 w-full" routerLink="/login" [queryParams]="{ returnUrl: returnUrl }">
-      Return to login
+      Back
     </a>
   }
 </section>

@@ -111,7 +111,7 @@ export class MedicationEdit implements OnInit {
 
         if (selectedPatient === null || medication.patientRecordId !== selectedPatient.patientRecordId) {
           this.status.set('invalid');
-          this.errorMessage.set('This medication does not belong to the currently selected patient.');
+          this.errorMessage.set('This medication is not available for the selected patient.');
           return;
         }
 

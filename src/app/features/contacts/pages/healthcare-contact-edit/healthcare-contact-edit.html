@@ -1,9 +1,9 @@
 <section class="app-page">
   <div class="mb-6">
     @if (contact(); as currentContact) {
-      <a [routerLink]="['/contacts/healthcare', currentContact.id]" class="text-sm font-semibold text-brand-plum underline">Back to healthcare contact</a>
+      <a [routerLink]="['/contacts/healthcare', currentContact.id]" class="text-sm font-semibold text-brand-plum underline">Back</a>
     } @else {
-      <a routerLink="/contacts" class="text-sm font-semibold text-brand-plum underline">Back to contacts</a>
+      <a routerLink="/contacts" class="text-sm font-semibold text-brand-plum underline">Back</a>
     }
 
     <h1 class="mt-4 text-3xl font-bold text-brand-plum">Edit healthcare contact</h1>
@@ -19,12 +19,12 @@
   } @else if (status() === 'forbidden') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
       <h2 class="font-semibold text-brand-plum">Editing unavailable</h2>
-      <p class="mt-2 text-brand-plum/70">You do not have permission to edit this healthcare contact.</p>
+      <p class="mt-2 text-brand-plum/70">Your current access does not allow changes to this healthcare contact.</p>
     </div>
   } @else if (status() === 'invalid') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
       <p class="text-brand-plum">{{ errorMessage() }}</p>
-      <a routerLink="/contacts" class="btn btn-secondary mt-4">Return to contacts</a>
+      <a routerLink="/contacts" class="btn btn-secondary mt-4">Back</a>
     </div>
   } @else if (status() === 'error') {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
@@ -40,7 +40,7 @@
       }
 
       <div class="flex flex-wrap gap-3">
-        <button type="submit" class="btn btn-primary" [disabled]="isSaving()">{{ isSaving() ? 'Saving...' : 'Save healthcare contact' }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving()">{{ isSaving() ? 'Saving...' : 'Save' }}</button>
         <a [routerLink]="['/contacts/healthcare', currentContact.id]" class="btn btn-secondary">Cancel</a>
       </div>
     </form>

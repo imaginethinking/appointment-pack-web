@@ -106,7 +106,7 @@ export function getPatientActivityActionLabel(action: PatientActivityAction): st
     case 'REVOKED':
       return 'Access revoked';
     case 'PERMISSIONS_UPDATED':
-      return 'Permissions updated';
+      return 'Access updated';
     case 'APPOINTMENT_CONFIRMED':
       return 'Appointment confirmed';
     case 'APPOINTMENT_REJECTED':

@@ -1,6 +1,6 @@
 <section class="app-page">
   <div class="mb-6">
-    <a routerLink="/contacts" class="text-sm font-semibold text-brand-plum underline">Back to contacts</a>
+    <a routerLink="/contacts" class="text-sm font-semibold text-brand-plum underline">Back</a>
     <h1 class="mt-4 text-3xl font-bold text-brand-plum">Add healthcare contact</h1>
 
     @if (selectedPatient()) {
@@ -11,12 +11,12 @@
   @if (!selectedPatient()) {
     <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6">
       <h2 class="font-semibold text-brand-plum">No patient selected</h2>
-      <p class="mt-2 text-brand-plum/70">Select an accessible patient before adding a healthcare contact.</p>
+      <p class="mt-2 text-brand-plum/70">Select a patient before adding a healthcare contact.</p>
     </div>
   } @else if (!canEdit()) {
     <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
       <h2 class="font-semibold text-brand-plum">Contact editing unavailable</h2>
-      <p class="mt-2 text-brand-plum/70">You do not have permission to add contacts for this patient.</p>
+      <p class="mt-2 text-brand-plum/70">Your current access does not allow new contacts to be added.</p>
     </div>
   } @else {
     <form class="space-y-6" [formGroup]="form" novalidate (ngSubmit)="create()">
@@ -27,7 +27,7 @@
       }
 
       <div class="flex flex-wrap gap-3">
-        <button type="submit" class="btn btn-primary" [disabled]="isSaving()">{{ isSaving() ? 'Creating...' : 'Create healthcare contact' }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving()">{{ isSaving() ? 'Saving...' : 'Save' }}</button>
         <a routerLink="/contacts" class="btn btn-secondary">Cancel</a>
       </div>
     </form>

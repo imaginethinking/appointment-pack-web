@@ -52,7 +52,7 @@ export class BloodTestCreate {
     const selectedPatient = this.selectedPatient();
 
     if (selectedPatient === null || !this.canEdit()) {
-      this.errorMessage.set('You do not have permission to add blood results for the selected patient.');
+      this.errorMessage.set('Your current access does not allow new blood tests to be added.');
       return;
     }
 
@@ -96,7 +96,7 @@ export class BloodTestCreate {
 
         this.errorMessage.set(this.canEdit()
           ? 'The blood test could not be created because the patient record is no longer available.'
-          : 'You no longer have permission to add blood results for this patient.');
+          : 'Your current access does not allow new blood tests to be added.');
       },
       error: (refreshError: unknown) => this.errorMessage.set(getHttpErrorMessage(refreshError, 'Unable to refresh patient access.')),
     });

@@ -91,7 +91,7 @@ export class AppointmentPackDetails implements OnInit {
     ).subscribe({
       next: (response) => {
         if (response.body === null) {
-          this.actionError.set('The downloaded appointment-pack file was empty.');
+          this.actionError.set('The downloaded appointment pack was empty.');
           return;
         }
 
@@ -114,7 +114,7 @@ export class AppointmentPackDetails implements OnInit {
       return;
     }
 
-    if (!window.confirm('Archive this appointment pack? The generated snapshot will no longer appear in the normal pack list.')) {
+    if (!window.confirm('Archive this appointment pack? It will no longer appear in the appointment pack list.')) {
       return;
     }
 
@@ -177,7 +177,7 @@ export class AppointmentPackDetails implements OnInit {
 
         if (selectedPatient === null || appointmentPack.patientRecordId !== selectedPatient.patientRecordId) {
           this.status.set('invalid');
-          this.errorMessage.set('This appointment pack does not belong to the currently selected patient.');
+          this.errorMessage.set('This appointment pack is not available for the selected patient.');
           return;
         }
 
@@ -250,7 +250,7 @@ export class AppointmentPackDetails implements OnInit {
 
         if (action === 'archive') {
           this.status.set('ready');
-          this.actionError.set('You no longer have permission to archive appointment packs for this patient.');
+          this.actionError.set('Your current access does not allow appointment packs to be archived.');
           return;
         }
 

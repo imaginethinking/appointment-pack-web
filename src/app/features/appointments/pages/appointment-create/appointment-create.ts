@@ -52,7 +52,7 @@ export class AppointmentCreate {
     const selectedPatient = this.selectedPatient();
 
     if (selectedPatient === null || !this.canEdit()) {
-      this.errorMessage.set('You do not have permission to create appointments for the selected patient.');
+      this.errorMessage.set('Your current access does not allow new appointments to be added.');
       return;
     }
 
@@ -97,7 +97,7 @@ export class AppointmentCreate {
         this.errorMessage.set(
           this.canEdit()
             ? 'The appointment could not be created because the patient record is no longer available.'
-            : 'You no longer have permission to create appointments for this patient.',
+            : 'Your current access does not allow new appointments to be added.',
         );
       },
       error: (refreshError: unknown) => {

@@ -1,8 +1,8 @@
 <section class="mx-auto max-w-md p-8">
-  <h1 class="mb-2 text-2xl font-bold text-brand-plum">Register</h1>
+  <h1 class="mb-2 text-2xl font-bold text-brand-plum">Create your account</h1>
 
   <p class="mb-6 text-brand-plum/70">
-    After registration, you will need to verify your email address before logging in.
+    We’ll send you an email to verify your address before you sign in.
   </p>
 
   <form class="space-y-4" [formGroup]="form" novalidate (ngSubmit)="register()">
@@ -68,7 +68,7 @@
       @if (form.controls.password.touched && form.controls.password.hasError('required')) {
         <p class="mt-1 text-sm text-brand-coral">Password is required.</p>
       } @else if (form.controls.password.touched && form.controls.password.hasError('strongPassword')) {
-        <p class="mt-1 text-sm text-brand-coral">Password does not meet the required complexity.</p>
+        <p class="mt-1 text-sm text-brand-coral">Password does not meet the requirements.</p>
       } @else if (form.controls.password.errors?.['server']; as message) {
         <p class="mt-1 text-sm text-brand-coral">{{ message }}</p>
       }
@@ -89,7 +89,7 @@
     </div>
 
     <button class="btn btn-primary w-full" type="submit" [disabled]="isSubmitting()">
-      {{ isSubmitting() ? 'Registering...' : 'Register' }}
+      {{ isSubmitting() ? 'Creating...' : 'Create account' }}
     </button>
 
     @if (errorMessage()) {
@@ -97,8 +97,8 @@
     }
 
     <p class="text-center text-brand-plum">
-      Already registered?
-      <a class="font-medium underline" routerLink="/login">Login</a>
+      Already have an account?
+      <a class="font-medium underline" routerLink="/login">Sign in</a>
     </p>
   </form>
 </section>

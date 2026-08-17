@@ -72,7 +72,7 @@ export class MedicationDetails implements OnInit {
       return;
     }
 
-    if (!window.confirm('Archive this medication? It will no longer appear in the normal medication list.')) {
+    if (!window.confirm('Archive this medication? It will no longer appear in the medication list.')) {
       return;
     }
 
@@ -100,7 +100,7 @@ export class MedicationDetails implements OnInit {
 
         if (selectedPatient === null || medication.patientRecordId !== selectedPatient.patientRecordId) {
           this.status.set('invalid');
-          this.errorMessage.set('This medication does not belong to the currently selected patient.');
+          this.errorMessage.set('This medication is not available for the selected patient.');
           return;
         }
 

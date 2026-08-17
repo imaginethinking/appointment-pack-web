@@ -132,7 +132,7 @@ export class MfaSettings implements OnInit {
         this.mfaEnabled.set(true);
         this.provisioningUri.set(null);
         this.setupForm.reset({ code: '' });
-        this.mfaSuccessMessage.set('Multi-factor authentication has been enabled.');
+        this.mfaSuccessMessage.set('Multi-factor authentication is now enabled.');
       },
       error: (error: unknown) => {
         if (applyServerFieldErrors(this.setupForm, error)) {
@@ -163,7 +163,7 @@ export class MfaSettings implements OnInit {
         this.provisioningUri.set(null);
         this.disableMfaForm.reset({ code: '' });
         this.setupForm.reset({ code: '' });
-        this.mfaSuccessMessage.set('Multi-factor authentication has been disabled. You can set it up again at any time.');
+        this.mfaSuccessMessage.set('Multi-factor authentication is now disabled. You can set it up again at any time.');
       },
       error: (error: unknown) => {
         if (applyServerFieldErrors(this.disableMfaForm, error)) {

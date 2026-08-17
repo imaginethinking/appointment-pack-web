@@ -111,7 +111,7 @@ export class AppointmentEdit implements OnInit {
 
         if (selectedPatient === null || appointment.patientRecordId !== selectedPatient.patientRecordId) {
           this.status.set('invalid');
-          this.errorMessage.set('This appointment does not belong to the currently selected patient.');
+          this.errorMessage.set('This appointment is not available for the selected patient.');
           return;
         }
 
