@@ -40,33 +40,33 @@ export const PERMISSION_GROUPS: readonly PermissionGroup[] = [
     resource: 'patient-record',
     label: 'Patient record',
     permissions: [
-      permissionOption('patient-record', 'view', 'View patient record', 'View patient-record details.'),
-      permissionOption('patient-record', 'edit', 'Edit patient record', 'Update patient-record details.', ['patient-record:view']),
+      permissionOption('patient-record', 'view', 'View patient record', 'View patient details and healthcare information.'),
+      permissionOption('patient-record', 'edit', 'Edit patient record', 'Update patient details and healthcare information.', ['patient-record:view']),
     ],
   },
   {
     resource: 'document',
     label: 'Documents',
     permissions: [
-      permissionOption('document', 'view', 'View documents', 'View document details and download stored documents.', ['patient-record:view']),
-      permissionOption('document', 'edit', 'Process and review documents', 'Process, review and archive documents when allowed.', ['document:view']),
-      permissionOption('document', 'upload', 'Upload documents', 'Upload new documents for the patient.', ['document:edit']),
+      permissionOption('document', 'view', 'View documents', 'View and download the patient’s documents.', ['patient-record:view']),
+      permissionOption('document', 'edit', 'Review documents', 'Process, review and archive documents.', ['document:view']),
+      permissionOption('document', 'upload', 'Upload documents', 'Add documents to the patient record.', ['document:edit']),
     ],
   },
   {
     resource: 'appointment',
     label: 'Appointments',
     permissions: [
-      permissionOption('appointment', 'view', 'View appointments', 'View appointments for the patient.', ['patient-record:view']),
-      permissionOption('appointment', 'edit', 'Manage appointments', 'Create, update, archive and confirm appointments.', ['appointment:view']),
+      permissionOption('appointment', 'view', 'View appointments', 'View the patient’s appointments.', ['patient-record:view']),
+      permissionOption('appointment', 'edit', 'Manage appointments', 'Add, update, archive and confirm appointments.', ['appointment:view']),
     ],
   },
   {
     resource: 'medication',
     label: 'Medications',
     permissions: [
-      permissionOption('medication', 'view', 'View medications', 'View the patient’s medication records.', ['patient-record:view']),
-      permissionOption('medication', 'edit', 'Manage medications', 'Create, update and archive medication records.', ['medication:view']),
+      permissionOption('medication', 'view', 'View medications', 'View the patient’s medications.', ['patient-record:view']),
+      permissionOption('medication', 'edit', 'Manage medications', 'Add, update and archive medications.', ['medication:view']),
     ],
   },
   {
@@ -74,38 +74,38 @@ export const PERMISSION_GROUPS: readonly PermissionGroup[] = [
     label: 'Contacts',
     permissions: [
       permissionOption('contact', 'view', 'View contacts', 'View healthcare and emergency contacts.', ['patient-record:view']),
-      permissionOption('contact', 'edit', 'Manage contacts', 'Create, update and archive healthcare and emergency contacts.', ['contact:view']),
+      permissionOption('contact', 'edit', 'Manage contacts', 'Add, update and archive healthcare and emergency contacts.', ['contact:view']),
     ],
   },
   {
     resource: 'blood-result',
     label: 'Blood results',
     permissions: [
-      permissionOption('blood-result', 'view', 'View blood results', 'View manually recorded blood tests and results.', ['patient-record:view']),
-      permissionOption('blood-result', 'edit', 'Manage blood results', 'Create, update and archive blood-test records.', ['blood-result:view']),
+      permissionOption('blood-result', 'view', 'View blood results', 'View blood tests and results.', ['patient-record:view']),
+      permissionOption('blood-result', 'edit', 'Manage blood results', 'Add, update and archive blood tests.', ['blood-result:view']),
     ],
   },
   {
     resource: 'history',
     label: 'Medical history',
     permissions: [
-      permissionOption('history', 'view', 'View medical history', 'View medical-history entries.', ['patient-record:view']),
-      permissionOption('history', 'edit', 'Manage medical history', 'Create, update, archive and accept medical-history entries.', ['history:view']),
+      permissionOption('history', 'view', 'View medical history', 'View the patient’s medical history.', ['patient-record:view']),
+      permissionOption('history', 'edit', 'Manage medical history', 'Add, update and archive medical history entries.', ['history:view']),
     ],
   },
   {
     resource: 'appointment-pack',
     label: 'Appointment packs',
     permissions: [
-      permissionOption('appointment-pack', 'view', 'View appointment packs', 'View and download generated appointment packs.', ['patient-record:view']),
-      permissionOption('appointment-pack', 'create', 'Generate appointment packs', 'Generate and archive appointment-pack snapshots.', ['appointment-pack:view']),
+      permissionOption('appointment-pack', 'view', 'View appointment packs', 'View and download appointment packs.', ['patient-record:view']),
+      permissionOption('appointment-pack', 'create', 'Create appointment packs', 'Create and archive appointment packs.', ['appointment-pack:view']),
     ],
   },
   {
     resource: 'audit',
     label: 'Activity history',
     permissions: [
-      permissionOption('audit', 'view', 'View activity history', 'View patient-centred audit activity.', ['patient-record:view']),
+      permissionOption('audit', 'view', 'View activity history', 'View important activity recorded for the patient.', ['patient-record:view']),
     ],
   },
 ];
