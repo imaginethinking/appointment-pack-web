@@ -1,3 +1,4 @@
+import { DOCUMENT } from '@angular/common';
 import { Component, effect, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
@@ -12,6 +13,7 @@ import { Navbar } from './shared/components/navbar/navbar';
   templateUrl: './app.html',
 })
 export class App {
+  private readonly document = inject(DOCUMENT);
   private readonly authService = inject(AuthService);
   private readonly pageTelemetryService = inject(PageTelemetryService);
   private readonly patientContextCoordinator = inject(PatientContextCoordinator);
@@ -33,5 +35,12 @@ export class App {
 
       onCleanup(() => subscription.unsubscribe());
     });
+  }
+
+  // The normal #main-content link is resolved against Angular's base URL, which can return us to '/'.
+  // Preventing the navigation lets the link simply move keyboard focus to the current page content instead.
+  protected skipToMainContent(event: Event): void {
+    event.preventDefault();
+    this.document.getElementById('main-content')?.focus();
   }
 }
