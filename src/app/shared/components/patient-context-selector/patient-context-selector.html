@@ -3,6 +3,7 @@
   [class.w-full]="fullWidth()"
   [class.max-w-72]="!fullWidth()"
   (click)="$event.stopPropagation()"
+  (keydown.escape)="closeMenuOnEscape()"
 >
   <label
     [for]="selectId()"
@@ -16,10 +17,10 @@
   </label>
 
   <button
+    #triggerButton
     type="button"
     [id]="selectId()"
     class="flex h-10 w-full items-center justify-between gap-3 rounded-md border border-brand-peach bg-brand-off-white px-4 text-sm font-medium text-brand-plum transition-colors hover:bg-brand-pink focus:outline-none focus:ring-2 focus:ring-brand-mint/50 disabled:cursor-not-allowed disabled:opacity-60"
-    aria-haspopup="listbox"
     [attr.aria-expanded]="menuOpen()"
     [attr.aria-controls]="selectId() + '-options'"
     [disabled]="isLoading() || loadFailed() || patientContexts().length === 0"
@@ -45,17 +46,14 @@
   @if (menuOpen()) {
     <div
       [id]="selectId() + '-options'"
-      role="listbox"
       class="absolute right-0 z-50 mt-2 max-h-72 w-full min-w-72 overflow-y-auto rounded-md border border-brand-peach bg-brand-off-white py-2 text-brand-plum shadow-lg"
     >
       @for (context of patientContexts(); track context.patientRecordId) {
         <button
           type="button"
-          role="option"
           class="flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-brand-pink focus:bg-brand-pink focus:outline-none"
           [class.bg-brand-pink]="isSelected(context)"
           [class.font-semibold]="isSelected(context)"
-          [attr.aria-selected]="isSelected(context)"
           (click)="selectPatient(context.patientRecordId, $event)"
         >
           <span class="min-w-0">

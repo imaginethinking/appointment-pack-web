@@ -1,4 +1,4 @@
-import { Component, HostListener, computed, inject, input, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, computed, inject, input, signal, viewChild } from '@angular/core';
 
 import { getPatientContextName, SelectedPatientContext } from '../../../features/patient-context/models/selected-patient-context';
 import { PatientContextCoordinator } from '../../../features/patient-context/services/patient-context-coordinator';
@@ -11,6 +11,7 @@ import { SelectedPatientState } from '../../../features/patient-context/services
 export class PatientContextSelector {
   private readonly selectedPatientState = inject(SelectedPatientState);
   private readonly patientContextCoordinator = inject(PatientContextCoordinator);
+  private readonly triggerButton = viewChild<ElementRef<HTMLButtonElement>>('triggerButton');
 
   readonly selectId = input.required<string>();
   readonly showLabel = input(false);
@@ -79,8 +80,13 @@ export class PatientContextSelector {
     this.menuOpen.set(false);
   }
 
-  @HostListener('document:keydown.escape')
+  // Escape closes the custom selector and returns focus to the button that opened it.
   protected closeMenuOnEscape(): void {
+    if (!this.menuOpen()) {
+      return;
+    }
+
     this.menuOpen.set(false);
+    this.triggerButton()?.nativeElement.focus();
   }
 }
