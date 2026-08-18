@@ -3,12 +3,14 @@ import { CanActivateFn, Router } from '@angular/router';
 
 import { PermissionRequirement } from '../models/permission-model';
 import { PatientContextAuthorisation } from '../../features/patient-context/services/patient-context-auth';
+import { PatientContextCoordinator } from '../../features/patient-context/services/patient-context-coordinator';
 import { SelectedPatientState } from '../../features/patient-context/services/selected-patient-state';
 
 export const selectedPatientPermissionGuard: CanActivateFn = (route) => {
   const authorisation = inject(PatientContextAuthorisation);
 
   const selectedPatientState = inject(SelectedPatientState);
+  const patientContextCoordinator = inject(PatientContextCoordinator);
 
   const router = inject(Router);
 
@@ -16,6 +18,10 @@ export const selectedPatientPermissionGuard: CanActivateFn = (route) => {
 
   if (requirement === undefined) {
     return router.createUrlTree(['/access-denied']);
+  }
+
+  if (patientContextCoordinator.loadFailed()) {
+    return router.createUrlTree(['/home']);
   }
 
   const permitted = authorisation.can(

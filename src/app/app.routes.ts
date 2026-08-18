@@ -5,90 +5,37 @@ import { authGuard } from './core/guards/auth-guard';
 import { mfaLoginGuard } from './core/guards/mfa-login-guard';
 import { patientContextLoadGuard } from './core/guards/patient-context-load-guard';
 import { selectedPatientPermissionGuard } from './core/guards/selected-patient-permission-guard';
-import { AdminAnalyticsEvents } from './features/admin-analytics/pages/admin-analytics-events/admin-analytics-events';
-import { AdminAnalyticsSummary } from './features/admin-analytics/pages/admin-analytics-summary/admin-analytics-summary';
-import { AppointmentPackCreate } from './features/appointment-packs/pages/appointment-pack-create/appointment-pack-create';
-import { AppointmentPackDetails } from './features/appointment-packs/pages/appointment-pack-details/appointment-pack-details';
-import { AppointmentPackList } from './features/appointment-packs/pages/appointment-pack-list/appointment-pack-list';
-import { AppointmentCreate } from './features/appointments/pages/appointment-create/appointment-create';
-import { AppointmentDetails } from './features/appointments/pages/appointment-details/appointment-details';
-import { AppointmentEdit } from './features/appointments/pages/appointment-edit/appointment-edit';
-import { AppointmentList } from './features/appointments/pages/appointment-list/appointment-list';
-import { PatientAudit } from './features/audit/pages/patient-audit/patient-audit';
-import { ForgotPassword } from './features/auth/pages/forgot-password/forgot-password';
-import { Login } from './features/auth/pages/login/login';
-import { MfaLogin } from './features/auth/pages/mfa-login/mfa-login';
-import { Register } from './features/auth/pages/register/register';
-import { ResetPassword } from './features/auth/pages/reset-password/reset-password';
-import { VerifyEmail } from './features/auth/pages/verify-email/verify-email';
-import { BloodTestCreate } from './features/blood-results/pages/blood-test-create/blood-test-create';
-import { BloodTestDetails } from './features/blood-results/pages/blood-test-details/blood-test-details';
-import { BloodTestEdit } from './features/blood-results/pages/blood-test-edit/blood-test-edit';
-import { BloodTestList } from './features/blood-results/pages/blood-test-list/blood-test-list';
-import { CareNetwork } from './features/care-network/pages/care-network/care-network';
-import { CarerAccess } from './features/care-network/pages/carer-access/carer-access';
-import { ContactList } from './features/contacts/pages/contact-list/contact-list';
-import { EmergencyContactCreate } from './features/contacts/pages/emergency-contact-create/emergency-contact-create';
-import { EmergencyContactDetails } from './features/contacts/pages/emergency-contact-details/emergency-contact-details';
-import { EmergencyContactEdit } from './features/contacts/pages/emergency-contact-edit/emergency-contact-edit';
-import { HealthcareContactCreate } from './features/contacts/pages/healthcare-contact-create/healthcare-contact-create';
-import { HealthcareContactDetails } from './features/contacts/pages/healthcare-contact-details/healthcare-contact-details';
-import { HealthcareContactEdit } from './features/contacts/pages/healthcare-contact-edit/healthcare-contact-edit';
-import { AppointmentReview } from './features/documents/pages/appointment-review/appointment-review';
-import { DeidentificationReview } from './features/documents/pages/deidentification-review/deidentification-review';
-import { DocumentDetails } from './features/documents/pages/document-details/document-details';
-import { DocumentList } from './features/documents/pages/document-list/document-list';
-import { DocumentUpload } from './features/documents/pages/document-upload/document-upload';
-import { SummaryReview } from './features/documents/pages/summary-review/summary-review';
-import { AccessDenied } from './features/errors/pages/access-denied/access-denied';
-import { NotFound } from './features/errors/pages/not-found/not-found';
-import { Home } from './features/home/pages/home/home';
-import { Landing } from './features/landing/pages/landing/landing';
-import { MedicalHistoryCreate } from './features/medical-history/pages/medical-history-create/medical-history-create';
-import { MedicalHistoryDetails } from './features/medical-history/pages/medical-history-details/medical-history-details';
-import { MedicalHistoryEdit } from './features/medical-history/pages/medical-history-edit/medical-history-edit';
-import { MedicalHistory } from './features/medical-history/pages/medical-history/medical-history';
-import { MedicationCreate } from './features/medications/pages/medication-create/medication-create';
-import { MedicationDetails } from './features/medications/pages/medication-details/medication-details';
-import { MedicationEdit } from './features/medications/pages/medication-edit/medication-edit';
-import { MedicationList } from './features/medications/pages/medication-list/medication-list';
-import { PatientRecordCreate } from './features/patient-record/pages/patient-record-create/patient-record-create';
-import { PatientRecordEdit } from './features/patient-record/pages/patient-record-edit/patient-record-edit';
-import { PatientRecord } from './features/patient-record/pages/patient-record/patient-record';
-import { MfaSettings } from './features/profile/pages/mfa-settings/mfa-settings';
-import { ProfileEdit } from './features/profile/pages/profile-edit/profile-edit';
-import { Profile } from './features/profile/pages/profile/profile';
 
 export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    component: Landing,
+    loadComponent: () => import('./features/landing/pages/landing/landing').then((module) => module.Landing),
   },
   {
     path: 'register',
-    component: Register,
+    loadComponent: () => import('./features/auth/pages/register/register').then((module) => module.Register),
   },
   {
     path: 'login',
-    component: Login,
+    loadComponent: () => import('./features/auth/pages/login/login').then((module) => module.Login),
   },
   {
     path: 'login/mfa',
-    component: MfaLogin,
+    loadComponent: () => import('./features/auth/pages/mfa-login/mfa-login').then((module) => module.MfaLogin),
     canActivate: [mfaLoginGuard],
   },
   {
     path: 'verify-email',
-    component: VerifyEmail,
+    loadComponent: () => import('./features/auth/pages/verify-email/verify-email').then((module) => module.VerifyEmail),
   },
   {
     path: 'forgot-password',
-    component: ForgotPassword,
+    loadComponent: () => import('./features/auth/pages/forgot-password/forgot-password').then((module) => module.ForgotPassword),
   },
   {
     path: 'reset-password',
-    component: ResetPassword,
+    loadComponent: () => import('./features/auth/pages/reset-password/reset-password').then((module) => module.ResetPassword),
   },
   {
     path: '',
@@ -96,31 +43,31 @@ export const routes: Routes = [
     children: [
       {
         path: 'home',
-        component: Home,
+        loadComponent: () => import('./features/home/pages/home/home').then((module) => module.Home),
       },
       {
         path: 'profile',
-        component: Profile,
+        loadComponent: () => import('./features/profile/pages/profile/profile').then((module) => module.Profile),
       },
       {
         path: 'profile/edit',
-        component: ProfileEdit,
+        loadComponent: () => import('./features/profile/pages/profile-edit/profile-edit').then((module) => module.ProfileEdit),
       },
       {
         path: 'profile/settings/mfa',
-        component: MfaSettings,
+        loadComponent: () => import('./features/profile/pages/mfa-settings/mfa-settings').then((module) => module.MfaSettings),
       },
       {
         path: 'patient',
-        component: PatientRecord,
+        loadComponent: () => import('./features/patient-record/pages/patient-record/patient-record').then((module) => module.PatientRecord),
       },
       {
         path: 'patient/create',
-        component: PatientRecordCreate,
+        loadComponent: () => import('./features/patient-record/pages/patient-record-create/patient-record-create').then((module) => module.PatientRecordCreate),
       },
       {
         path: 'patient/edit',
-        component: PatientRecordEdit,
+        loadComponent: () => import('./features/patient-record/pages/patient-record-edit/patient-record-edit').then((module) => module.PatientRecordEdit),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -131,7 +78,7 @@ export const routes: Routes = [
       },
       {
         path: 'documents',
-        component: DocumentList,
+        loadComponent: () => import('./features/documents/pages/document-list/document-list').then((module) => module.DocumentList),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -142,7 +89,7 @@ export const routes: Routes = [
       },
       {
         path: 'documents/upload',
-        component: DocumentUpload,
+        loadComponent: () => import('./features/documents/pages/document-upload/document-upload').then((module) => module.DocumentUpload),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -153,7 +100,7 @@ export const routes: Routes = [
       },
       {
         path: 'documents/:documentId/appointment-review',
-        component: AppointmentReview,
+        loadComponent: () => import('./features/documents/pages/appointment-review/appointment-review').then((module) => module.AppointmentReview),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -164,7 +111,7 @@ export const routes: Routes = [
       },
       {
         path: 'documents/:documentId/deidentification-review',
-        component: DeidentificationReview,
+        loadComponent: () => import('./features/documents/pages/deidentification-review/deidentification-review').then((module) => module.DeidentificationReview),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -175,7 +122,7 @@ export const routes: Routes = [
       },
       {
         path: 'documents/:documentId/summary-review',
-        component: SummaryReview,
+        loadComponent: () => import('./features/documents/pages/summary-review/summary-review').then((module) => module.SummaryReview),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -186,7 +133,7 @@ export const routes: Routes = [
       },
       {
         path: 'documents/:documentId',
-        component: DocumentDetails,
+        loadComponent: () => import('./features/documents/pages/document-details/document-details').then((module) => module.DocumentDetails),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -197,7 +144,7 @@ export const routes: Routes = [
       },
       {
         path: 'appointments',
-        component: AppointmentList,
+        loadComponent: () => import('./features/appointments/pages/appointment-list/appointment-list').then((module) => module.AppointmentList),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -208,7 +155,7 @@ export const routes: Routes = [
       },
       {
         path: 'appointments/create',
-        component: AppointmentCreate,
+        loadComponent: () => import('./features/appointments/pages/appointment-create/appointment-create').then((module) => module.AppointmentCreate),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -219,7 +166,7 @@ export const routes: Routes = [
       },
       {
         path: 'appointments/:appointmentId/edit',
-        component: AppointmentEdit,
+        loadComponent: () => import('./features/appointments/pages/appointment-edit/appointment-edit').then((module) => module.AppointmentEdit),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -230,7 +177,7 @@ export const routes: Routes = [
       },
       {
         path: 'appointments/:appointmentId',
-        component: AppointmentDetails,
+        loadComponent: () => import('./features/appointments/pages/appointment-details/appointment-details').then((module) => module.AppointmentDetails),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -241,7 +188,7 @@ export const routes: Routes = [
       },
       {
         path: 'appointment-packs',
-        component: AppointmentPackList,
+        loadComponent: () => import('./features/appointment-packs/pages/appointment-pack-list/appointment-pack-list').then((module) => module.AppointmentPackList),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -252,7 +199,7 @@ export const routes: Routes = [
       },
       {
         path: 'appointment-packs/create',
-        component: AppointmentPackCreate,
+        loadComponent: () => import('./features/appointment-packs/pages/appointment-pack-create/appointment-pack-create').then((module) => module.AppointmentPackCreate),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -263,7 +210,7 @@ export const routes: Routes = [
       },
       {
         path: 'appointment-packs/:appointmentPackId',
-        component: AppointmentPackDetails,
+        loadComponent: () => import('./features/appointment-packs/pages/appointment-pack-details/appointment-pack-details').then((module) => module.AppointmentPackDetails),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -274,7 +221,7 @@ export const routes: Routes = [
       },
       {
         path: 'medications',
-        component: MedicationList,
+        loadComponent: () => import('./features/medications/pages/medication-list/medication-list').then((module) => module.MedicationList),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -285,7 +232,7 @@ export const routes: Routes = [
       },
       {
         path: 'medications/create',
-        component: MedicationCreate,
+        loadComponent: () => import('./features/medications/pages/medication-create/medication-create').then((module) => module.MedicationCreate),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -296,7 +243,7 @@ export const routes: Routes = [
       },
       {
         path: 'medications/:medicationId/edit',
-        component: MedicationEdit,
+        loadComponent: () => import('./features/medications/pages/medication-edit/medication-edit').then((module) => module.MedicationEdit),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -307,7 +254,7 @@ export const routes: Routes = [
       },
       {
         path: 'medications/:medicationId',
-        component: MedicationDetails,
+        loadComponent: () => import('./features/medications/pages/medication-details/medication-details').then((module) => module.MedicationDetails),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -318,7 +265,7 @@ export const routes: Routes = [
       },
       {
         path: 'contacts',
-        component: ContactList,
+        loadComponent: () => import('./features/contacts/pages/contact-list/contact-list').then((module) => module.ContactList),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -329,7 +276,7 @@ export const routes: Routes = [
       },
       {
         path: 'contacts/healthcare/create',
-        component: HealthcareContactCreate,
+        loadComponent: () => import('./features/contacts/pages/healthcare-contact-create/healthcare-contact-create').then((module) => module.HealthcareContactCreate),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -340,7 +287,7 @@ export const routes: Routes = [
       },
       {
         path: 'contacts/healthcare/:contactId/edit',
-        component: HealthcareContactEdit,
+        loadComponent: () => import('./features/contacts/pages/healthcare-contact-edit/healthcare-contact-edit').then((module) => module.HealthcareContactEdit),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -351,7 +298,7 @@ export const routes: Routes = [
       },
       {
         path: 'contacts/healthcare/:contactId',
-        component: HealthcareContactDetails,
+        loadComponent: () => import('./features/contacts/pages/healthcare-contact-details/healthcare-contact-details').then((module) => module.HealthcareContactDetails),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -362,7 +309,7 @@ export const routes: Routes = [
       },
       {
         path: 'contacts/emergency/create',
-        component: EmergencyContactCreate,
+        loadComponent: () => import('./features/contacts/pages/emergency-contact-create/emergency-contact-create').then((module) => module.EmergencyContactCreate),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -373,7 +320,7 @@ export const routes: Routes = [
       },
       {
         path: 'contacts/emergency/:contactId/edit',
-        component: EmergencyContactEdit,
+        loadComponent: () => import('./features/contacts/pages/emergency-contact-edit/emergency-contact-edit').then((module) => module.EmergencyContactEdit),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -384,7 +331,7 @@ export const routes: Routes = [
       },
       {
         path: 'contacts/emergency/:contactId',
-        component: EmergencyContactDetails,
+        loadComponent: () => import('./features/contacts/pages/emergency-contact-details/emergency-contact-details').then((module) => module.EmergencyContactDetails),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -395,7 +342,7 @@ export const routes: Routes = [
       },
       {
         path: 'blood-results',
-        component: BloodTestList,
+        loadComponent: () => import('./features/blood-results/pages/blood-test-list/blood-test-list').then((module) => module.BloodTestList),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -406,7 +353,7 @@ export const routes: Routes = [
       },
       {
         path: 'blood-results/create',
-        component: BloodTestCreate,
+        loadComponent: () => import('./features/blood-results/pages/blood-test-create/blood-test-create').then((module) => module.BloodTestCreate),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -417,7 +364,7 @@ export const routes: Routes = [
       },
       {
         path: 'blood-results/:bloodTestId/edit',
-        component: BloodTestEdit,
+        loadComponent: () => import('./features/blood-results/pages/blood-test-edit/blood-test-edit').then((module) => module.BloodTestEdit),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -428,7 +375,7 @@ export const routes: Routes = [
       },
       {
         path: 'blood-results/:bloodTestId',
-        component: BloodTestDetails,
+        loadComponent: () => import('./features/blood-results/pages/blood-test-details/blood-test-details').then((module) => module.BloodTestDetails),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -439,7 +386,7 @@ export const routes: Routes = [
       },
       {
         path: 'medical-history',
-        component: MedicalHistory,
+        loadComponent: () => import('./features/medical-history/pages/medical-history/medical-history').then((module) => module.MedicalHistory),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -450,7 +397,7 @@ export const routes: Routes = [
       },
       {
         path: 'medical-history/create',
-        component: MedicalHistoryCreate,
+        loadComponent: () => import('./features/medical-history/pages/medical-history-create/medical-history-create').then((module) => module.MedicalHistoryCreate),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -461,7 +408,7 @@ export const routes: Routes = [
       },
       {
         path: 'medical-history/:entryId/edit',
-        component: MedicalHistoryEdit,
+        loadComponent: () => import('./features/medical-history/pages/medical-history-edit/medical-history-edit').then((module) => module.MedicalHistoryEdit),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -472,7 +419,7 @@ export const routes: Routes = [
       },
       {
         path: 'medical-history/:entryId',
-        component: MedicalHistoryDetails,
+        loadComponent: () => import('./features/medical-history/pages/medical-history-details/medical-history-details').then((module) => module.MedicalHistoryDetails),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -483,7 +430,7 @@ export const routes: Routes = [
       },
       {
         path: 'activity-history',
-        component: PatientAudit,
+        loadComponent: () => import('./features/audit/pages/patient-audit/patient-audit').then((module) => module.PatientAudit),
         canActivate: [selectedPatientPermissionGuard],
         data: {
           permission: {
@@ -502,33 +449,33 @@ export const routes: Routes = [
           },
           {
             path: 'carers',
-            component: CareNetwork,
+            loadComponent: () => import('./features/care-network/pages/care-network/care-network').then((module) => module.CareNetwork),
           },
           {
             path: 'patients',
-            component: CarerAccess,
+            loadComponent: () => import('./features/care-network/pages/carer-access/carer-access').then((module) => module.CarerAccess),
           },
         ],
       },
       {
         path: 'admin/analytics/events',
-        component: AdminAnalyticsEvents,
+        loadComponent: () => import('./features/admin-analytics/pages/admin-analytics-events/admin-analytics-events').then((module) => module.AdminAnalyticsEvents),
         canActivate: [adminGuard],
       },
       {
         path: 'admin/analytics',
-        component: AdminAnalyticsSummary,
+        loadComponent: () => import('./features/admin-analytics/pages/admin-analytics-summary/admin-analytics-summary').then((module) => module.AdminAnalyticsSummary),
         canActivate: [adminGuard],
       },
       {
         path: 'access-denied',
-        component: AccessDenied,
+        loadComponent: () => import('./features/errors/pages/access-denied/access-denied').then((module) => module.AccessDenied),
       },
     ],
   },
   {
     path: 'not-found',
-    component: NotFound,
+    loadComponent: () => import('./features/errors/pages/not-found/not-found').then((module) => module.NotFound),
   },
   {
     path: '**',

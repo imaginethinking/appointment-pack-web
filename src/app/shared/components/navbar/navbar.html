@@ -1,4 +1,7 @@
-<nav class="rounded-2xl border border-brand-peach/30 bg-brand-plum text-brand-off-white">
+<nav
+  class="rounded-2xl border border-brand-peach/30 bg-brand-plum text-brand-off-white"
+  (keydown.escape)="closeMenus()"
+>
   <div class="w-full px-4 sm:px-6 lg:px-8">
     <div class="grid min-h-16 grid-cols-[1fr_auto_1fr] items-center gap-4 py-2">
       <a
@@ -36,9 +39,11 @@
                   [class.text-brand-plum]="isNavigationGroupActive(group)"
                   [attr.aria-expanded]="isNavigationGroupOpen(group)"
                   [attr.aria-controls]="'desktop-navigation-' + group.key"
+                  aria-haspopup="true"
                   (click)="toggleNavigationGroup(group)"
                 >
                   <span>{{ group.label }}</span>
+
                   <svg
                     class="h-4 w-4 transition-transform"
                     [class.rotate-180]="isNavigationGroupOpen(group)"
@@ -65,7 +70,7 @@
                           [routerLink]="item.route"
                           routerLinkActive="bg-brand-pink font-semibold"
                           [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
-                          class="block px-4 py-2 text-sm hover:bg-brand-pink"
+                          class="block px-4 py-2 text-sm hover:bg-brand-pink focus-visible:bg-brand-pink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-mint"
                           (click)="closeMenus()"
                         >
                           {{ item.label }}
@@ -95,12 +100,34 @@
             (click)="toggleMobileMenu()"
           >
             @if (mobileMenuOpen) {
-              <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+              <svg
+                class="h-6 w-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18 18 6M6 6l12 12"
+                />
               </svg>
             } @else {
-              <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              <svg
+                class="h-6 w-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               </svg>
             }
           </button>
@@ -110,10 +137,18 @@
               type="button"
               class="btn btn-ghost h-10 w-10 p-0"
               aria-label="Open profile menu"
+              aria-controls="profile-navigation"
+              aria-haspopup="true"
               [attr.aria-expanded]="profileMenuOpen"
               (click)="toggleProfileMenu()"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-7 w-7" aria-hidden="true">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                class="h-7 w-7"
+                aria-hidden="true"
+              >
                 <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
                 <path
                   fill-rule="evenodd"
@@ -123,16 +158,27 @@
             </button>
 
             @if (profileMenuOpen) {
-              <div class="absolute right-0 z-50 mt-2 w-56 rounded-md border border-brand-peach bg-brand-off-white py-2 text-brand-plum shadow-lg">
+              <div
+                id="profile-navigation"
+                class="absolute right-0 z-50 mt-2 w-56 rounded-md border border-brand-peach bg-brand-off-white py-2 text-brand-plum shadow-lg"
+              >
                 <div class="border-b border-brand-peach px-4 py-3">
                   <p class="text-sm font-semibold">Account</p>
                 </div>
 
-                <a routerLink="/profile" class="block px-4 py-2 text-sm hover:bg-brand-pink" (click)="closeMenus()">
+                <a
+                  routerLink="/profile"
+                  class="block px-4 py-2 text-sm hover:bg-brand-pink focus-visible:bg-brand-pink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-mint"
+                  (click)="closeMenus()"
+                >
                   Profile
                 </a>
 
-                <a routerLink="/profile/settings/mfa" class="block px-4 py-2 text-sm hover:bg-brand-pink" (click)="closeMenus()">
+                <a
+                  routerLink="/profile/settings/mfa"
+                  class="block px-4 py-2 text-sm hover:bg-brand-pink focus-visible:bg-brand-pink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-mint"
+                  (click)="closeMenus()"
+                >
                   Account security
                 </a>
 
@@ -140,7 +186,7 @@
                   <div class="mt-2 border-t border-brand-peach pt-2">
                     <a
                       routerLink="/admin/analytics"
-                      class="block px-4 py-2 text-sm font-semibold hover:bg-brand-pink"
+                      class="block px-4 py-2 text-sm font-semibold hover:bg-brand-pink focus-visible:bg-brand-pink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-mint"
                       (click)="closeMenus()"
                     >
                       Admin analytics
@@ -149,7 +195,11 @@
                 }
 
                 <div class="mt-2 border-t border-brand-peach px-2 pt-2">
-                  <button type="button" class="btn btn-danger w-full" (click)="logout()">
+                  <button
+                    type="button"
+                    class="btn btn-danger w-full"
+                    (click)="logout()"
+                  >
                     Log out
                   </button>
                 </div>
@@ -157,11 +207,19 @@
             }
           </div>
         } @else {
-          <a routerLink="/login" routerLinkActive="bg-brand-pink text-brand-plum" class="btn btn-secondary">
+          <a
+            routerLink="/login"
+            routerLinkActive="bg-brand-pink text-brand-plum"
+            class="btn btn-secondary"
+          >
             Sign in
           </a>
 
-          <a routerLink="/register" routerLinkActive="bg-brand-pink text-brand-plum" class="btn btn-secondary">
+          <a
+            routerLink="/register"
+            routerLinkActive="bg-brand-pink text-brand-plum"
+            class="btn btn-secondary"
+          >
             Create account
           </a>
         }
@@ -169,7 +227,10 @@
     </div>
 
     @if (isAuthenticated() && mobileMenuOpen) {
-      <div id="mobile-navigation" class="border-t border-brand-peach/30 py-3 xl:hidden">
+      <div
+        id="mobile-navigation"
+        class="border-t border-brand-peach/30 py-3 xl:hidden"
+      >
         <div class="mb-3 md:hidden">
           <app-patient-context-selector
             selectId="mobilePatientContext"
