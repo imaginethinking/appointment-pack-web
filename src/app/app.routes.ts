@@ -209,6 +209,17 @@ export const routes: Routes = [
         },
       },
       {
+        path: 'appointment-packs/:appointmentPackId/preview',
+        loadComponent: () => import('./features/appointment-packs/pages/appointment-pack-preview/appointment-pack-preview').then((module) => module.AppointmentPackPreview),
+        canActivate: [selectedPatientPermissionGuard],
+        data: {
+          permission: {
+            resource: 'appointment-pack',
+            action: 'view',
+          },
+        },
+      },
+      {
         path: 'appointment-packs/:appointmentPackId',
         loadComponent: () => import('./features/appointment-packs/pages/appointment-pack-details/appointment-pack-details').then((module) => module.AppointmentPackDetails),
         canActivate: [selectedPatientPermissionGuard],

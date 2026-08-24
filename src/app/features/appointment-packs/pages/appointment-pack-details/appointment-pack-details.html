@@ -109,6 +109,8 @@
       }
 
       <section class="flex flex-wrap gap-3">
+        <a [routerLink]="['/appointment-packs', currentPack.id, 'preview']" class="btn btn-secondary">Preview</a>
+
         <button type="button" class="btn btn-primary" [disabled]="isDownloading()" (click)="download()">{{ isDownloading() ? 'Downloading...' : 'Download' }}</button>
 
         @if (canArchive()) {

@@ -1,0 +1,75 @@
+<section class="app-page">
+  <div class="mb-6">
+    @if (appointmentPack(); as currentPack) {
+      <a [routerLink]="['/appointment-packs', currentPack.id]" class="text-sm font-semibold text-brand-plum underline">Back to appointment pack</a>
+    } @else {
+      <a routerLink="/appointment-packs" class="text-sm font-semibold text-brand-plum underline">Back to appointment packs</a>
+    }
+
+    <h1 class="mt-4 text-3xl font-bold text-brand-plum">Appointment pack preview</h1>
+
+    @if (appointmentPack(); as currentPack) {
+      <p class="mt-2 break-words text-brand-plum/70">{{ currentPack.title }}</p>
+    }
+  </div>
+
+  @if (status() === 'loading') {
+    <div class="rounded-lg border border-brand-plum/20 bg-brand-off-white p-6 text-brand-plum" role="status">
+      Loading appointment pack preview...
+    </div>
+  } @else if (status() === 'not-found') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Appointment pack not found</h2>
+      <p class="mt-2 text-brand-plum/70">The pack does not exist, has been archived, or is no longer available.</p>
+    </div>
+  } @else if (status() === 'forbidden') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <h2 class="font-semibold text-brand-plum">Appointment pack unavailable</h2>
+      <p class="mt-2 text-brand-plum/70">This appointment pack is not available with your current access.</p>
+    </div>
+  } @else if (status() === 'invalid') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-plum">{{ errorMessage() }}</p>
+      <a routerLink="/appointment-packs" class="btn btn-secondary mt-4">Back</a>
+    </div>
+  } @else if (status() === 'error') {
+    <div class="rounded-lg border border-brand-coral bg-brand-off-white p-6" role="alert">
+      <p class="text-brand-coral">{{ errorMessage() }}</p>
+      <button type="button" class="btn btn-secondary mt-4" (click)="retry()">Try again</button>
+    </div>
+  } @else if (appointmentPack(); as currentPack) {
+    <div class="space-y-4">
+      @if (actionError()) {
+        <div class="rounded-lg border border-brand-coral bg-brand-off-white p-4 text-brand-coral" role="alert">
+          {{ actionError() }}
+        </div>
+      }
+
+      <div class="flex flex-wrap gap-3">
+        <a [routerLink]="['/appointment-packs', currentPack.id]" class="btn btn-secondary">Back</a>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="isDownloading()"
+          (click)="download()">
+          {{ isDownloading() ? 'Downloading...' : 'Download' }}
+        </button>
+      </div>
+
+      @if (previewUrl(); as pdfUrl) {
+        <section class="overflow-hidden rounded-lg border border-brand-plum/20 bg-white">
+          <iframe
+            [src]="pdfUrl"
+            class="block h-[75vh] min-h-[36rem] w-full"
+            title="Appointment pack PDF preview">
+          </iframe>
+        </section>
+
+        <p class="text-sm text-brand-plum/70">
+          If your browser cannot display the PDF, use the Download button instead.
+        </p>
+      }
+    </div>
+  }
+</section>

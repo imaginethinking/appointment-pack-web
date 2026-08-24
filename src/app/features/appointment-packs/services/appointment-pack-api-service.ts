@@ -25,6 +25,12 @@ export class AppointmentPackApiService {
     return this.http.get<AppointmentPackResponse>(`${this.appointmentPacksUrl}/${appointmentPackId}`);
   }
 
+  previewAppointmentPack(appointmentPackId: string): Observable<Blob> {
+    return this.http.get(`${this.appointmentPacksUrl}/${appointmentPackId}/preview`, {
+      responseType: 'blob',
+    });
+  }
+
   downloadAppointmentPack(appointmentPackId: string): Observable<HttpResponse<Blob>> {
     return this.http.get(`${this.appointmentPacksUrl}/${appointmentPackId}/file`, {
       observe: 'response',
