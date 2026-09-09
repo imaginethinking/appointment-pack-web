@@ -14,6 +14,9 @@ import { BloodTestFormFields } from '../../components/blood-test-form-fields/blo
 import { createBloodTestForm, mapBloodTestFormToRequest, resetBloodTestForm } from '../../forms/blood-test-form';
 import { BloodTestApiService } from '../../services/blood-test-api-service';
 
+/**
+ * Provides the form for adding a blood test and its results to the selected patient.
+ */
 @Component({
   selector: 'app-blood-test-create',
   imports: [ReactiveFormsModule, RouterLink, BloodTestFormFields],
@@ -37,6 +40,9 @@ export class BloodTestCreate {
   protected readonly errorMessage = signal('');
   protected readonly form = createBloodTestForm(this.formBuilder);
 
+  /**
+   * Resets the form when the selected patient changes.
+   */
   constructor() {
     effect(() => {
       this.selectedPatient()?.patientRecordId;
@@ -45,6 +51,9 @@ export class BloodTestCreate {
     });
   }
 
+  /**
+   * Checks the form and saves the new blood test for the selected patient.
+   */
   protected create(): void {
     this.errorMessage.set('');
     clearServerFieldErrors(this.form);
@@ -71,6 +80,9 @@ export class BloodTestCreate {
     });
   }
 
+  /**
+   * Handles validation and access errors returned while creating the blood test.
+   */
   private handleCreateError(error: unknown, failedPatientRecordId: string): void {
     if (applyServerFieldErrors(this.form, error)) {
       return;
@@ -84,6 +96,9 @@ export class BloodTestCreate {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to create the blood test.'));
   }
 
+  /**
+   * Refreshes patient access and checks whether the blood test can still be added to the same patient.
+   */
   private refreshPatientAccess(failedPatientRecordId: string): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       next: () => {

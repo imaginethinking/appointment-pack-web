@@ -16,6 +16,9 @@ import { BloodTestApiService } from '../../services/blood-test-api-service';
 
 type BloodTestEditStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 
+/**
+ * Loads an existing blood test into the shared form so its details and results can be edited.
+ */
 @Component({
   selector: 'app-blood-test-edit',
   imports: [ReactiveFormsModule, RouterLink, BloodTestFormFields],
@@ -38,6 +41,9 @@ export class BloodTestEdit implements OnInit {
   protected readonly canEdit = computed(() => this.authorisation.can(this.selectedPatient(), 'blood-result', 'edit'));
   protected readonly form = createBloodTestForm(this.formBuilder);
 
+  /**
+   * Returns to the results list if the blood test no longer matches the selected patient.
+   */
   constructor() {
     effect(() => {
       const bloodTest = this.bloodTest();
@@ -49,6 +55,9 @@ export class BloodTestEdit implements OnInit {
     });
   }
 
+  /**
+   * Loads the blood test identified by the current route.
+   */
   ngOnInit(): void {
     const bloodTestId = this.route.snapshot.paramMap.get('bloodTestId');
 
@@ -60,6 +69,9 @@ export class BloodTestEdit implements OnInit {
     this.loadBloodTest(bloodTestId);
   }
 
+  /**
+   * Checks the form and saves the changes made to the blood test.
+   */
   protected save(): void {
     const bloodTest = this.bloodTest();
     this.errorMessage.set('');
@@ -89,6 +101,9 @@ export class BloodTestEdit implements OnInit {
     });
   }
 
+  /**
+   * Reloads the blood test after a failed attempt.
+   */
   protected retry(): void {
     const bloodTestId = this.route.snapshot.paramMap.get('bloodTestId');
 
@@ -97,6 +112,9 @@ export class BloodTestEdit implements OnInit {
     }
   }
 
+  /**
+   * Loads the blood test and fills the form when it is available for the selected patient.
+   */
   private loadBloodTest(bloodTestId: string): void {
     const failedPatientRecordId = this.selectedPatient()?.patientRecordId ?? null;
 
@@ -127,6 +145,9 @@ export class BloodTestEdit implements OnInit {
     });
   }
 
+  /**
+   * Updates the page when the blood test cannot be loaded.
+   */
   private handleLoadError(error: unknown, failedPatientRecordId: string | null): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(failedPatientRecordId);
@@ -142,6 +163,9 @@ export class BloodTestEdit implements OnInit {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the blood test for editing.'));
   }
 
+  /**
+   * Applies any field errors and handles failures while saving the blood test.
+   */
   private handleSaveError(error: unknown, bloodTest: BloodTestResponse): void {
     if (applyServerFieldErrors(this.form, error)) {
       return;
@@ -160,6 +184,9 @@ export class BloodTestEdit implements OnInit {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to update the blood test.'));
   }
 
+  /**
+   * Refreshes patient access and leaves the edit page when the selected patient has changed.
+   */
   private recoverPatientAccess(failedPatientRecordId: string | null): void {
     this.status.set('loading');
 

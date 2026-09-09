@@ -14,6 +14,9 @@ import { MedicalHistoryApiService } from '../../services/medical-history-api-ser
 
 type MedicalHistoryDetailsStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 
+/**
+ * Displays a Medical History entry together with its source information when available.
+ */
 @Component({
   selector: 'app-medical-history-details',
   imports: [DatePipe, RouterLink],
@@ -37,6 +40,9 @@ export class MedicalHistoryDetails implements OnInit {
   protected readonly getMedicalHistorySourceLabel = getMedicalHistorySourceLabel;
   protected readonly getDocumentTypeLabel = getDocumentTypeLabel;
 
+  /**
+   * Returns to Medical History when the loaded entry no longer matches the selected patient.
+   */
   constructor() {
     effect(() => {
       const entry = this.entry();
@@ -48,6 +54,9 @@ export class MedicalHistoryDetails implements OnInit {
     });
   }
 
+  /**
+   * Loads the Medical History entry identified by the route.
+   */
   ngOnInit(): void {
     const entryId = this.route.snapshot.paramMap.get('entryId');
 
@@ -59,6 +68,9 @@ export class MedicalHistoryDetails implements OnInit {
     this.loadEntry(entryId);
   }
 
+  /**
+   * Tries to load the entry again.
+   */
   protected retry(): void {
     const entryId = this.route.snapshot.paramMap.get('entryId');
 
@@ -67,6 +79,9 @@ export class MedicalHistoryDetails implements OnInit {
     }
   }
 
+  /**
+   * Confirms the action before archiving the Medical History entry.
+   */
   protected archive(): void {
     const entry = this.entry();
     this.actionError.set('');
@@ -89,6 +104,9 @@ export class MedicalHistoryDetails implements OnInit {
     });
   }
 
+  /**
+   * Loads the entry and checks that it belongs to the selected patient.
+   */
   private loadEntry(entryId: string): void {
     const failedPatientRecordId = this.selectedPatient()?.patientRecordId ?? null;
 
@@ -114,6 +132,9 @@ export class MedicalHistoryDetails implements OnInit {
     });
   }
 
+  /**
+   * Handles errors that occur while loading the Medical History entry.
+   */
   private handleLoadError(error: unknown, failedPatientRecordId: string | null): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(failedPatientRecordId, 'forbidden');
@@ -129,6 +150,9 @@ export class MedicalHistoryDetails implements OnInit {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the medical history entry.'));
   }
 
+  /**
+   * Handles errors that occur while archiving the entry.
+   */
   private handleArchiveError(error: unknown, entry: MedicalHistoryEntryResponse): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(entry.patientRecordId, 'forbidden');
@@ -143,6 +167,9 @@ export class MedicalHistoryDetails implements OnInit {
     this.actionError.set(getHttpErrorMessage(error, 'Unable to archive the medical history entry.'));
   }
 
+  /**
+   * Refreshes patient access and keeps the page in the correct state after an access change.
+   */
   private recoverPatientAccess(failedPatientRecordId: string | null, fallbackStatus: 'forbidden' | 'not-found'): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       next: () => {

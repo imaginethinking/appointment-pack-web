@@ -14,6 +14,9 @@ import { BloodTestApiService } from '../../services/blood-test-api-service';
 
 type BloodTestDetailsStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 
+/**
+ * Displays a blood test and each of its recorded results.
+ */
 @Component({
   selector: 'app-blood-test-details',
   imports: [DatePipe, RouterLink],
@@ -36,6 +39,9 @@ export class BloodTestDetails implements OnInit {
   protected readonly canEdit = computed(() => this.authorisation.can(this.selectedPatient(), 'blood-result', 'edit'));
   protected readonly formatFlag = formatEnumLabel;
 
+  /**
+   * Leaves the page if the loaded blood test no longer belongs to the selected patient.
+   */
   constructor() {
     effect(() => {
       const bloodTest = this.bloodTest();
@@ -47,6 +53,9 @@ export class BloodTestDetails implements OnInit {
     });
   }
 
+  /**
+   * Reads the blood test id from the route and loads its details.
+   */
   ngOnInit(): void {
     const bloodTestId = this.route.snapshot.paramMap.get('bloodTestId');
 
@@ -58,6 +67,9 @@ export class BloodTestDetails implements OnInit {
     this.loadBloodTest(bloodTestId);
   }
 
+  /**
+   * Tries to load the current blood test again.
+   */
   protected retry(): void {
     const bloodTestId = this.route.snapshot.paramMap.get('bloodTestId');
 
@@ -66,6 +78,9 @@ export class BloodTestDetails implements OnInit {
     }
   }
 
+  /**
+   * Asks for confirmation before archiving the current blood test.
+   */
   protected archive(): void {
     const bloodTest = this.bloodTest();
     this.actionError.set('');
@@ -88,6 +103,9 @@ export class BloodTestDetails implements OnInit {
     });
   }
 
+  /**
+   * Loads the blood test and checks that it belongs to the patient currently selected.
+   */
   private loadBloodTest(bloodTestId: string): void {
     const failedPatientRecordId = this.selectedPatient()?.patientRecordId ?? null;
 
@@ -113,6 +131,9 @@ export class BloodTestDetails implements OnInit {
     });
   }
 
+  /**
+   * Handles errors raised while loading the blood test.
+   */
   private handleLoadError(error: unknown, failedPatientRecordId: string | null): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(failedPatientRecordId);
@@ -128,6 +149,9 @@ export class BloodTestDetails implements OnInit {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the blood test.'));
   }
 
+  /**
+   * Handles errors raised while archiving the blood test.
+   */
   private handleArchiveError(error: unknown, bloodTest: BloodTestResponse): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(bloodTest.patientRecordId);
@@ -142,6 +166,9 @@ export class BloodTestDetails implements OnInit {
     this.actionError.set(getHttpErrorMessage(error, 'Unable to archive the blood test.'));
   }
 
+  /**
+   * Refreshes patient access and returns to the results list when the selected patient has changed.
+   */
   private recoverPatientAccess(failedPatientRecordId: string | null): void {
     this.status.set('loading');
 

@@ -14,6 +14,9 @@ import { BloodTestApiService } from '../../services/blood-test-api-service';
 
 type BloodTestListStatus = 'loading' | 'ready' | 'no-patient' | 'forbidden' | 'error';
 
+/**
+ * Shows the blood tests available for the selected patient.
+ */
 @Component({
   selector: 'app-blood-test-list',
   imports: [DatePipe, RouterLink],
@@ -34,6 +37,9 @@ export class BloodTestList {
   protected readonly getPatientContextName = getPatientContextName;
   protected readonly formatFlag = formatEnumLabel;
 
+  /**
+   * Reloads the blood test list when the selected patient changes or a retry is requested.
+   */
   constructor() {
     effect((onCleanup) => {
       this.reloadVersion();
@@ -66,10 +72,16 @@ export class BloodTestList {
     });
   }
 
+  /**
+   * Starts another attempt to load the blood results.
+   */
   protected retry(): void {
     this.reloadVersion.update((version) => version + 1);
   }
 
+  /**
+   * Updates the page when blood results cannot be loaded and refreshes patient access when needed.
+   */
   private handleLoadError(error: unknown): void {
     if (hasHttpStatus(error, 403)) {
       this.status.set('forbidden');
@@ -88,6 +100,9 @@ export class BloodTestList {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load blood results.'));
   }
 
+  /**
+   * Reloads the available patient access after the current patient can no longer be used.
+   */
   private refreshPatientAccess(): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       error: (error: unknown) => {

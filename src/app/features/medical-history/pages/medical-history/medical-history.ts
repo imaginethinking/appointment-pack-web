@@ -14,6 +14,9 @@ import { MedicalHistoryApiService } from '../../services/medical-history-api-ser
 
 type MedicalHistoryStatus = 'loading' | 'ready' | 'no-patient' | 'forbidden' | 'error';
 
+/**
+ * Shows the Medical History recorded for the selected patient.
+ */
 @Component({
   selector: 'app-medical-history',
   imports: [DatePipe, RouterLink],
@@ -35,6 +38,9 @@ export class MedicalHistory {
   protected readonly getMedicalHistorySourceLabel = getMedicalHistorySourceLabel;
   protected readonly getDocumentTypeLabel = getDocumentTypeLabel;
 
+  /**
+   * Loads the Medical History again when the patient changes or the user retries the request.
+   */
   constructor() {
     effect((onCleanup) => {
       this.reloadVersion();
@@ -67,10 +73,16 @@ export class MedicalHistory {
     });
   }
 
+  /**
+   * Reloads the Medical History after a failed request.
+   */
   protected retry(): void {
     this.reloadVersion.update((version) => version + 1);
   }
 
+  /**
+   * Handles problems loading Medical History and checks for changes to patient access.
+   */
   private handleLoadError(error: unknown): void {
     if (hasHttpStatus(error, 403)) {
       this.status.set('forbidden');
@@ -89,6 +101,9 @@ export class MedicalHistory {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load medical history.'));
   }
 
+  /**
+   * Refreshes the patients currently available to the user.
+   */
   private refreshPatientAccess(): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       error: (error: unknown) => {

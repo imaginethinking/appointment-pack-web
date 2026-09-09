@@ -14,6 +14,9 @@ import { MedicalHistoryFormFields } from '../../components/medical-history-form-
 import { createMedicalHistoryForm, mapMedicalHistoryFormToCreateRequest, resetMedicalHistoryForm } from '../../forms/medical-history-form';
 import { MedicalHistoryApiService } from '../../services/medical-history-api-service';
 
+/**
+ * Provides the form for adding a new Medical History entry to the selected patient.
+ */
 @Component({
   selector: 'app-medical-history-create',
   imports: [ReactiveFormsModule, RouterLink, MedicalHistoryFormFields],
@@ -37,6 +40,9 @@ export class MedicalHistoryCreate {
   protected readonly errorMessage = signal('');
   protected readonly form = createMedicalHistoryForm(this.formBuilder);
 
+  /**
+   * Clears the form when the user switches to another patient.
+   */
   constructor() {
     effect(() => {
       this.selectedPatient()?.patientRecordId;
@@ -45,6 +51,9 @@ export class MedicalHistoryCreate {
     });
   }
 
+  /**
+   * Validates the entered information and adds it to the selected patient's Medical History.
+   */
   protected create(): void {
     this.errorMessage.set('');
     clearServerFieldErrors(this.form);
@@ -71,6 +80,9 @@ export class MedicalHistoryCreate {
     });
   }
 
+  /**
+   * Applies field errors and handles problems that occur while adding the entry.
+   */
   private handleCreateError(error: unknown, failedPatientRecordId: string): void {
     if (applyServerFieldErrors(this.form, error)) {
       return;
@@ -84,6 +96,9 @@ export class MedicalHistoryCreate {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to add the medical history entry.'));
   }
 
+  /**
+   * Refreshes patient access and checks whether an entry can still be added for the same patient.
+   */
   private refreshPatientAccess(failedPatientRecordId: string): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       next: () => {

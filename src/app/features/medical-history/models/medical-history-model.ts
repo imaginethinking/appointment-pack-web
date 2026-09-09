@@ -25,6 +25,9 @@ export interface MedicalHistoryEntryResponse {
   archivedAt: string | null;
 }
 
+/**
+ * Returns the label shown for the source of a Medical History entry.
+ */
 export function getMedicalHistorySourceLabel(sourceType: MedicalHistorySourceType): string {
   switch (sourceType) {
     case 'DOCUMENT_SUMMARY':

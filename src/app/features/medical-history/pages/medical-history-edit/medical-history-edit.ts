@@ -17,6 +17,9 @@ import { MedicalHistoryApiService } from '../../services/medical-history-api-ser
 
 type MedicalHistoryEditStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 
+/**
+ * Loads a Medical History entry into the form so it can be reviewed and edited.
+ */
 @Component({
   selector: 'app-medical-history-edit',
   imports: [ReactiveFormsModule, RouterLink, MedicalHistoryFormFields],
@@ -41,6 +44,9 @@ export class MedicalHistoryEdit implements OnInit {
   protected readonly getMedicalHistorySourceLabel = getMedicalHistorySourceLabel;
   protected readonly getDocumentTypeLabel = getDocumentTypeLabel;
 
+  /**
+   * Leaves the edit page if the loaded entry no longer belongs to the selected patient.
+   */
   constructor() {
     effect(() => {
       const entry = this.entry();
@@ -52,6 +58,9 @@ export class MedicalHistoryEdit implements OnInit {
     });
   }
 
+  /**
+   * Finds the entry id in the route and loads the entry for editing.
+   */
   ngOnInit(): void {
     const entryId = this.route.snapshot.paramMap.get('entryId');
 
@@ -63,6 +72,9 @@ export class MedicalHistoryEdit implements OnInit {
     this.loadEntry(entryId);
   }
 
+  /**
+   * Validates the form and saves the updated Medical History entry.
+   */
   protected save(): void {
     const entry = this.entry();
 
@@ -93,6 +105,9 @@ export class MedicalHistoryEdit implements OnInit {
     });
   }
 
+  /**
+   * Reloads the entry after a failed attempt.
+   */
   protected retry(): void {
     const entryId = this.route.snapshot.paramMap.get('entryId');
 
@@ -101,6 +116,9 @@ export class MedicalHistoryEdit implements OnInit {
     }
   }
 
+  /**
+   * Loads the entry and fills the edit form with its current information.
+   */
   private loadEntry(entryId: string): void {
     const failedPatientRecordId = this.selectedPatient()?.patientRecordId ?? null;
 
@@ -131,6 +149,9 @@ export class MedicalHistoryEdit implements OnInit {
     });
   }
 
+  /**
+   * Updates the page when the entry cannot be loaded.
+   */
   private handleLoadError(error: unknown, failedPatientRecordId: string | null): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(failedPatientRecordId, 'forbidden');
@@ -146,6 +167,9 @@ export class MedicalHistoryEdit implements OnInit {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the medical history entry.'));
   }
 
+  /**
+   * Applies field errors and handles problems that occur while saving the entry.
+   */
   private handleSaveError(error: unknown, entry: MedicalHistoryEntryResponse): void {
     if (applyServerFieldErrors(this.form, error)) {
       return;
@@ -164,6 +188,9 @@ export class MedicalHistoryEdit implements OnInit {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to save the medical history entry.'));
   }
 
+  /**
+   * Refreshes patient access and returns to Medical History if the selected patient has changed.
+   */
   private recoverPatientAccess(failedPatientRecordId: string | null, fallbackStatus: 'forbidden' | 'not-found'): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       next: () => {
