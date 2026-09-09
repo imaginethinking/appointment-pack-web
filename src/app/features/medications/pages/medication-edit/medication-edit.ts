@@ -16,6 +16,9 @@ import { MedicationApiService } from '../../services/medication-api-service';
 
 type MedicationEditStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 
+/**
+ * Loads and edits a medication for the selected patient.
+ */
 @Component({
   selector: 'app-medication-edit',
   imports: [ReactiveFormsModule, RouterLink, MedicationFormFields],
@@ -38,6 +41,9 @@ export class MedicationEdit implements OnInit {
   protected readonly canEdit = computed(() => this.authorisation.can(this.selectedPatient(), 'medication', 'edit'));
   protected readonly form = createMedicationForm(this.formBuilder);
 
+  /**
+   * Returns to the medication list if the loaded medication no longer matches the selected patient.
+   */
   constructor() {
     effect(() => {
       const medication = this.medication();
@@ -49,6 +55,9 @@ export class MedicationEdit implements OnInit {
     });
   }
 
+  /**
+   * Loads the medication from the id in the current route.
+   */
   ngOnInit(): void {
     const medicationId = this.route.snapshot.paramMap.get('medicationId');
 
@@ -60,6 +69,9 @@ export class MedicationEdit implements OnInit {
     this.loadMedication(medicationId);
   }
 
+  /**
+   * Validates the form and saves changes to the medication.
+   */
   protected save(): void {
     const medication = this.medication();
 
@@ -90,6 +102,9 @@ export class MedicationEdit implements OnInit {
     });
   }
 
+  /**
+   * Reloads the medication for editing.
+   */
   protected retry(): void {
     const medicationId = this.route.snapshot.paramMap.get('medicationId');
 
@@ -98,6 +113,9 @@ export class MedicationEdit implements OnInit {
     }
   }
 
+  /**
+   * Loads the medication and fills the form with its current details.
+   */
   private loadMedication(medicationId: string): void {
     const failedPatientRecordId = this.selectedPatient()?.patientRecordId ?? null;
 
@@ -128,6 +146,9 @@ export class MedicationEdit implements OnInit {
     });
   }
 
+  /**
+   * Handles medication loading errors and refreshes patient access when needed.
+   */
   private handleLoadError(error: unknown, failedPatientRecordId: string | null): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(failedPatientRecordId);
@@ -143,6 +164,9 @@ export class MedicationEdit implements OnInit {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the medication for editing.'));
   }
 
+  /**
+   * Applies form errors and refreshes patient access when the medication cannot be saved.
+   */
   private handleSaveError(error: unknown, medication: MedicationResponse): void {
     if (applyServerFieldErrors(this.form, error)) {
       return;
@@ -161,6 +185,9 @@ export class MedicationEdit implements OnInit {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to update the medication.'));
   }
 
+  /**
+   * Refreshes patient access and returns to the medication list if the selected patient has changed.
+   */
   private recoverPatientAccess(failedPatientRecordId: string | null): void {
     this.status.set('loading');
 

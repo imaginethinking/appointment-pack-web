@@ -14,6 +14,9 @@ import { AppointmentFormFields } from '../../components/appointment-form-fields/
 import { createAppointmentForm, mapAppointmentFormToRequest, resetAppointmentForm } from '../../forms/appointment-form';
 import { AppointmentApiService } from '../../services/appointment-api-service';
 
+/**
+ * Creates a new appointment for the selected patient.
+ */
 @Component({
   selector: 'app-appointment-create',
   imports: [ReactiveFormsModule, RouterLink, AppointmentFormFields],
@@ -37,6 +40,9 @@ export class AppointmentCreate {
   protected readonly errorMessage = signal('');
   protected readonly form = createAppointmentForm(this.formBuilder);
 
+  /**
+   * Creates a new appointment for the selected patient.
+   */
   constructor() {
     effect(() => {
       this.selectedPatient()?.patientRecordId;
@@ -45,6 +51,9 @@ export class AppointmentCreate {
     });
   }
 
+  /**
+   * Validates the form and creates an appointment for the selected patient.
+   */
   protected create(): void {
     this.errorMessage.set('');
     clearServerFieldErrors(this.form);
@@ -71,6 +80,9 @@ export class AppointmentCreate {
     });
   }
 
+  /**
+   * Applies form errors and refreshes patient access when the appointment cannot be created.
+   */
   private handleCreateError(error: unknown, failedPatientRecordId: string): void {
     if (applyServerFieldErrors(this.form, error)) {
       return;
@@ -84,6 +96,9 @@ export class AppointmentCreate {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to create the appointment.'));
   }
 
+  /**
+   * Refreshes patient access and checks whether the same patient can still be edited.
+   */
   private refreshPatientAccess(failedPatientRecordId: string): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       next: () => {

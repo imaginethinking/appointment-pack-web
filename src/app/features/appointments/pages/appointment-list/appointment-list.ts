@@ -14,6 +14,9 @@ import { AppointmentApiService } from '../../services/appointment-api-service';
 
 type AppointmentListStatus = 'loading' | 'ready' | 'no-patient' | 'forbidden' | 'error';
 
+/**
+ * Displays the appointments for the selected patient.
+ */
 @Component({
   selector: 'app-appointment-list',
   imports: [DatePipe, RouterLink],
@@ -35,6 +38,9 @@ export class AppointmentList {
   protected readonly formatTime = formatLocalTime;
   protected readonly formatAddress = (appointment: AppointmentResponse) => formatAddressLines(appointment.address);
 
+  /**
+   * Loads appointments whenever the selected patient changes or the page is retried.
+   */
   constructor() {
     effect((onCleanup) => {
       this.reloadVersion();
@@ -67,10 +73,16 @@ export class AppointmentList {
     });
   }
 
+  /**
+   * Reloads the appointment list.
+   */
   protected retry(): void {
     this.reloadVersion.update((version) => version + 1);
   }
 
+  /**
+   * Handles appointment loading errors and refreshes patient access when needed.
+   */
   private handleLoadError(error: unknown): void {
     if (hasHttpStatus(error, 403)) {
       this.status.set('forbidden');
@@ -89,6 +101,9 @@ export class AppointmentList {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load appointments.'));
   }
 
+  /**
+   * Refreshes the available patient access after the current selection fails.
+   */
   private refreshPatientAccess(): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       error: (error: unknown) => {

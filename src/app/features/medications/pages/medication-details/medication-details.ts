@@ -13,6 +13,9 @@ import { MedicationApiService } from '../../services/medication-api-service';
 
 type MedicationDetailsStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 
+/**
+ * Displays the details of a medication for the selected patient.
+ */
 @Component({
   selector: 'app-medication-details',
   imports: [DatePipe, RouterLink],
@@ -34,6 +37,9 @@ export class MedicationDetails implements OnInit {
   protected readonly selectedPatient = this.selectedPatientState.selectedPatient;
   protected readonly canEdit = computed(() => this.authorisation.can(this.selectedPatient(), 'medication', 'edit'));
 
+  /**
+   * Returns to the medication list if the loaded medication no longer matches the selected patient.
+   */
   constructor() {
     effect(() => {
       const medication = this.medication();
@@ -45,6 +51,9 @@ export class MedicationDetails implements OnInit {
     });
   }
 
+  /**
+   * Loads the medication from the id in the current route.
+   */
   ngOnInit(): void {
     const medicationId = this.route.snapshot.paramMap.get('medicationId');
 
@@ -56,6 +65,9 @@ export class MedicationDetails implements OnInit {
     this.loadMedication(medicationId);
   }
 
+  /**
+   * Reloads the current medication.
+   */
   protected retry(): void {
     const medicationId = this.route.snapshot.paramMap.get('medicationId');
 
@@ -64,6 +76,9 @@ export class MedicationDetails implements OnInit {
     }
   }
 
+  /**
+   * Confirms and archives the current medication.
+   */
   protected archive(): void {
     const medication = this.medication();
     this.actionError.set('');
@@ -86,6 +101,9 @@ export class MedicationDetails implements OnInit {
     });
   }
 
+  /**
+   * Loads the medication and checks that it belongs to the selected patient.
+   */
   private loadMedication(medicationId: string): void {
     const failedPatientRecordId = this.selectedPatient()?.patientRecordId ?? null;
 
@@ -111,6 +129,9 @@ export class MedicationDetails implements OnInit {
     });
   }
 
+  /**
+   * Handles medication loading errors and refreshes patient access when needed.
+   */
   private handleLoadError(error: unknown, failedPatientRecordId: string | null): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(failedPatientRecordId);
@@ -126,6 +147,9 @@ export class MedicationDetails implements OnInit {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the medication.'));
   }
 
+  /**
+   * Handles medication archive errors and refreshes patient access when needed.
+   */
   private handleArchiveError(error: unknown, medication: MedicationResponse): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(medication.patientRecordId);
@@ -140,6 +164,9 @@ export class MedicationDetails implements OnInit {
     this.actionError.set(getHttpErrorMessage(error, 'Unable to archive the medication.'));
   }
 
+  /**
+   * Refreshes patient access and returns to the medication list if the selected patient has changed.
+   */
   private recoverPatientAccess(failedPatientRecordId: string | null): void {
     this.status.set('loading');
 

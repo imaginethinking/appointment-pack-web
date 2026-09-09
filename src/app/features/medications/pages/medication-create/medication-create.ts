@@ -14,6 +14,9 @@ import { MedicationFormFields } from '../../components/medication-form-fields/me
 import { createMedicationForm, mapMedicationFormToRequest, resetMedicationForm } from '../../forms/medication-form';
 import { MedicationApiService } from '../../services/medication-api-service';
 
+/**
+ * Creates a new medication for the selected patient.
+ */
 @Component({
   selector: 'app-medication-create',
   imports: [ReactiveFormsModule, RouterLink, MedicationFormFields],
@@ -37,6 +40,9 @@ export class MedicationCreate {
   protected readonly errorMessage = signal('');
   protected readonly form = createMedicationForm(this.formBuilder);
 
+  /**
+   * Clears the form when the selected patient changes.
+   */
   constructor() {
     effect(() => {
       this.selectedPatient()?.patientRecordId;
@@ -45,6 +51,9 @@ export class MedicationCreate {
     });
   }
 
+  /**
+   * Validates the form and creates a medication for the selected patient.
+   */
   protected create(): void {
     this.errorMessage.set('');
     clearServerFieldErrors(this.form);
@@ -71,6 +80,9 @@ export class MedicationCreate {
     });
   }
 
+  /**
+   * Applies form errors and refreshes patient access when the medication cannot be created.
+   */
   private handleCreateError(error: unknown, failedPatientRecordId: string): void {
     if (applyServerFieldErrors(this.form, error)) {
       return;
@@ -84,6 +96,9 @@ export class MedicationCreate {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to create the medication.'));
   }
 
+  /**
+   * Refreshes patient access and checks whether the same patient can still be edited.
+   */
   private refreshPatientAccess(failedPatientRecordId: string): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       next: () => {

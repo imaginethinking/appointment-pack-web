@@ -16,6 +16,9 @@ import { AppointmentApiService } from '../../services/appointment-api-service';
 
 type AppointmentEditStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 
+/**
+ * Loads and edits an appointment for the selected patient.
+ */
 @Component({
   selector: 'app-appointment-edit',
   imports: [ReactiveFormsModule, RouterLink, AppointmentFormFields],
@@ -38,6 +41,9 @@ export class AppointmentEdit implements OnInit {
   protected readonly canEdit = computed(() => this.authorisation.can(this.selectedPatient(), 'appointment', 'edit'));
   protected readonly form = createAppointmentForm(this.formBuilder);
 
+  /**
+   * Returns to the appointment list if the loaded appointment no longer matches the selected patient.
+   */
   constructor() {
     effect(() => {
       const appointment = this.appointment();
@@ -49,6 +55,9 @@ export class AppointmentEdit implements OnInit {
     });
   }
 
+  /**
+   * Loads the appointment from the id in the current route.
+   */
   ngOnInit(): void {
     const appointmentId = this.route.snapshot.paramMap.get('appointmentId');
 
@@ -60,6 +69,9 @@ export class AppointmentEdit implements OnInit {
     this.loadAppointment(appointmentId);
   }
 
+  /**
+   * Validates the form and saves changes to the appointment.
+   */
   protected save(): void {
     const appointment = this.appointment();
 
@@ -90,6 +102,9 @@ export class AppointmentEdit implements OnInit {
     });
   }
 
+  /**
+   * Reloads the appointment for editing.
+   */
   protected retry(): void {
     const appointmentId = this.route.snapshot.paramMap.get('appointmentId');
 
@@ -98,6 +113,9 @@ export class AppointmentEdit implements OnInit {
     }
   }
 
+  /**
+   * Loads the appointment and fills the form with its current details.
+   */
   private loadAppointment(appointmentId: string): void {
     const failedPatientRecordId = this.selectedPatient()?.patientRecordId ?? null;
 
@@ -128,6 +146,9 @@ export class AppointmentEdit implements OnInit {
     });
   }
 
+  /**
+   * Handles appointment loading errors and refreshes patient access when needed.
+   */
   private handleLoadError(error: unknown, failedPatientRecordId: string | null): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(failedPatientRecordId, 'forbidden');
@@ -143,6 +164,9 @@ export class AppointmentEdit implements OnInit {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the appointment for editing.'));
   }
 
+  /**
+   * Applies form errors and refreshes patient access when the appointment cannot be saved.
+   */
   private handleSaveError(error: unknown, appointment: AppointmentResponse): void {
     if (applyServerFieldErrors(this.form, error)) {
       return;
@@ -161,6 +185,9 @@ export class AppointmentEdit implements OnInit {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to update the appointment.'));
   }
 
+  /**
+   * Refreshes patient access and returns to the appointment list if the selected patient has changed.
+   */
   private recoverPatientAccess(failedPatientRecordId: string | null, fallbackStatus: 'forbidden' | 'not-found'): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       next: () => {

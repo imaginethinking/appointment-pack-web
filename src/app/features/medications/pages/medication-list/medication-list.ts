@@ -13,6 +13,9 @@ import { MedicationApiService } from '../../services/medication-api-service';
 
 type MedicationListStatus = 'loading' | 'ready' | 'no-patient' | 'forbidden' | 'error';
 
+/**
+ * Displays the medications for the selected patient.
+ */
 @Component({
   selector: 'app-medication-list',
   imports: [DatePipe, RouterLink],
@@ -32,6 +35,9 @@ export class MedicationList {
   protected readonly canEditMedications = computed(() => this.authorisation.can(this.selectedPatient(), 'medication', 'edit'));
   protected readonly getPatientContextName = getPatientContextName;
 
+  /**
+   * Loads medications whenever the selected patient changes or the page is retried.
+   */
   constructor() {
     effect((onCleanup) => {
       this.reloadVersion();
@@ -64,10 +70,16 @@ export class MedicationList {
     });
   }
 
+  /**
+   * Reloads the medication list.
+   */
   protected retry(): void {
     this.reloadVersion.update((version) => version + 1);
   }
 
+  /**
+   * Handles medication loading errors and refreshes patient access when needed.
+   */
   private handleLoadError(error: unknown): void {
     if (hasHttpStatus(error, 403)) {
       this.status.set('forbidden');
@@ -86,6 +98,9 @@ export class MedicationList {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load medications.'));
   }
 
+  /**
+   * Refreshes the available patient access after the current selection fails.
+   */
   private refreshPatientAccess(): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       error: (error: unknown) => {

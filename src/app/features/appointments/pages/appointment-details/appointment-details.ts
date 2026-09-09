@@ -14,6 +14,9 @@ import { AppointmentApiService } from '../../services/appointment-api-service';
 
 type AppointmentDetailsStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 
+/**
+ * Displays the details of an appointment for the selected patient.
+ */
 @Component({
   selector: 'app-appointment-details',
   imports: [DatePipe, RouterLink],
@@ -37,6 +40,9 @@ export class AppointmentDetails implements OnInit {
   protected readonly formatTime = formatLocalTime;
   protected readonly formatAddress = (appointment: AppointmentResponse) => formatAddressLines(appointment.address);
 
+  /**
+   * Returns to the appointment list if the loaded appointment no longer matches the selected patient.
+   */
   constructor() {
     effect(() => {
       const appointment = this.appointment();
@@ -48,6 +54,9 @@ export class AppointmentDetails implements OnInit {
     });
   }
 
+  /**
+   * Loads the appointment from the id in the current route.
+   */
   ngOnInit(): void {
     const appointmentId = this.route.snapshot.paramMap.get('appointmentId');
 
@@ -59,6 +68,9 @@ export class AppointmentDetails implements OnInit {
     this.loadAppointment(appointmentId);
   }
 
+  /**
+   * Reloads the current appointment.
+   */
   protected retry(): void {
     const appointmentId = this.route.snapshot.paramMap.get('appointmentId');
 
@@ -67,6 +79,9 @@ export class AppointmentDetails implements OnInit {
     }
   }
 
+  /**
+   * Confirms and archives the current appointment.
+   */
   protected archive(): void {
     const appointment = this.appointment();
     this.actionError.set('');
@@ -89,6 +104,9 @@ export class AppointmentDetails implements OnInit {
     });
   }
 
+  /**
+   * Loads the appointment and checks that it belongs to the selected patient.
+   */
   private loadAppointment(appointmentId: string): void {
     const failedPatientRecordId = this.selectedPatient()?.patientRecordId ?? null;
 
@@ -114,6 +132,9 @@ export class AppointmentDetails implements OnInit {
     });
   }
 
+  /**
+   * Handles appointment loading errors and refreshes patient access when needed.
+   */
   private handleLoadError(error: unknown, failedPatientRecordId: string | null): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(failedPatientRecordId, 'forbidden');
@@ -129,6 +150,9 @@ export class AppointmentDetails implements OnInit {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the appointment.'));
   }
 
+  /**
+   * Handles appointment archive errors and refreshes patient access when needed.
+   */
   private handleArchiveError(error: unknown, appointment: AppointmentResponse): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(appointment.patientRecordId, 'forbidden');
@@ -143,6 +167,9 @@ export class AppointmentDetails implements OnInit {
     this.actionError.set(getHttpErrorMessage(error, 'Unable to archive the appointment.'));
   }
 
+  /**
+   * Refreshes patient access and returns to the appointment list if the selected patient has changed.
+   */
   private recoverPatientAccess(failedPatientRecordId: string | null, fallbackStatus: 'forbidden' | 'not-found'): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       next: () => {
