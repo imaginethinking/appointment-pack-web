@@ -5,6 +5,9 @@ import { hasHttpStatus} from '../../../core/http/http-problem-detail';
 import {CreatePatientRecordRequest, PatientRecordResponse, UpdatePatientRecordRequest} from '../models/patient-record-model';
 import {PatientRecordApiService} from './patient-record-api-service';
 
+/**
+ * Keeps the user's own patient record and its loading and saving state.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -12,16 +15,17 @@ export class PersonalPatientRecordState {
   private readonly patientRecordApi = inject(PatientRecordApiService);
 
   private readonly patientRecordValue = signal<PatientRecordResponse | null>(null);
-
   private readonly loadingValue = signal(false);
   private readonly savingValue = signal(false);
 
   readonly patientRecord = this.patientRecordValue.asReadonly();
 
   readonly isLoading = this.loadingValue.asReadonly();
-
   readonly isSaving = this.savingValue.asReadonly();
 
+  /**
+   * Loads the user's patient record and treats a missing record as an empty state.
+   */
   loadCurrentPatientRecord():
     Observable<PatientRecordResponse | null> {
     this.loadingValue.set(true);
@@ -33,6 +37,7 @@ export class PersonalPatientRecordState {
           this.patientRecordValue.set(patientRecord);
         }),
         catchError((error: unknown) => {
+          // A missing record is expected when the user has not created their patient record yet.
           if (hasHttpStatus(error, 404)) {
             this.patientRecordValue.set(null);
             return of(null);
@@ -46,6 +51,9 @@ export class PersonalPatientRecordState {
       );
   }
 
+  /**
+   * Creates the user's patient record and stores the new record in the shared state.
+   */
   createPatientRecord(request: CreatePatientRecordRequest): Observable<PatientRecordResponse> {
     this.savingValue.set(true);
 
@@ -61,6 +69,9 @@ export class PersonalPatientRecordState {
       );
   }
 
+  /**
+   * Saves changes to the loaded patient record and updates the shared state.
+   */
   updateCurrentPatientRecord(request: UpdatePatientRecordRequest): Observable<PatientRecordResponse> {
     const patientRecord = this.patientRecordValue();
 
@@ -91,6 +102,9 @@ export class PersonalPatientRecordState {
       );
   }
 
+  /**
+   * Clears the patient record and resets its loading and saving state.
+   */
   reset(): void {
     this.patientRecordValue.set(null);
     this.loadingValue.set(false);

@@ -4,6 +4,9 @@ import { finalize, Observable, tap } from 'rxjs';
 import { ProfileResponse, UpdateProfileRequest } from '../models/profile-model';
 import { ProfileApiService } from './profile-api-service';
 
+/**
+ * Keeps the current profile and its loading and saving state available across the application.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -19,6 +22,9 @@ export class ProfileState {
   readonly isLoading = this.loadingValue.asReadonly();
   readonly isSaving = this.savingValue.asReadonly();
 
+  /**
+   * Loads the current profile and stores it in the shared profile state.
+   */
   loadCurrentProfile(): Observable<ProfileResponse> {
     this.loadingValue.set(true);
 
@@ -32,6 +38,9 @@ export class ProfileState {
     );
   }
 
+  /**
+   * Saves changes to the current profile and updates the shared profile state.
+   */
   updateCurrentProfile(request: UpdateProfileRequest): Observable<ProfileResponse> {
     this.savingValue.set(true);
 
@@ -45,6 +54,9 @@ export class ProfileState {
     );
   }
 
+  /**
+   * Clears the current profile and resets its loading and saving state.
+   */
   reset(): void {
     this.profileValue.set(null);
     this.loadingValue.set(false);

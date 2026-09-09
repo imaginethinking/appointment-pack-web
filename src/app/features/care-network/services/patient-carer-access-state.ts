@@ -8,6 +8,9 @@ import {
 } from '../models/patient-carer-access-model';
 import { PatientCarerAccessApiService } from './patient-carer-access-api-service';
 
+/**
+ * Keeps patient and carer relationships up to date as they are loaded or changed.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -15,21 +18,18 @@ export class PatientCarerAccessState {
   private readonly accessApi = inject(PatientCarerAccessApiService);
 
   private readonly asPatientRelationshipsValue = signal<readonly PatientCarerAccessResponse[]>([]);
-
   private readonly asCarerRelationshipsValue = signal<readonly PatientCarerAccessResponse[]>([]);
-
   private readonly loadingAsPatientValue = signal(false);
-
   private readonly loadingAsCarerValue = signal(false);
 
   readonly asPatientRelationships = this.asPatientRelationshipsValue.asReadonly();
-
   readonly asCarerRelationships = this.asCarerRelationshipsValue.asReadonly();
-
   readonly isLoadingAsPatient = this.loadingAsPatientValue.asReadonly();
-
   readonly isLoadingAsCarer = this.loadingAsCarerValue.asReadonly();
 
+  /**
+   * Loads the relationships where the current user owns the patient record.
+   */
   loadAsPatient(): Observable<PatientCarerAccessResponse[]> {
     this.loadingAsPatientValue.set(true);
 
@@ -43,6 +43,9 @@ export class PatientCarerAccessState {
     );
   }
 
+  /**
+   * Loads the relationships where the current user has access as a carer.
+   */
   loadAsCarer(): Observable<PatientCarerAccessResponse[]> {
     this.loadingAsCarerValue.set(true);
 
@@ -56,6 +59,9 @@ export class PatientCarerAccessState {
     );
   }
 
+  /**
+   * Invites a carer and adds the returned relationship to the current state.
+   */
   inviteCarer(request: CreateCarerInvitationRequest): Observable<PatientCarerAccessResponse> {
     return this.accessApi.inviteCarer(request).pipe(
       tap((relationship) => {
@@ -64,6 +70,9 @@ export class PatientCarerAccessState {
     );
   }
 
+  /**
+   * Saves the carer's permissions and updates the relationship in the current state.
+   */
   updatePermissions(
     accessId: string,
     request: UpdatePatientCarerPermissionsRequest,
@@ -75,6 +84,9 @@ export class PatientCarerAccessState {
     );
   }
 
+  /**
+   * Cancels a pending carer invitation and updates the relationship state.
+   */
   cancelInvitation(accessId: string): Observable<PatientCarerAccessResponse> {
     return this.accessApi.cancelInvitation(accessId).pipe(
       tap((relationship) => {
@@ -83,6 +95,9 @@ export class PatientCarerAccessState {
     );
   }
 
+  /**
+   * Revokes an active carer's access and updates the relationship state.
+   */
   revokeAccess(accessId: string): Observable<PatientCarerAccessResponse> {
     return this.accessApi.revokeAccess(accessId).pipe(
       tap((relationship) => {
@@ -91,6 +106,9 @@ export class PatientCarerAccessState {
     );
   }
 
+  /**
+   * Accepts a carer invitation and updates the relationship in the current state.
+   */
   acceptInvitation(accessId: string): Observable<PatientCarerAccessResponse> {
     return this.accessApi.acceptInvitation(accessId).pipe(
       tap((relationship) => {
@@ -99,6 +117,9 @@ export class PatientCarerAccessState {
     );
   }
 
+  /**
+   * Declines a carer invitation and updates the relationship in the current state.
+   */
   declineInvitation(accessId: string): Observable<PatientCarerAccessResponse> {
     return this.accessApi.declineInvitation(accessId).pipe(
       tap((relationship) => {
@@ -107,6 +128,9 @@ export class PatientCarerAccessState {
     );
   }
 
+  /**
+   * Clears the loaded patient and carer relationships.
+   */
   reset(): void {
     this.asPatientRelationshipsValue.set([]);
     this.asCarerRelationshipsValue.set([]);
@@ -114,6 +138,9 @@ export class PatientCarerAccessState {
     this.loadingAsCarerValue.set(false);
   }
 
+  /**
+   * Adds or updates a relationship in the list where the current user owns the patient record.
+   */
   private updateAsPatientRelationship(updatedRelationship: PatientCarerAccessResponse): void {
     const relationships = this.asPatientRelationshipsValue();
 
@@ -134,6 +161,9 @@ export class PatientCarerAccessState {
     );
   }
 
+  /**
+   * Adds or updates a relationship in the list where the current user has carer access.
+   */
   private updateAsCarerRelationship(updatedRelationship: PatientCarerAccessResponse): void {
     const relationships = this.asCarerRelationshipsValue();
 

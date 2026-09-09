@@ -7,6 +7,9 @@ import { ProfileState } from '../../profile/services/profile-state';
 import { SelectedPatientContext } from '../models/selected-patient-context';
 import { PatientContextAuthorisation } from './patient-context-auth';
 
+/**
+ * Keeps the available patient contexts and the patient currently selected by the user.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -71,6 +74,9 @@ export class SelectedPatientState {
     equal: selectedPatientContextEqual,
   });
 
+  /**
+   * Selects an available patient and saves the choice for the current browser session.
+   */
   selectPatient(patientRecordId: string): boolean {
     const context = this.contexts().find((candidate) => candidate.patientRecordId === patientRecordId);
 
@@ -83,10 +89,16 @@ export class SelectedPatientState {
     return true;
   }
 
+  /**
+   * Checks whether the patient context can be opened.
+   */
   canSelect(context: SelectedPatientContext): boolean {
     return this.authorisation.can(context, 'patient-record', 'view');
   }
 
+  /**
+   * Keeps the current patient selected when possible and chooses another available patient when access has changed.
+   */
   revalidateSelection(): void {
     const contexts = this.contexts();
     const preferredPatientRecordId = this.selectedPatientRecordIdValue();
@@ -119,16 +131,25 @@ export class SelectedPatientState {
     this.clearSelection();
   }
 
+  /**
+   * Clears the current patient selection.
+   */
   reset(): void {
     this.clearSelection();
   }
 
+  /**
+   * Removes the selected patient from the state and browser session.
+   */
   private clearSelection(): void {
     this.selectedPatientRecordIdValue.set(null);
     sessionStorage.removeItem(this.selectedPatientRecordIdKey);
   }
 }
 
+/**
+ * Checks whether two patient contexts contain the same patient details and permissions.
+ */
 function selectedPatientContextEqual(previous: SelectedPatientContext | null, current: SelectedPatientContext | null): boolean {
   if (previous === current) {
     return true;
@@ -147,6 +168,9 @@ function selectedPatientContextEqual(previous: SelectedPatientContext | null, cu
     && permissionSetsEqual(previous.permissions, current.permissions);
 }
 
+/**
+ * Checks whether two permission sets contain the same permissions.
+ */
 function permissionSetsEqual(previous: ReadonlySet<Permission>, current: ReadonlySet<Permission>): boolean {
   if (previous.size !== current.size) {
     return false;

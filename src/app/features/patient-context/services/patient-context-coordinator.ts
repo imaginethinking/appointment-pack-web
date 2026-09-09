@@ -6,6 +6,9 @@ import { PersonalPatientRecordState } from '../../patient-record/services/person
 import { ProfileState } from '../../profile/services/profile-state';
 import { SelectedPatientState } from './selected-patient-state';
 
+/**
+ * Loads the shared information used to create and maintain the current patient selection.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -24,11 +27,15 @@ export class PatientContextCoordinator {
   readonly isLoaded = this.loadedValue.asReadonly();
   readonly loadFailed = this.loadFailedValue.asReadonly();
 
+  /**
+   * Loads the information needed for patient selection and keeps the current selection valid once it is ready.
+   */
   load(): Observable<void> {
     if (this.loadedValue()) {
       return of(undefined);
     }
 
+    // Reuse the current load so different parts of the page do not start the same requests again.
     if (this.loadRequest !== null) {
       return this.loadRequest;
     }
@@ -60,6 +67,9 @@ export class PatientContextCoordinator {
     return this.loadRequest;
   }
 
+  /**
+   * Reloads carer relationships and checks whether the current patient selection is still available.
+   */
   reloadCarerAccess(): Observable<void> {
     this.loadingValue.set(true);
     this.loadFailedValue.set(false);
@@ -75,6 +85,9 @@ export class PatientContextCoordinator {
     );
   }
 
+  /**
+   * Refreshes carer access when the selected patient comes from a carer relationship.
+   */
   refreshSelectedPatientAccess(): Observable<void> {
     const selectedPatientRecordId = this.selectedPatientState.selectedPatientRecordId();
 
@@ -91,6 +104,9 @@ export class PatientContextCoordinator {
     return this.reloadCarerAccess();
   }
 
+  /**
+   * Clears the loaded patient context information and current patient selection.
+   */
   reset(): void {
     this.profileState.reset();
     this.personalPatientRecordState.reset();
