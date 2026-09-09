@@ -6,6 +6,10 @@ import { catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../services/auth-service';
 
+/**
+ * Adds the current access token to protected API requests and clears the
+ * browser session when a protected request receives an unexpected 401.
+ */
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);

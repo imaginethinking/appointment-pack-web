@@ -1,3 +1,6 @@
+/**
+ * Defines the patient permission resources
+ */
 export const PERMISSION_CATALOG = {
   'patient-record': ['view', 'edit'],
   document: ['view', 'edit', 'upload'],
@@ -17,11 +20,18 @@ export type Permission = {
   [R in PermissionResource]: `${R}:${PermissionAction<R>}`;
 }[PermissionResource];
 
+/**
+ * Describes the patient permission required by a route or feature.
+ */
 export interface PermissionRequirement<R extends PermissionResource = PermissionResource> {
   resource: R;
   action: PermissionAction<R>;
 }
 
+/**
+ * Holds the display information and prerequisite permissions used by the
+ * permission editor.
+ */
 export interface PermissionOption {
   permission: Permission;
   label: string;
@@ -29,12 +39,19 @@ export interface PermissionOption {
   dependencies: readonly Permission[];
 }
 
+/**
+ * Groups related permissions for presentation in the Care Network interface.
+ */
 export interface PermissionGroup {
   resource: PermissionResource;
   label: string;
   permissions: readonly PermissionOption[];
 }
 
+/**
+ * Defines the permission options shown to users together with their direct
+ * prerequisite permissions.
+ */
 export const PERMISSION_GROUPS: readonly PermissionGroup[] = [
   {
     resource: 'patient-record',
@@ -110,25 +127,46 @@ export const PERMISSION_GROUPS: readonly PermissionGroup[] = [
   },
 ];
 
+/**
+ * Provides the direct prerequisite permissions for each permission.
+ */
 export const PERMISSION_DEPENDENCIES: Readonly<Partial<Record<Permission, readonly Permission[]>>> = buildPermissionDependencies();
+
+/**
+ * Provides the reverse dependency lookup used when removing permissions.
+ */
 export const PERMISSION_DEPENDENTS: Readonly<Partial<Record<Permission, readonly Permission[]>>> = buildPermissionDependents();
 
+/**
+ * Builds the permission string for a resource and action.
+ */
 export function buildPermission<R extends PermissionResource>(resource: R, action: PermissionAction<R>): `${R}:${PermissionAction<R>}` {
   return `${resource}:${action}` as `${R}:${PermissionAction<R>}`;
 }
 
+/**
+ * Returns a new permission set containing the requested permission and all
+ * of its required prerequisites.
+ */
 export function addPermissionWithDependencies(selectedPermissions: ReadonlySet<Permission>, permission: Permission): ReadonlySet<Permission> {
   const permissions = new Set(selectedPermissions);
   addPermission(permissions, permission);
   return permissions;
 }
 
+/**
+ * Returns a new permission set with the requested permission and anything
+ * that depends on it removed.
+ */
 export function removePermissionWithDependents(selectedPermissions: ReadonlySet<Permission>, permission: Permission): ReadonlySet<Permission> {
   const permissions = new Set(selectedPermissions);
   removePermission(permissions, permission);
   return permissions;
 }
 
+/**
+ * Builds the display metadata for a permission and its direct prerequisites.
+ */
 function permissionOption<R extends PermissionResource>(
   resource: R,
   action: PermissionAction<R>,
@@ -144,6 +182,9 @@ function permissionOption<R extends PermissionResource>(
   };
 }
 
+/**
+ * Builds the prerequisite lookup from the permission groups defined above.
+ */
 function buildPermissionDependencies(): Partial<Record<Permission, readonly Permission[]>> {
   const dependencies: Partial<Record<Permission, readonly Permission[]>> = {};
 
@@ -158,6 +199,10 @@ function buildPermissionDependencies(): Partial<Record<Permission, readonly Perm
   return dependencies;
 }
 
+/**
+ * Builds the reverse lookup used to find permissions that depend on another
+ * permission.
+ */
 function buildPermissionDependents(): Partial<Record<Permission, readonly Permission[]>> {
   const dependents: Partial<Record<Permission, Permission[]>> = {};
 
@@ -172,6 +217,9 @@ function buildPermissionDependents(): Partial<Record<Permission, readonly Permis
   return dependents;
 }
 
+/**
+ * Adds a permission to the working set and recursively includes its prerequisites.
+ */
 function addPermission(permissions: Set<Permission>, permission: Permission): void {
   permissions.add(permission);
 
@@ -180,6 +228,10 @@ function addPermission(permissions: Set<Permission>, permission: Permission): vo
   }
 }
 
+/**
+ * Recursively removes permissions that depend on the requested permission
+ * before removing the permission itself.
+ */
 function removePermission(permissions: Set<Permission>, permission: Permission): void {
   for (const dependent of PERMISSION_DEPENDENTS[permission] ?? []) {
     removePermission(permissions, dependent);
