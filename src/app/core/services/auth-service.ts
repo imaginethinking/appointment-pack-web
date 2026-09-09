@@ -17,6 +17,13 @@ interface JwtPayload {
   roles?: unknown;
 }
 
+/**
+ * Maintains browser-side authentication state, including the access token,
+ * supported roles and any pending MFA login challenge.
+ *
+ * JWT contents are decoded only for frontend session and navigation state.
+ * The backend remains responsible for validating the token.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -33,10 +40,18 @@ export class AuthService {
   readonly roles = this.rolesValue.asReadonly();
   readonly isAdmin = computed(() => this.rolesValue().has('ADMIN'));
 
+  /**
+   * Restores a valid authenticated session from browser storage when the
+   * service is created.
+   */
   constructor() {
     this.restoreAuthenticatedSession();
   }
 
+  /**
+   * Starts a password login after clearing any authentication state left from
+   * the previous session or login attempt.
+   */
   login(request: LoginRequest): Observable<LoginResponse> {
     this.clearSession();
 
@@ -45,6 +60,10 @@ export class AuthService {
     );
   }
 
+  /**
+   * Completes the pending MFA login using the challenge stored for the current
+   * browser session.
+   */
   completeMfaLogin(code: string): Observable<LoginResponse> {
     const mfaChallengeId = sessionStorage.getItem(this.mfaChallengeIdKey);
 
@@ -62,26 +81,48 @@ export class AuthService {
     );
   }
 
+  /**
+   * Loads the current account security settings from the backend.
+   */
   getAccountSecurity(): Observable<AccountSecurityResponse> {
     return this.authApi.getAccountSecurity();
   }
 
+  /**
+   * Changes the current user's password using the supplied current and new
+   * password details.
+   */
   changePassword(request: PasswordChangeRequest): Observable<void> {
     return this.authApi.changePassword(request);
   }
 
+  /**
+   * Starts MFA setup and returns the provisioning details required by the user.
+   */
   setupMfa(): Observable<MfaSetupResponse> {
     return this.authApi.setupMfa();
   }
 
+  /**
+   * Confirms the pending MFA setup using a current authenticator code.
+   */
   confirmMfa(code: string): Observable<void> {
     return this.authApi.confirmMfa({ code });
   }
 
+  /**
+   * Disables MFA after the backend verifies the supplied authenticator code.
+   */
   disableMfa(code: string): Observable<void> {
     return this.authApi.disableMfa({ code });
   }
 
+  /**
+   * Returns the stored access token when it is structurally valid and has not
+   * expired, clears stale session state otherwise.
+   *
+   * @returns The current access token, or null when no usable token is stored.
+   */
   getAccessToken(): string | null {
     const accessToken = sessionStorage.getItem(this.accessTokenKey);
 
@@ -100,26 +141,48 @@ export class AuthService {
     return accessToken;
   }
 
+  /**
+   * Checks whether the browser session currently contains a usable access token.
+   */
   isAuthenticated(): boolean {
     return this.getAccessToken() !== null;
   }
 
+  /**
+   * Checks whether the roles decoded for the current frontend session include
+   * the requested role.
+   */
   hasRole(role: UserRole): boolean {
     return this.rolesValue().has(role);
   }
 
+  /**
+   * Checks whether an MFA login challenge is waiting to be completed in this
+   * browser session.
+   */
   hasPendingMfaChallenge(): boolean {
     return sessionStorage.getItem(this.mfaChallengeIdKey) !== null;
   }
 
+  /**
+   * Cancels the pending MFA login and clears authentication state for the
+   * current browser session.
+   */
   cancelMfaLogin(): void {
     this.clearSession();
   }
 
+  /**
+   * Clears the current browser authentication state.
+   */
   logout(): void {
     this.clearSession();
   }
 
+  /**
+   * Validates the password login response before storing either an authenticated
+   * session or a pending MFA challenge.
+   */
   private handlePasswordLoginResponse(response: LoginResponse): void {
     switch (response.status) {
       case 'AUTHENTICATED':
@@ -147,6 +210,10 @@ export class AuthService {
     }
   }
 
+  /**
+   * Accepts only a completed authenticated MFA response before storing the
+   * returned access token.
+   */
   private handleMfaLoginResponse(response: LoginResponse): void {
     if (
       response.status !== 'AUTHENTICATED'
@@ -160,6 +227,10 @@ export class AuthService {
     this.storeAuthenticatedSession(response.accessToken);
   }
 
+  /**
+   * Validates and stores an access token, clears any completed MFA challenge
+   * and updates the reactive authentication state.
+   */
   private storeAuthenticatedSession(accessToken: string): void {
     const payload = this.decodeJwtPayload(accessToken);
 
@@ -173,6 +244,10 @@ export class AuthService {
     this.updateAuthenticatedState(payload);
   }
 
+  /**
+   * Restores reactive authentication state when browser storage contains a
+   * valid, unexpired access token.
+   */
   private restoreAuthenticatedSession(): void {
     const accessToken = sessionStorage.getItem(this.accessTokenKey);
 
@@ -197,6 +272,10 @@ export class AuthService {
     this.authenticatedValue.set(true);
   }
 
+  /**
+   * Removes stored authentication and MFA state and resets the corresponding
+   * reactive values.
+   */
   private clearSession(): void {
     sessionStorage.removeItem(this.accessTokenKey);
     sessionStorage.removeItem(this.mfaChallengeIdKey);
@@ -205,6 +284,9 @@ export class AuthService {
     this.authenticatedValue.set(false);
   }
 
+  /**
+   * Decodes the JWT payload for frontend expiry and role state.
+   */
   private decodeJwtPayload(accessToken: string): JwtPayload | null {
     try {
       const tokenParts = accessToken.split('.');
@@ -223,11 +305,17 @@ export class AuthService {
     }
   }
 
+  /**
+   * Checks whether the decoded token expiry has passed or is missing.
+   */
   private isPayloadExpired(payload: JwtPayload): boolean {
     return payload.exp === undefined || payload.exp * 1000 <= Date.now();
   }
 }
 
+/**
+ * Narrows a decoded role value to one of the roles understood by the frontend.
+ */
 function isUserRole(value: unknown): value is UserRole {
   return value === 'USER' || value === 'ADMIN';
 }
