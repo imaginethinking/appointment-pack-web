@@ -3,6 +3,9 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { EmergencyContactForm } from '../../forms/emergency-contact-form';
 
+/**
+ * Displays the shared fields used for creating and editing emergency contacts.
+ */
 @Component({
   selector: 'app-emergency-contact-form-fields',
   imports: [ReactiveFormsModule],

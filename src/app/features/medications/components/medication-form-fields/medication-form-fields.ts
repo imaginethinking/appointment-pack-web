@@ -3,6 +3,9 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { MedicationForm } from '../../forms/medication-form';
 
+/**
+ * Displays the shared fields used for creating and editing medications.
+ */
 @Component({
   selector: 'app-medication-form-fields',
   imports: [ReactiveFormsModule],

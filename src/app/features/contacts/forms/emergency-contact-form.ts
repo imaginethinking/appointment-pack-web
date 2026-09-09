@@ -3,6 +3,9 @@ import { AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators
 import { normaliseOptionalText } from '../../../shared/utils/formatting';
 import { EmergencyContactRequest, EmergencyContactResponse } from '../models/emergency-contact-model';
 
+/**
+ * Creates the form used to enter emergency contact details.
+ */
 export function createEmergencyContactForm(formBuilder: FormBuilder) {
   return formBuilder.group({
     name: formBuilder.nonNullable.control('', [Validators.required, nonBlankValidator, Validators.maxLength(200)]),
@@ -16,6 +19,9 @@ export function createEmergencyContactForm(formBuilder: FormBuilder) {
 
 export type EmergencyContactForm = ReturnType<typeof createEmergencyContactForm>;
 
+/**
+ * Converts the emergency contact form values into the request used when saving a contact.
+ */
 export function mapEmergencyContactFormToRequest(form: EmergencyContactForm): EmergencyContactRequest {
   const value = form.getRawValue();
 
@@ -29,6 +35,9 @@ export function mapEmergencyContactFormToRequest(form: EmergencyContactForm): Em
   };
 }
 
+/**
+ * Resets the emergency contact form using an existing contact when one is provided.
+ */
 export function resetEmergencyContactForm(form: EmergencyContactForm, contact: EmergencyContactResponse | null = null): void {
   form.reset({
     name: contact?.name ?? '',
@@ -40,6 +49,9 @@ export function resetEmergencyContactForm(form: EmergencyContactForm, contact: E
   });
 }
 
+/**
+ * Rejects text that contains only spaces.
+ */
 const nonBlankValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const value = control.value;
   return typeof value === 'string' && value.length > 0 && value.trim().length === 0 ? { blank: true } : null;

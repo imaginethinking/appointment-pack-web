@@ -3,6 +3,9 @@ import { AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators
 import { normaliseOptionalText } from '../../../shared/utils/formatting';
 import { BloodType, HeightUnit, PatientRecordRequest, PatientRecordResponse, WeightUnit } from '../models/patient-record-model';
 
+/**
+ * Creates the form used to enter healthcare identifiers measurements and blood type.
+ */
 export function createPatientRecordForm(formBuilder: FormBuilder) {
   return formBuilder.group({
     nhsNumber: formBuilder.nonNullable.control('', Validators.maxLength(10)),
@@ -23,6 +26,9 @@ export function createPatientRecordForm(formBuilder: FormBuilder) {
 
 export type PatientRecordForm = ReturnType<typeof createPatientRecordForm>;
 
+/**
+ * Converts the patient record form values into the request used when saving the record.
+ */
 export function mapPatientRecordFormToRequest(form: PatientRecordForm): PatientRecordRequest {
   const value = form.getRawValue();
 
@@ -38,6 +44,9 @@ export function mapPatientRecordFormToRequest(form: PatientRecordForm): PatientR
   };
 }
 
+/**
+ * Resets the form using the current patient record values.
+ */
 export function resetPatientRecordForm(form: PatientRecordForm, patientRecord: PatientRecordResponse): void {
   form.reset({
     nhsNumber: patientRecord.nhsNumber ?? '',
@@ -51,6 +60,9 @@ export function resetPatientRecordForm(form: PatientRecordForm, patientRecord: P
   });
 }
 
+/**
+ * Requires a measurement value and its unit to be entered together.
+ */
 function measurementPairValidator(valueControlName: string, unitControlName: string, errorKey: string): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const value = control.get(valueControlName)?.value;
@@ -62,6 +74,9 @@ function measurementPairValidator(valueControlName: string, unitControlName: str
   };
 }
 
+/**
+ * Checks that a numeric value does not use more than the allowed number of decimal places.
+ */
 function decimalPlacesValidator(maximumDecimalPlaces: number): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const value = control.value;

@@ -3,6 +3,9 @@ import { AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators
 import { normaliseOptionalText } from '../../../shared/utils/formatting';
 import { MedicationRequest, MedicationResponse } from '../models/medication-model';
 
+/**
+ * Creates the form used to enter medication details.
+ */
 export function createMedicationForm(formBuilder: FormBuilder) {
   return formBuilder.group({
     name: formBuilder.nonNullable.control('', [Validators.required, nonBlankValidator, Validators.maxLength(200)]),
@@ -19,6 +22,9 @@ export function createMedicationForm(formBuilder: FormBuilder) {
 
 export type MedicationForm = ReturnType<typeof createMedicationForm>;
 
+/**
+ * Converts the medication form values into the request used when saving a medication.
+ */
 export function mapMedicationFormToRequest(form: MedicationForm): MedicationRequest {
   const value = form.getRawValue();
 
@@ -33,6 +39,9 @@ export function mapMedicationFormToRequest(form: MedicationForm): MedicationRequ
   };
 }
 
+/**
+ * Resets the medication form using an existing medication when one is provided.
+ */
 export function resetMedicationForm(form: MedicationForm, medication: MedicationResponse | null = null): void {
   form.reset({
     name: medication?.name ?? '',
@@ -45,11 +54,17 @@ export function resetMedicationForm(form: MedicationForm, medication: Medication
   });
 }
 
+/**
+ * Rejects text that contains only spaces.
+ */
 const nonBlankValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const value = control.value;
   return typeof value === 'string' && value.length > 0 && value.trim().length === 0 ? { blank: true } : null;
 };
 
+/**
+ * Checks that the medication end date is not earlier than the start date.
+ */
 const medicationDateRangeValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const startDate = control.get('startDate')?.value;
   const endDate = control.get('endDate')?.value;

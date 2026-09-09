@@ -3,6 +3,9 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { HealthcareContactForm } from '../../forms/healthcare-contact-form';
 
+/**
+ * Displays the shared fields used for creating and editing healthcare contacts.
+ */
 @Component({
   selector: 'app-healthcare-contact-form-fields',
   imports: [ReactiveFormsModule],

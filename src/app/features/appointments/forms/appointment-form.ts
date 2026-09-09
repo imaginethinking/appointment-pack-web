@@ -4,6 +4,9 @@ import { PartialAddressRequest } from '../../../shared/models/address-model';
 import { normaliseOptionalText } from '../../../shared/utils/formatting';
 import { AppointmentRequest } from '../models/appointment-model';
 
+/**
+ * Contains appointment values that can be loaded into the shared appointment form.
+ */
 export interface AppointmentFormSource {
   date: string | null;
   startTime: string | null;
@@ -16,6 +19,9 @@ export interface AppointmentFormSource {
   notes: string | null;
 }
 
+/**
+ * Creates the form used to enter and review appointment details.
+ */
 export function createAppointmentForm(formBuilder: FormBuilder) {
   return formBuilder.group({
     date: formBuilder.nonNullable.control('', Validators.required),
@@ -41,6 +47,9 @@ export function createAppointmentForm(formBuilder: FormBuilder) {
 
 export type AppointmentForm = ReturnType<typeof createAppointmentForm>;
 
+/**
+ * Converts the appointment form values into the request used when saving an appointment.
+ */
 export function mapAppointmentFormToRequest(form: AppointmentForm): AppointmentRequest {
   const value = form.getRawValue();
 
@@ -57,6 +66,9 @@ export function mapAppointmentFormToRequest(form: AppointmentForm): AppointmentR
   };
 }
 
+/**
+ * Resets the appointment form using existing appointment details when they are available.
+ */
 export function resetAppointmentForm(form: AppointmentForm, source: AppointmentFormSource | null = null): void {
   form.reset({
     date: source?.date ?? '',
@@ -78,6 +90,9 @@ export function resetAppointmentForm(form: AppointmentForm, source: AppointmentF
   });
 }
 
+/**
+ * Builds an address from the completed fields or returns null when the address is empty.
+ */
 function buildPartialAddressRequest(value: {
   addressLine1: string;
   addressLine2: string;
@@ -98,10 +113,16 @@ function buildPartialAddressRequest(value: {
   return Object.values(address).some((field) => field !== null) ? address : null;
 }
 
+/**
+ * Converts a stored time into the hours and minutes used by a time input.
+ */
 function toTimeInput(value: string | null): string {
   return value === null || value.length < 5 ? '' : value.substring(0, 5);
 }
 
+/**
+ * Checks that the appointment end time is later than the start time when both are provided.
+ */
 const appointmentTimeValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const startTime = control.get('startTime')?.value;
   const endTime = control.get('endTime')?.value;

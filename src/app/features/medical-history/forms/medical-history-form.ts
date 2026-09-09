@@ -3,6 +3,9 @@ import { AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators
 import { pastOrPresentDateValidator } from '../../../core/forms/date-validators';
 import { CreateMedicalHistoryEntryRequest, MedicalHistoryEntryResponse, UpdateMedicalHistoryEntryRequest } from '../models/medical-history-model';
 
+/**
+ * Creates the form used to enter a Medical History entry.
+ */
 export function createMedicalHistoryForm(formBuilder: FormBuilder) {
   return formBuilder.group({
     title: formBuilder.nonNullable.control('', [Validators.required, nonBlankValidator, Validators.maxLength(200)]),
@@ -13,14 +16,23 @@ export function createMedicalHistoryForm(formBuilder: FormBuilder) {
 
 export type MedicalHistoryForm = ReturnType<typeof createMedicalHistoryForm>;
 
+/**
+ * Converts the form values into a request for creating a Medical History entry.
+ */
 export function mapMedicalHistoryFormToCreateRequest(form: MedicalHistoryForm): CreateMedicalHistoryEntryRequest {
   return mapMedicalHistoryFormToRequest(form);
 }
 
+/**
+ * Converts the form values into a request for updating a Medical History entry.
+ */
 export function mapMedicalHistoryFormToUpdateRequest(form: MedicalHistoryForm): UpdateMedicalHistoryEntryRequest {
   return mapMedicalHistoryFormToRequest(form);
 }
 
+/**
+ * Resets the form using an existing Medical History entry when one is provided.
+ */
 export function resetMedicalHistoryForm(form: MedicalHistoryForm, entry: MedicalHistoryEntryResponse | null = null): void {
   form.reset({
     title: entry?.title ?? '',
@@ -29,6 +41,9 @@ export function resetMedicalHistoryForm(form: MedicalHistoryForm, entry: Medical
   });
 }
 
+/**
+ * Trims the entered values and creates the request shared by create and update actions.
+ */
 function mapMedicalHistoryFormToRequest(form: MedicalHistoryForm): CreateMedicalHistoryEntryRequest {
   const value = form.getRawValue();
 
@@ -39,6 +54,9 @@ function mapMedicalHistoryFormToRequest(form: MedicalHistoryForm): CreateMedical
   };
 }
 
+/**
+ * Rejects text that contains only spaces.
+ */
 const nonBlankValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const value = control.value;
   return typeof value === 'string' && value.length > 0 && value.trim().length === 0 ? { blank: true } : null;

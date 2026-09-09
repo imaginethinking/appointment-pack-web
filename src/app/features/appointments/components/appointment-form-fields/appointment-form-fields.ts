@@ -3,6 +3,9 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { AppointmentForm } from '../../forms/appointment-form';
 
+/**
+ * Displays the shared fields used for creating and editing appointments.
+ */
 @Component({
   selector: 'app-appointment-form-fields',
   imports: [ReactiveFormsModule],

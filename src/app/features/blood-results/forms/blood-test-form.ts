@@ -4,6 +4,9 @@ import { pastOrPresentDateValidator } from '../../../core/forms/date-validators'
 import { normaliseOptionalText } from '../../../shared/utils/formatting';
 import { BloodTestRequest, BloodTestResponse, BloodTestResultResponse } from '../models/blood-test-model';
 
+/**
+ * Creates the form used to enter a blood test and its results.
+ */
 export function createBloodTestForm(formBuilder: FormBuilder) {
   return formBuilder.group({
     title: formBuilder.nonNullable.control('', Validators.maxLength(200)),
@@ -17,6 +20,9 @@ export function createBloodTestForm(formBuilder: FormBuilder) {
 export type BloodTestForm = ReturnType<typeof createBloodTestForm>;
 export type BloodTestResultForm = ReturnType<typeof createBloodTestResultForm>;
 
+/**
+ * Creates a result row using existing blood test data when it is available.
+ */
 export function createBloodTestResultForm(formBuilder: FormBuilder, result: BloodTestResultResponse | null = null) {
   return formBuilder.group({
     analyteName: formBuilder.nonNullable.control(result?.analyteName ?? '', [Validators.required, nonBlankValidator, Validators.maxLength(200)]),
@@ -27,6 +33,9 @@ export function createBloodTestResultForm(formBuilder: FormBuilder, result: Bloo
   });
 }
 
+/**
+ * Adds another result row while keeping the blood test within the maximum number of results.
+ */
 export function addBloodTestResult(form: BloodTestForm, formBuilder: FormBuilder): void {
   if (form.controls.results.length >= 100) {
     return;
@@ -35,6 +44,9 @@ export function addBloodTestResult(form: BloodTestForm, formBuilder: FormBuilder
   form.controls.results.push(createBloodTestResultForm(formBuilder));
 }
 
+/**
+ * Removes a result row while keeping at least one row in the form.
+ */
 export function removeBloodTestResult(form: BloodTestForm, index: number): void {
   if (form.controls.results.length <= 1) {
     return;
@@ -44,6 +56,9 @@ export function removeBloodTestResult(form: BloodTestForm, index: number): void 
   form.controls.results.markAsTouched();
 }
 
+/**
+ * Converts the blood test form and its result rows into the request used when saving a blood test.
+ */
 export function mapBloodTestFormToRequest(form: BloodTestForm): BloodTestRequest {
   const value = form.getRawValue();
 
@@ -62,6 +77,9 @@ export function mapBloodTestFormToRequest(form: BloodTestForm): BloodTestRequest
   };
 }
 
+/**
+ * Resets the blood test form and rebuilds its result rows from the supplied blood test.
+ */
 export function resetBloodTestForm(form: BloodTestForm, formBuilder: FormBuilder, bloodTest: BloodTestResponse | null = null): void {
   form.controls.results.clear();
 
@@ -79,6 +97,9 @@ export function resetBloodTestForm(form: BloodTestForm, formBuilder: FormBuilder
   form.markAsUntouched();
 }
 
+/**
+ * Rejects text that contains only spaces.
+ */
 const nonBlankValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const value = control.value;
   return typeof value === 'string' && value.length > 0 && value.trim().length === 0 ? { blank: true } : null;

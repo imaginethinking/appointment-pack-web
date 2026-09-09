@@ -4,6 +4,9 @@ import { AddressRequest } from '../../../shared/models/address-model';
 import { normaliseOptionalText } from '../../../shared/utils/formatting';
 import { HealthcareContactRequest, HealthcareContactResponse } from '../models/healthcare-contact-model';
 
+/**
+ * Creates the form used to enter healthcare contact details.
+ */
 export function createHealthcareContactForm(formBuilder: FormBuilder) {
   return formBuilder.group({
     name: formBuilder.nonNullable.control('', [Validators.required, nonBlankValidator, Validators.maxLength(200)]),
@@ -25,6 +28,9 @@ export function createHealthcareContactForm(formBuilder: FormBuilder) {
 
 export type HealthcareContactForm = ReturnType<typeof createHealthcareContactForm>;
 
+/**
+ * Converts the healthcare contact form values into the request used when saving a contact.
+ */
 export function mapHealthcareContactFormToRequest(form: HealthcareContactForm): HealthcareContactRequest {
   const value = form.getRawValue();
 
@@ -39,6 +45,9 @@ export function mapHealthcareContactFormToRequest(form: HealthcareContactForm): 
   };
 }
 
+/**
+ * Resets the healthcare contact form using an existing contact when one is provided.
+ */
 export function resetHealthcareContactForm(form: HealthcareContactForm, contact: HealthcareContactResponse | null = null): void {
   form.reset({
     name: contact?.name ?? '',
@@ -58,6 +67,9 @@ export function resetHealthcareContactForm(form: HealthcareContactForm, contact:
   });
 }
 
+/**
+ * Builds the contact address when any address details have been entered.
+ */
 function buildAddressRequest(value: {
   addressLine1: string;
   addressLine2: string;
@@ -79,11 +91,17 @@ function buildAddressRequest(value: {
   return hasAnyAddressValue ? normalised : null;
 }
 
+/**
+ * Rejects text that contains only spaces.
+ */
 const nonBlankValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const value = control.value;
   return typeof value === 'string' && value.length > 0 && value.trim().length === 0 ? { blank: true } : null;
 };
 
+/**
+ * Allows an empty address but requires the main address fields when an address is entered.
+ */
 const optionalCompleteAddressValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const values = ['addressLine1', 'addressLine2', 'townCity', 'county', 'postcode', 'country'].map((name) => {
     const value = control.get(name)?.value;
