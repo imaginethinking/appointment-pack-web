@@ -3,6 +3,9 @@ import { Component, input } from '@angular/core';
 import { Permission } from '../../../../core/models/permission-model';
 import { CARE_NETWORK_PERMISSION_GROUPS, CareNetworkPermissionOption } from '../../models/patient-carer-access-model';
 
+/**
+ * Displays the permissions currently available through a carer relationship.
+ */
 @Component({
   selector: 'app-permission-badges',
   templateUrl: './permission-badges.html',
@@ -14,6 +17,9 @@ export class PermissionBadges {
     (group) => group.permissions,
   );
 
+  /**
+   * Checks whether the relationship includes the given permission.
+   */
   protected hasPermission(permission: Permission): boolean {
     return this.permissions().includes(permission);
   }

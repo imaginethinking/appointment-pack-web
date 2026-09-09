@@ -17,6 +17,9 @@ import { PatientRecordApiService } from '../../services/patient-record-api-servi
 
 type PatientRecordEditStatus = 'loading' | 'ready' | 'no-selection' | 'forbidden' | 'not-found' | 'error';
 
+/**
+ * Loads and edits the patient record currently selected by the user.
+ */
 @Component({
   selector: 'app-patient-record-edit',
   imports: [ReactiveFormsModule, RouterLink],
@@ -49,6 +52,9 @@ export class PatientRecordEdit {
   protected readonly form = createPatientRecordForm(this.formBuilder);
   protected readonly formatOption = formatEnumLabel;
 
+  /**
+   * Reloads the form whenever the selected patient or its available access changes.
+   */
   constructor() {
     effect((onCleanup) => {
       this.reloadVersion();
@@ -83,6 +89,9 @@ export class PatientRecordEdit {
     });
   }
 
+  /**
+   * Validates and saves changes to the selected patient record.
+   */
   protected save(): void {
     const patientRecord = this.patientRecord();
     const patientRecordId = this.selectedPatientId();
@@ -126,10 +135,16 @@ export class PatientRecordEdit {
     });
   }
 
+  /**
+   * Triggers another attempt to load the selected patient record.
+   */
   protected retry(): void {
     this.reloadVersion.update((version) => version + 1);
   }
 
+  /**
+   * Handles a failed patient record load and refreshes patient access when needed.
+   */
   private handleLoadError(error: unknown, failedPatientRecordId: string): void {
     this.patientRecord.set(null);
 
@@ -142,11 +157,17 @@ export class PatientRecordEdit {
     this.recoverContext(error, failedPatientRecordId);
   }
 
+  /**
+   * Refreshes patient access after a save fails because the selected record may have changed.
+   */
   private recoverAfterSaveFailure(error: unknown, failedPatientRecordId: string): void {
     this.status.set('loading');
     this.recoverContext(error, failedPatientRecordId);
   }
 
+  /**
+   * Refreshes patient access and updates the page for the patient that is still selected.
+   */
   private recoverContext(error: unknown, failedPatientRecordId: string): void {
     const recordNotFound = hasHttpStatus(error, 404);
     this.status.set('loading');

@@ -19,6 +19,9 @@ import { PermissionSelector } from '../../components/permission-selector/permiss
 import { DEFAULT_CARER_PERMISSIONS, PatientCarerAccessResponse } from '../../models/patient-carer-access-model';
 import { PatientCarerAccessState } from '../../services/patient-carer-access-state';
 
+/**
+ * Manages carers who have been invited to or given access to the user's patient record.
+ */
 @Component({
   selector: 'app-care-network',
   imports: [DatePipe, ReactiveFormsModule, RouterLink, CareNetworkTabs, PermissionBadges, PermissionSelector],
@@ -52,12 +55,18 @@ export class CareNetwork implements OnInit {
     carerEmail: this.formBuilder.nonNullable.control('', [Validators.required, Validators.email]),
   });
 
+  /**
+   * Loads carer relationships when the user has a patient record.
+   */
   ngOnInit(): void {
     if (this.personalPatientRecord() !== null) {
       this.loadRelationships();
     }
   }
 
+  /**
+   * Creates a carer invitation using the email address and permissions selected in the form.
+   */
   protected inviteCarer(): void {
     this.clearMessages();
 
@@ -100,25 +109,40 @@ export class CareNetwork implements OnInit {
     });
   }
 
+  /**
+   * Updates the permissions selected for a new carer invitation.
+   */
   protected toggleInvitationPermission(permission: Permission, checked: boolean): void {
     this.invitationPermissionsValue.set(this.updatePermissionSelection(this.invitationPermissions(), permission, checked));
   }
 
+  /**
+   * Opens permission editing with the permissions currently assigned to the relationship.
+   */
   protected startPermissionEdit(relationship: PatientCarerAccessResponse): void {
     this.clearMessages();
     this.editingPermissionsValue.set(new Set(relationship.permissions));
     this.editingAccessId.set(relationship.id);
   }
 
+  /**
+   * Updates the permission selection while editing a carer relationship.
+   */
   protected toggleEditingPermission(permission: Permission, checked: boolean): void {
     this.editingPermissionsValue.set(this.updatePermissionSelection(this.editingPermissions(), permission, checked));
   }
 
+  /**
+   * Closes permission editing and clears the current selection.
+   */
   protected cancelPermissionEdit(): void {
     this.editingAccessId.set(null);
     this.editingPermissionsValue.set(new Set());
   }
 
+  /**
+   * Saves the edited permissions for the selected carer relationship.
+   */
   protected savePermissions(): void {
     const accessId = this.editingAccessId();
 
@@ -145,6 +169,9 @@ export class CareNetwork implements OnInit {
     });
   }
 
+  /**
+   * Confirms and cancels a pending carer invitation.
+   */
   protected cancelInvitation(relationship: PatientCarerAccessResponse): void {
     if (!window.confirm(`Cancel the invitation for ${this.relationshipName(relationship)}?`)) {
       return;
@@ -163,6 +190,9 @@ export class CareNetwork implements OnInit {
     });
   }
 
+  /**
+   * Confirms and revokes an active carer's access.
+   */
   protected revokeAccess(relationship: PatientCarerAccessResponse): void {
     if (!window.confirm(`Revoke access for ${this.relationshipName(relationship)}?`)) {
       return;
@@ -181,6 +211,9 @@ export class CareNetwork implements OnInit {
     });
   }
 
+  /**
+   * Loads the user's current and previous carer relationships.
+   */
   protected loadRelationships(): void {
     this.clearMessages();
 
@@ -191,20 +224,32 @@ export class CareNetwork implements OnInit {
     });
   }
 
+  /**
+   * Returns the carer's full name for display.
+   */
   protected relationshipName(relationship: PatientCarerAccessResponse): string {
     return `${relationship.carer.firstName} ${relationship.carer.lastName}`.trim();
   }
 
+  /**
+   * Checks whether the relationship is currently being updated.
+   */
   protected isBusy(accessId: string): boolean {
     return this.busyAccessId() === accessId;
   }
 
+  /**
+   * Updates a permission selection and keeps its required permissions in sync.
+   */
   private updatePermissionSelection(selectedPermissions: ReadonlySet<Permission>, permission: Permission, checked: boolean): ReadonlySet<Permission> {
     return checked
       ? addPermissionWithDependencies(selectedPermissions, permission)
       : removePermissionWithDependents(selectedPermissions, permission);
   }
 
+  /**
+   * Clears the current success and error messages.
+   */
   private clearMessages(): void {
     this.errorMessage.set('');
     this.successMessage.set('');

@@ -9,6 +9,9 @@ import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
 import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
 import { AuthService } from '../../../../core/services/auth-service';
 
+/**
+ * Manages password changes and multi factor authentication settings for the current account.
+ */
 @Component({
   selector: 'app-mfa-settings',
   imports: [ReactiveFormsModule, QrCodeComponent],
@@ -62,10 +65,16 @@ export class MfaSettings implements OnInit {
     validators: matchingControlsValidator('newPassword', 'confirmPassword', 'passwordMismatch'),
   });
 
+  /**
+   * Loads the current account security settings when the page opens.
+   */
   ngOnInit(): void {
     this.loadSecurityStatus();
   }
 
+  /**
+   * Loads the current MFA status and resets any setup details from an earlier attempt.
+   */
   protected loadSecurityStatus(): void {
     this.status.set('loading');
     this.pageErrorMessage.set('');
@@ -85,6 +94,9 @@ export class MfaSettings implements OnInit {
     });
   }
 
+  /**
+   * Starts MFA setup and stores the provisioning details shown to the user.
+   */
   protected startSetup(): void {
     this.clearMfaMessages();
     this.isStartingSetup.set(true);
@@ -108,12 +120,18 @@ export class MfaSettings implements OnInit {
     });
   }
 
+  /**
+   * Cancels the current MFA setup and clears the entered code.
+   */
   protected cancelSetup(): void {
     this.provisioningUri.set(null);
     this.setupForm.reset({ code: '' });
     this.clearMfaMessages();
   }
 
+  /**
+   * Confirms MFA setup using the six digit code entered by the user.
+   */
   protected confirmMfa(): void {
     this.clearMfaMessages();
     clearServerFieldErrors(this.setupForm);
@@ -144,6 +162,9 @@ export class MfaSettings implements OnInit {
     });
   }
 
+  /**
+   * Disables MFA using the six digit code entered by the user.
+   */
   protected disableMfa(): void {
     this.clearMfaMessages();
     clearServerFieldErrors(this.disableMfaForm);
@@ -181,6 +202,9 @@ export class MfaSettings implements OnInit {
     });
   }
 
+  /**
+   * Validates and submits the password change form.
+   */
   protected changePassword(): void {
     this.passwordSuccessMessage.set('');
     this.passwordErrorMessage.set('');
@@ -215,6 +239,9 @@ export class MfaSettings implements OnInit {
     });
   }
 
+  /**
+   * Clears the current MFA success and error messages.
+   */
   private clearMfaMessages(): void {
     this.mfaSuccessMessage.set('');
     this.mfaErrorMessage.set('');

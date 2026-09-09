@@ -11,6 +11,9 @@ import { createPatientRecordForm, mapPatientRecordFormToRequest} from '../../for
 import { BLOOD_TYPES, HEIGHT_UNITS, WEIGHT_UNITS } from '../../models/patient-record-model';
 import { PersonalPatientRecordState } from '../../services/personal-patient-record-state';
 
+/**
+ * Creates the patient record owned by the current user.
+ */
 @Component({
   selector: 'app-patient-record-create',
   imports: [ReactiveFormsModule, RouterLink],
@@ -30,6 +33,9 @@ export class PatientRecordCreate {
   protected readonly form = createPatientRecordForm(this.formBuilder);
   protected readonly formatOption = formatEnumLabel;
 
+  /**
+   * Validates and creates the patient record before making it the current patient selection.
+   */
   protected create(): void {
     this.errorMessage.set('');
 

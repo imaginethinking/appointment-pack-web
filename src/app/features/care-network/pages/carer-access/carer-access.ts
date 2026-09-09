@@ -11,6 +11,9 @@ import { PermissionBadges } from '../../components/permission-badges/permission-
 import { PatientCarerAccessResponse } from '../../models/patient-carer-access-model';
 import { PatientCarerAccessState } from '../../services/patient-carer-access-state';
 
+/**
+ * Shows patient records the current user has been invited to access as a carer.
+ */
 @Component({
   selector: 'app-carer-access',
   imports: [DatePipe, CareNetworkTabs, PermissionBadges],
@@ -35,6 +38,9 @@ export class CarerAccess {
     (relationship) => relationship.status === 'DECLINED' || relationship.status === 'CANCELLED' || relationship.status === 'REVOKED',
   ));
 
+  /**
+   * Accepts a patient invitation and refreshes the available patient selection.
+   */
   protected acceptInvitation(relationship: PatientCarerAccessResponse): void {
     this.clearMessages();
     this.busyAccessId.set(relationship.id);
@@ -52,6 +58,9 @@ export class CarerAccess {
     });
   }
 
+  /**
+   * Declines a patient invitation and refreshes the available patient selection.
+   */
   protected declineInvitation(relationship: PatientCarerAccessResponse): void {
     this.clearMessages();
     this.busyAccessId.set(relationship.id);
@@ -69,6 +78,9 @@ export class CarerAccess {
     });
   }
 
+  /**
+   * Selects an available patient record and opens the patient page.
+   */
   protected openPatient(relationship: PatientCarerAccessResponse): void {
     this.clearMessages();
 
@@ -80,6 +92,9 @@ export class CarerAccess {
     void this.router.navigate(['/patient']);
   }
 
+  /**
+   * Reloads the user's carer relationships after patient access failed to load.
+   */
   protected retryLoad(): void {
     this.clearMessages();
 
@@ -90,6 +105,9 @@ export class CarerAccess {
     });
   }
 
+  /**
+   * Checks whether the patient relationship is currently available for selection.
+   */
   protected canOpenPatient(relationship: PatientCarerAccessResponse): boolean {
     const context = this.selectedPatientState.contexts().find(
       (candidate) => candidate.patientRecordId === relationship.patient.patientRecordId,
@@ -97,14 +115,23 @@ export class CarerAccess {
     return context !== undefined && this.selectedPatientState.canSelect(context);
   }
 
+  /**
+   * Returns the patient's full name for display.
+   */
   protected patientName(relationship: PatientCarerAccessResponse): string {
     return `${relationship.patient.firstName} ${relationship.patient.lastName}`.trim();
   }
 
+  /**
+   * Checks whether the relationship is currently being updated.
+   */
   protected isBusy(accessId: string): boolean {
     return this.busyAccessId() === accessId;
   }
 
+  /**
+   * Clears the current success and error messages.
+   */
   private clearMessages(): void {
     this.errorMessage.set('');
     this.successMessage.set('');

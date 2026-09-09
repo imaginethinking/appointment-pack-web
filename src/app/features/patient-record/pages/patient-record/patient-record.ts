@@ -13,6 +13,9 @@ import { PatientRecordApiService } from '../../services/patient-record-api-servi
 
 type PatientRecordPageStatus = 'loading' | 'ready' | 'no-selection' | 'forbidden' | 'not-found' | 'error';
 
+/**
+ * Displays the patient record currently selected by the user.
+ */
 @Component({
   selector: 'app-patient-record',
   imports: [RouterLink],
@@ -47,6 +50,9 @@ export class PatientRecord {
   protected readonly canEditSelectedPatient = computed(() => this.authorisation.can(this.selectedPatient(), 'patient-record', 'edit'));
   protected readonly formatOption = formatEnumLabel;
 
+  /**
+   * Reloads the patient record whenever the selected patient or its available access changes.
+   */
   constructor() {
     effect((onCleanup) => {
       this.reloadVersion();
@@ -80,10 +86,16 @@ export class PatientRecord {
     });
   }
 
+  /**
+   * Triggers another attempt to load the selected patient record.
+   */
   protected retry(): void {
     this.reloadVersion.update((version) => version + 1);
   }
 
+  /**
+   * Formats a measurement with its unit or shows that no value has been provided.
+   */
   protected formatMeasurement(value: number | null, unit: string | null): string {
     if (value === null) {
       return 'Not provided';
@@ -92,14 +104,23 @@ export class PatientRecord {
     return unit === null ? value.toString() : `${value} ${formatEnumLabel(unit)}`;
   }
 
+  /**
+   * Formats an optional number for display.
+   */
   protected formatNumber(value: number | null): string {
     return value === null ? 'Not provided' : value.toString();
   }
 
+  /**
+   * Formats an optional healthcare identifier for display.
+   */
   protected formatIdentifier(value: string | null): string {
     return value === null || value.trim().length === 0 ? 'Not provided' : value;
   }
 
+  /**
+   * Handles a failed record load and refreshes patient access when the selected record may have changed.
+   */
   private handleLoadError(error: unknown, failedPatientRecordId: string): void {
     this.patientRecord.set(null);
 

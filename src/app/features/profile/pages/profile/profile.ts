@@ -5,6 +5,9 @@ import { RouterLink } from '@angular/router';
 import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
 import { ProfileState } from '../../services/profile-state';
 
+/**
+ * Displays the current user's profile information.
+ */
 @Component({
   selector: 'app-profile',
   imports: [DatePipe, RouterLink],
@@ -17,12 +20,18 @@ export class Profile implements OnInit {
   protected readonly isLoading = this.profileState.isLoading;
   protected readonly errorMessage = signal('');
 
+  /**
+   * Loads the profile when it is not already available in the shared state.
+   */
   ngOnInit(): void {
     if (this.profile() === null) {
       this.loadProfile();
     }
   }
 
+  /**
+   * Loads the current profile and shows an error when it cannot be retrieved.
+   */
   protected loadProfile(): void {
     this.errorMessage.set('');
 

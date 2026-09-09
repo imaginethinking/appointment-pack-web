@@ -7,6 +7,9 @@ import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
 import {ProfileResponse} from '../../models/profile-model';
 import {ProfileState} from '../../services/profile-state';
 
+/**
+ * Loads and edits the current user's profile and optional address.
+ */
 @Component({
   selector: 'app-profile-edit',
   imports: [
@@ -101,6 +104,9 @@ export class ProfileEdit implements OnInit {
         }),
     });
 
+  /**
+   * Uses the loaded profile when available or loads it before filling the form.
+   */
   ngOnInit(): void {
     const profile = this.profileState.profile();
 
@@ -111,6 +117,9 @@ export class ProfileEdit implements OnInit {
     this.loadProfile();
   }
 
+  /**
+   * Shows or hides the address fields and updates their validation rules.
+   */
   protected toggleAddress(
     event: Event,
   ): void {
@@ -127,6 +136,9 @@ export class ProfileEdit implements OnInit {
     );
   }
 
+  /**
+   * Validates and saves the profile before returning to the profile page.
+   */
   protected save(): void {
     this.errorMessage.set('');
 
@@ -207,6 +219,9 @@ export class ProfileEdit implements OnInit {
       });
   }
 
+  /**
+   * Loads the profile and fills the edit form with its current values.
+   */
   private loadProfile(): void {
     this.errorMessage.set('');
 
@@ -228,6 +243,9 @@ export class ProfileEdit implements OnInit {
       });
   }
 
+  /**
+   * Fills the form with the profile details and updates the address fields.
+   */
   private populateForm(
     profile: ProfileResponse,
   ): void {
@@ -281,6 +299,9 @@ export class ProfileEdit implements OnInit {
     );
   }
 
+  /**
+   * Makes the main address fields required when an address is enabled.
+   */
   private configureAddressValidation(
     enabled: boolean,
   ): void {
@@ -331,6 +352,9 @@ export class ProfileEdit implements OnInit {
     address.country.updateValueAndValidity();
   }
 
+  /**
+   * Trims optional text and returns null when the field is empty.
+   */
   private optionalText(
     value: string | null,
   ): string | null {
