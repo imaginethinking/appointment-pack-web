@@ -14,6 +14,9 @@ import { EmergencyContactFormFields } from '../../components/emergency-contact-f
 import { createEmergencyContactForm, mapEmergencyContactFormToRequest, resetEmergencyContactForm } from '../../forms/emergency-contact-form';
 import { EmergencyContactApiService } from '../../services/emergency-contact-api-service';
 
+/**
+ * Creates an emergency contact for the selected patient.
+ */
 @Component({
   selector: 'app-emergency-contact-create',
   imports: [ReactiveFormsModule, RouterLink, EmergencyContactFormFields],
@@ -37,6 +40,9 @@ export class EmergencyContactCreate {
   protected readonly errorMessage = signal('');
   protected readonly form = createEmergencyContactForm(this.formBuilder);
 
+  /**
+   * Clears the form when the selected patient changes.
+   */
   constructor() {
     effect(() => {
       this.selectedPatient()?.patientRecordId;
@@ -45,6 +51,9 @@ export class EmergencyContactCreate {
     });
   }
 
+  /**
+   * Validates the form and creates an emergency contact for the selected patient.
+   */
   protected create(): void {
     this.errorMessage.set('');
     clearServerFieldErrors(this.form);
@@ -71,6 +80,9 @@ export class EmergencyContactCreate {
     });
   }
 
+  /**
+   * Applies form errors and refreshes patient access when the contact cannot be created.
+   */
   private handleCreateError(error: unknown, failedPatientRecordId: string): void {
     if (applyServerFieldErrors(this.form, error)) {
       return;
@@ -84,6 +96,9 @@ export class EmergencyContactCreate {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to create the emergency contact.'));
   }
 
+  /**
+   * Refreshes patient access and checks whether the same patient can still be edited.
+   */
   private refreshPatientAccess(failedPatientRecordId: string): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       next: () => {

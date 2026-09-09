@@ -16,6 +16,9 @@ import { HealthcareContactApiService } from '../../services/healthcare-contact-a
 
 type ContactListStatus = 'loading' | 'ready' | 'no-patient' | 'forbidden' | 'error';
 
+/**
+ * Displays the healthcare and emergency contacts for the selected patient.
+ */
 @Component({
   selector: 'app-contact-list',
   imports: [RouterLink],
@@ -38,6 +41,9 @@ export class ContactList {
   protected readonly getPatientContextName = getPatientContextName;
   protected readonly formatAddress = (contact: HealthcareContactResponse) => formatAddressLines(contact.address);
 
+  /**
+   * Loads both contact lists whenever the selected patient changes or the page is retried.
+   */
   constructor() {
     effect((onCleanup) => {
       this.reloadVersion();
@@ -75,10 +81,16 @@ export class ContactList {
     });
   }
 
+  /**
+   * Reloads the contact lists.
+   */
   protected retry(): void {
     this.reloadVersion.update((version) => version + 1);
   }
 
+  /**
+   * Handles contact loading errors and refreshes patient access when needed.
+   */
   private handleLoadError(error: unknown): void {
     if (hasHttpStatus(error, 403)) {
       this.status.set('forbidden');
@@ -97,6 +109,9 @@ export class ContactList {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load contacts.'));
   }
 
+  /**
+   * Refreshes the available patient access after the current selection fails.
+   */
   private refreshPatientAccess(): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       error: (error: unknown) => {

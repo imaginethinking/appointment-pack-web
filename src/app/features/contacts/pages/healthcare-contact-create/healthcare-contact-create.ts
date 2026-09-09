@@ -14,6 +14,9 @@ import { HealthcareContactFormFields } from '../../components/healthcare-contact
 import { createHealthcareContactForm, mapHealthcareContactFormToRequest, resetHealthcareContactForm } from '../../forms/healthcare-contact-form';
 import { HealthcareContactApiService } from '../../services/healthcare-contact-api-service';
 
+/**
+ * Creates a healthcare contact for the selected patient.
+ */
 @Component({
   selector: 'app-healthcare-contact-create',
   imports: [ReactiveFormsModule, RouterLink, HealthcareContactFormFields],
@@ -37,6 +40,9 @@ export class HealthcareContactCreate {
   protected readonly errorMessage = signal('');
   protected readonly form = createHealthcareContactForm(this.formBuilder);
 
+  /**
+   * Clears the form when the selected patient changes.
+   */
   constructor() {
     effect(() => {
       this.selectedPatient()?.patientRecordId;
@@ -45,6 +51,9 @@ export class HealthcareContactCreate {
     });
   }
 
+  /**
+   * Validates the form and creates a healthcare contact for the selected patient.
+   */
   protected create(): void {
     this.errorMessage.set('');
     clearServerFieldErrors(this.form);
@@ -71,6 +80,9 @@ export class HealthcareContactCreate {
     });
   }
 
+  /**
+   * Applies form errors and refreshes patient access when the contact cannot be created.
+   */
   private handleCreateError(error: unknown, failedPatientRecordId: string): void {
     if (applyServerFieldErrors(this.form, error)) {
       return;
@@ -84,6 +96,9 @@ export class HealthcareContactCreate {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to create the healthcare contact.'));
   }
 
+  /**
+   * Refreshes patient access and checks whether the same patient can still be edited.
+   */
   private refreshPatientAccess(failedPatientRecordId: string): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       next: () => {

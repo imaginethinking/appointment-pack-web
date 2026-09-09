@@ -14,6 +14,9 @@ import { HealthcareContactApiService } from '../../services/healthcare-contact-a
 
 type HealthcareContactDetailsStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 
+/**
+ * Displays a healthcare contact for the selected patient.
+ */
 @Component({
   selector: 'app-healthcare-contact-details',
   imports: [DatePipe, RouterLink],
@@ -36,6 +39,9 @@ export class HealthcareContactDetails implements OnInit {
   protected readonly canEdit = computed(() => this.authorisation.can(this.selectedPatient(), 'contact', 'edit'));
   protected readonly formatAddress = (contact: HealthcareContactResponse) => formatAddressLines(contact.address);
 
+  /**
+   * Returns to the contacts page if the loaded contact no longer belongs to the selected patient.
+   */
   constructor() {
     effect(() => {
       const contact = this.contact();
@@ -47,6 +53,9 @@ export class HealthcareContactDetails implements OnInit {
     });
   }
 
+  /**
+   * Loads the healthcare contact from the id in the current route.
+   */
   ngOnInit(): void {
     const contactId = this.route.snapshot.paramMap.get('contactId');
 
@@ -58,6 +67,9 @@ export class HealthcareContactDetails implements OnInit {
     this.loadContact(contactId);
   }
 
+  /**
+   * Reloads the current healthcare contact.
+   */
   protected retry(): void {
     const contactId = this.route.snapshot.paramMap.get('contactId');
 
@@ -66,6 +78,9 @@ export class HealthcareContactDetails implements OnInit {
     }
   }
 
+  /**
+   * Confirms and archives the current healthcare contact.
+   */
   protected archive(): void {
     const contact = this.contact();
     this.actionError.set('');
@@ -88,6 +103,9 @@ export class HealthcareContactDetails implements OnInit {
     });
   }
 
+  /**
+   * Loads the healthcare contact and checks that it belongs to the selected patient.
+   */
   private loadContact(contactId: string): void {
     const failedPatientRecordId = this.selectedPatient()?.patientRecordId ?? null;
 
@@ -113,6 +131,9 @@ export class HealthcareContactDetails implements OnInit {
     });
   }
 
+  /**
+   * Handles contact loading errors and refreshes patient access when needed.
+   */
   private handleLoadError(error: unknown, failedPatientRecordId: string | null): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(failedPatientRecordId);
@@ -128,6 +149,9 @@ export class HealthcareContactDetails implements OnInit {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the healthcare contact.'));
   }
 
+  /**
+   * Handles contact archive errors and refreshes patient access when needed.
+   */
   private handleArchiveError(error: unknown, contact: HealthcareContactResponse): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(contact.patientRecordId);
@@ -142,6 +166,9 @@ export class HealthcareContactDetails implements OnInit {
     this.actionError.set(getHttpErrorMessage(error, 'Unable to archive the healthcare contact.'));
   }
 
+  /**
+   * Refreshes patient access and returns to the contacts page if the selected patient has changed.
+   */
   private recoverPatientAccess(failedPatientRecordId: string | null): void {
     this.status.set('loading');
 

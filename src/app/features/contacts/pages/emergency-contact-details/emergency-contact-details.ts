@@ -13,6 +13,9 @@ import { EmergencyContactApiService } from '../../services/emergency-contact-api
 
 type EmergencyContactDetailsStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 
+/**
+ * Displays an emergency contact for the selected patient.
+ */
 @Component({
   selector: 'app-emergency-contact-details',
   imports: [DatePipe, RouterLink],
@@ -34,6 +37,9 @@ export class EmergencyContactDetails implements OnInit {
   protected readonly selectedPatient = this.selectedPatientState.selectedPatient;
   protected readonly canEdit = computed(() => this.authorisation.can(this.selectedPatient(), 'contact', 'edit'));
 
+  /**
+   * Returns to the contacts page if the loaded contact no longer belongs to the selected patient.
+   */
   constructor() {
     effect(() => {
       const contact = this.contact();
@@ -45,6 +51,9 @@ export class EmergencyContactDetails implements OnInit {
     });
   }
 
+  /**
+   * Loads the emergency contact from the id in the current route.
+   */
   ngOnInit(): void {
     const contactId = this.route.snapshot.paramMap.get('contactId');
 
@@ -56,6 +65,9 @@ export class EmergencyContactDetails implements OnInit {
     this.loadContact(contactId);
   }
 
+  /**
+   * Reloads the current emergency contact.
+   */
   protected retry(): void {
     const contactId = this.route.snapshot.paramMap.get('contactId');
 
@@ -64,6 +76,9 @@ export class EmergencyContactDetails implements OnInit {
     }
   }
 
+  /**
+   * Confirms and archives the current emergency contact.
+   */
   protected archive(): void {
     const contact = this.contact();
     this.actionError.set('');
@@ -86,6 +101,9 @@ export class EmergencyContactDetails implements OnInit {
     });
   }
 
+  /**
+   * Loads the emergency contact and checks that it belongs to the selected patient.
+   */
   private loadContact(contactId: string): void {
     const failedPatientRecordId = this.selectedPatient()?.patientRecordId ?? null;
 
@@ -111,6 +129,9 @@ export class EmergencyContactDetails implements OnInit {
     });
   }
 
+  /**
+   * Handles contact loading errors and refreshes patient access when needed.
+   */
   private handleLoadError(error: unknown, failedPatientRecordId: string | null): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(failedPatientRecordId);
@@ -126,6 +147,9 @@ export class EmergencyContactDetails implements OnInit {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the emergency contact.'));
   }
 
+  /**
+   * Handles contact archive errors and refreshes patient access when needed.
+   */
   private handleArchiveError(error: unknown, contact: EmergencyContactResponse): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(contact.patientRecordId);
@@ -140,6 +164,9 @@ export class EmergencyContactDetails implements OnInit {
     this.actionError.set(getHttpErrorMessage(error, 'Unable to archive the emergency contact.'));
   }
 
+  /**
+   * Refreshes patient access and returns to the contacts page if the selected patient has changed.
+   */
   private recoverPatientAccess(failedPatientRecordId: string | null): void {
     this.status.set('loading');
 

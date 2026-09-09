@@ -16,6 +16,9 @@ import { EmergencyContactApiService } from '../../services/emergency-contact-api
 
 type EmergencyContactEditStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 
+/**
+ * Loads and edits an emergency contact for the selected patient.
+ */
 @Component({
   selector: 'app-emergency-contact-edit',
   imports: [ReactiveFormsModule, RouterLink, EmergencyContactFormFields],
@@ -38,6 +41,9 @@ export class EmergencyContactEdit implements OnInit {
   protected readonly canEdit = computed(() => this.authorisation.can(this.selectedPatient(), 'contact', 'edit'));
   protected readonly form = createEmergencyContactForm(this.formBuilder);
 
+  /**
+   * Returns to the contacts page if the loaded contact no longer belongs to the selected patient.
+   */
   constructor() {
     effect(() => {
       const contact = this.contact();
@@ -49,6 +55,9 @@ export class EmergencyContactEdit implements OnInit {
     });
   }
 
+  /**
+   * Loads the emergency contact from the id in the current route.
+   */
   ngOnInit(): void {
     const contactId = this.route.snapshot.paramMap.get('contactId');
 
@@ -60,6 +69,9 @@ export class EmergencyContactEdit implements OnInit {
     this.loadContact(contactId);
   }
 
+  /**
+   * Validates the form and saves changes to the emergency contact.
+   */
   protected save(): void {
     const contact = this.contact();
     this.errorMessage.set('');
@@ -89,6 +101,9 @@ export class EmergencyContactEdit implements OnInit {
     });
   }
 
+  /**
+   * Reloads the emergency contact for editing.
+   */
   protected retry(): void {
     const contactId = this.route.snapshot.paramMap.get('contactId');
 
@@ -97,6 +112,9 @@ export class EmergencyContactEdit implements OnInit {
     }
   }
 
+  /**
+   * Loads the emergency contact and fills the form with its current details.
+   */
   private loadContact(contactId: string): void {
     const failedPatientRecordId = this.selectedPatient()?.patientRecordId ?? null;
 
@@ -127,6 +145,9 @@ export class EmergencyContactEdit implements OnInit {
     });
   }
 
+  /**
+   * Handles contact loading errors and refreshes patient access when needed.
+   */
   private handleLoadError(error: unknown, failedPatientRecordId: string | null): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(failedPatientRecordId);
@@ -142,6 +163,9 @@ export class EmergencyContactEdit implements OnInit {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the emergency contact for editing.'));
   }
 
+  /**
+   * Applies form errors and refreshes patient access when the contact cannot be saved.
+   */
   private handleSaveError(error: unknown, contact: EmergencyContactResponse): void {
     if (applyServerFieldErrors(this.form, error)) {
       return;
@@ -160,6 +184,9 @@ export class EmergencyContactEdit implements OnInit {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to update the emergency contact.'));
   }
 
+  /**
+   * Refreshes patient access and returns to the contacts page if the selected patient has changed.
+   */
   private recoverPatientAccess(failedPatientRecordId: string | null): void {
     this.status.set('loading');
 
