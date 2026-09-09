@@ -89,7 +89,7 @@ describe('PageTelemetryService', () => {
     expect(JSON.stringify(analyticsApi.recordPageView.mock.calls)).not.toContain('document-123');
   });
 
-  // Checks that admin/internal or unknown routes do not invent a telemetry enum that the backend does not support.
+  // Checks that routes without a page mapping are ignored.
   it('ignores routes without a supported page mapping', () => {
     service.start();
 

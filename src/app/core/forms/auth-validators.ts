@@ -1,7 +1,12 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
+// [AI-GENERATED: ChatGPT, 2026-08-15]
+// Used to generate REGEX pattern for a strong password
 const STRONG_PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9\s])[^\r\n]+$/;
 
+/**
+ * Checks that a password meets the required length and character rules.
+ */
 export const strongPasswordValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const value = control.value;
 
@@ -16,6 +21,9 @@ export const strongPasswordValidator: ValidatorFn = (control: AbstractControl): 
   return null;
 };
 
+/**
+ * Creates a validator that checks whether two controls contain the same value.
+ */
 export function matchingControlsValidator(firstControlName: string, secondControlName: string, errorKey = 'mismatch'): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const firstValue = control.get(firstControlName)?.value;
@@ -29,6 +37,9 @@ export function matchingControlsValidator(firstControlName: string, secondContro
   };
 }
 
+/**
+ * Checks that a date is valid and earlier than today.
+ */
 export const pastDateValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const value = control.value;
 

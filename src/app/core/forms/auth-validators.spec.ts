@@ -11,7 +11,7 @@ describe('authentication validators', () => {
     vi.useRealTimers();
   });
 
-  // Checks a password that meets the same length and character groups required by the backend policy.
+  // Checks a password that meets the required length and character rules.
   it('accepts a strong password', () => {
     const control = new FormControl('Appointment1!');
 

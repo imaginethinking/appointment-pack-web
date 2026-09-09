@@ -1,3 +1,6 @@
+/**
+ * Contains the application page recorded for a page view.
+ */
 export const APPLICATION_PAGES = [
   'LANDING',
   'DASHBOARD',
@@ -20,6 +23,9 @@ export interface PageViewRequest {
   page: ApplicationPage;
 }
 
+/**
+ * Returns the display label for an application page.
+ */
 export function getApplicationPageLabel(page: ApplicationPage): string {
   switch (page) {
     case 'LANDING':

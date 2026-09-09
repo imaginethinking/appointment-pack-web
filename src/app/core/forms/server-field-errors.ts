@@ -2,6 +2,9 @@ import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 
 import { getHttpFieldErrors } from '../http/http-problem-detail';
 
+/**
+ * Adds returned field errors to the matching form controls and marks them as touched.
+ */
 export function applyServerFieldErrors(form: FormGroup, error: unknown): boolean {
   const fieldErrors = getHttpFieldErrors(error);
   let applied = false;
@@ -25,6 +28,9 @@ export function applyServerFieldErrors(form: FormGroup, error: unknown): boolean
   return applied;
 }
 
+/**
+ * Clears returned field errors from a control and any controls nested inside it.
+ */
 export function clearServerFieldErrors(control: AbstractControl): void {
   clearServerFieldError(control);
 
@@ -39,6 +45,9 @@ export function clearServerFieldErrors(control: AbstractControl): void {
   }
 }
 
+/**
+ * Removes the returned field error while keeping any other validation errors on the control.
+ */
 export function clearServerFieldError(control: AbstractControl): void {
   const errors = control.errors;
 
@@ -50,6 +59,11 @@ export function clearServerFieldError(control: AbstractControl): void {
   control.setErrors(Object.keys(remainingErrors).length > 0 ? remainingErrors : null);
 }
 
+/**
+ * Converts array field paths into the format used by Angular forms.
+ */
 function normaliseControlPath(fieldName: string): string {
+  // [AI-GENERATED: ChatGPT, 2026-08-16]
+  // Used to generate regular expression to match array field paths
   return fieldName.replace(/\[(\d+)]/g, '.$1');
 }

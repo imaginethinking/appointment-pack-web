@@ -1,5 +1,5 @@
-// Spring validation errors can target normal controls or nested FormArray rows.
-// These tests protect the shared mapping/clearing helper used by the application's forms.
+// Field validation errors can target normal controls or nested FormArray rows.
+// These tests cover the shared helpers used to apply and clear those errors.
 
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -7,7 +7,7 @@ import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { applyServerFieldErrors, clearServerFieldError, clearServerFieldErrors } from './server-field-errors';
 
 describe('server field error helpers', () => {
-  // Checks a normal backend field error is applied to the matching Angular control and marked as touched.
+  // Checks a normal field error is applied to the matching control and marked as touched.
   it('applies a server field error to a matching form control', () => {
     const form = new FormGroup({ name: new FormControl('Example') });
     const error = createValidationError({ name: 'Name is not valid' });
@@ -19,7 +19,7 @@ describe('server field error helpers', () => {
     expect(form.controls.name.touched).toBe(true);
   });
 
-  // Checks Spring paths such as results[0].analyteName reach the correct FormArray row.
+  // Checks paths such as results[0].analyteName reach the correct FormArray row.
   it('maps nested array field paths to Angular FormArray controls', () => {
     const form = new FormGroup({
       results: new FormArray([
@@ -63,7 +63,7 @@ describe('server field error helpers', () => {
   });
 });
 
-// Creates the same HttpErrorResponse shape returned by Spring when field validation fails.
+// Creates an HTTP error response containing field validation errors.
 function createValidationError(fieldErrors: Record<string, string>): HttpErrorResponse {
   return new HttpErrorResponse({
     status: 400,

@@ -2,6 +2,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 import { getHttpProblemDetail } from './http-problem-detail';
 
+/**
+ * Returns a useful message to show for an HTTP or application error.
+ */
 export function getHttpErrorMessage(error: unknown, fallbackMessage = 'An unexpected error occurred.'): string {
   if (error instanceof HttpErrorResponse) {
     if (error.status === 0) {
@@ -50,6 +53,9 @@ export function getHttpErrorMessage(error: unknown, fallbackMessage = 'An unexpe
   return fallbackMessage;
 }
 
+/**
+ * Reads the retry delay from the Retry After header when it contains a number of seconds.
+ */
 function getRetryAfterSeconds(error: HttpErrorResponse): number | null {
   const value = error.headers.get('Retry-After');
 
@@ -60,6 +66,9 @@ function getRetryAfterSeconds(error: HttpErrorResponse): number | null {
   return Number(value);
 }
 
+/**
+ * Checks whether a value can be safely read as an object.
+ */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }
