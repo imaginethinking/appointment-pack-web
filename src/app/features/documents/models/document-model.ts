@@ -49,6 +49,9 @@ const SUMMARY_SOURCE_LABELS: Record<SummarySource, string> = {
   MANUAL: 'Entered manually',
 };
 
+/**
+ * Contains the processing information and review results for a document.
+ */
 export interface DocumentResponse {
   id: string;
   patientRecordId: string;
@@ -60,6 +63,9 @@ export interface DocumentResponse {
   createdAt: string;
 }
 
+/**
+ * Contains the model and prompt details recorded for a generated summary.
+ */
 export interface DocumentModelMetadata {
   name: string;
   promptVersion: string;
@@ -108,34 +114,58 @@ export interface DocumentSummaryAcceptanceRequest {
   historyDate: string;
 }
 
+/**
+ * Returns the display name for a document type.
+ */
 export function getDocumentTypeLabel(documentType: DocumentType): string {
   return DOCUMENT_TYPE_LABELS[documentType];
 }
 
+/**
+ * Returns the text shown for a document status.
+ */
 export function getDocumentStatusLabel(status: DocumentStatus): string {
   return DOCUMENT_STATUS_LABELS[status];
 }
 
+/**
+ * Returns the display name for the source of a consultation summary.
+ */
 export function getSummarySourceLabel(source: SummarySource): string {
   return SUMMARY_SOURCE_LABELS[source];
 }
 
+/**
+ * Checks whether a document can currently be processed or retried.
+ */
 export function canExtractDocument(status: DocumentStatus): boolean {
   return status === 'UPLOADED' || status === 'EXTRACTION_FAILED';
 }
 
+/**
+ * Checks whether an appointment letter is ready for its appointment details to be reviewed.
+ */
 export function canReviewAppointment(document: DocumentResponse): boolean {
   return document.documentType === 'APPOINTMENT_LETTER' && document.status === 'READY_FOR_APPOINTMENT_REVIEW';
 }
 
+/**
+ * Checks whether a consultation letter is ready for privacy review.
+ */
 export function canReviewDeidentifiedText(document: DocumentResponse): boolean {
   return document.documentType === 'CONSULTATION_OUTCOME_LETTER' && document.status === 'READY_FOR_DEIDENTIFICATION_REVIEW';
 }
 
+/**
+ * Checks whether the consultation summary page can be opened for the current status.
+ */
 export function canOpenSummaryReview(status: DocumentStatus): boolean {
   return status === 'READY_FOR_SUMMARY_REVIEW' || status === 'SUMMARISATION_FAILED';
 }
 
+/**
+ * Checks whether a document has reached a state where it can be archived.
+ */
 export function canArchiveDocument(status: DocumentStatus): boolean {
   return [
     'UPLOADED',
@@ -149,6 +179,9 @@ export function canArchiveDocument(status: DocumentStatus): boolean {
   ].includes(status);
 }
 
+/**
+ * Checks whether processing information should be available for the document.
+ */
 export function documentHasProcessingResult(status: DocumentStatus): boolean {
   return [
     'READY_FOR_APPOINTMENT_REVIEW',

@@ -1,15 +1,9 @@
-import {
-  HttpClient,
-  HttpResponse,
-} from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import {HttpClient, HttpResponse,} from '@angular/common/http';
+import {inject, Injectable} from '@angular/core';
+import {Observable} from 'rxjs';
 
-import { environment } from '../../../../environments/environment';
-import {
-  AppointmentConfirmationRequest,
-  AppointmentResponse,
-} from '../../appointments/models/appointment-model';
+import {environment} from '../../../../environments/environment';
+import {AppointmentConfirmationRequest, AppointmentResponse,} from '../../appointments/models/appointment-model';
 import {
   DocumentProcessingResultResponse,
   DocumentResponse,
@@ -18,6 +12,9 @@ import {
   DocumentType,
 } from '../models/document-model';
 
+/**
+ * Handles document upload processing review and download requests.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -25,9 +22,11 @@ export class DocumentApiService {
   private readonly http = inject(HttpClient);
 
   private readonly documentsUrl = `${environment.apiBaseUrl}/documents`;
-
   private readonly patientRecordsUrl = `${environment.apiBaseUrl}/patient-records`;
 
+  /**
+   * Uploads a document for a patient using the selected document type and file.
+   */
   uploadDocument(
     patientRecordId: string,
     documentType: DocumentType,
@@ -44,6 +43,9 @@ export class DocumentApiService {
     );
   }
 
+  /**
+   * Loads the documents belonging to a patient.
+   */
   getDocuments(
     patientRecordId: string,
   ): Observable<DocumentResponse[]> {
@@ -52,6 +54,9 @@ export class DocumentApiService {
     );
   }
 
+  /**
+   * Loads a single document using its id.
+   */
   getDocument(
     documentId: string,
   ): Observable<DocumentResponse> {
@@ -60,6 +65,9 @@ export class DocumentApiService {
     );
   }
 
+  /**
+   * Loads the processing and review information stored for a document.
+   */
   getDocumentProcessing(
     documentId: string,
   ): Observable<DocumentProcessingResultResponse> {
@@ -68,6 +76,9 @@ export class DocumentApiService {
     );
   }
 
+  /**
+   * Starts document processing and returns the latest processing result.
+   */
   extractDocument(
     documentId: string,
   ): Observable<DocumentProcessingResultResponse> {
@@ -77,6 +88,9 @@ export class DocumentApiService {
     );
   }
 
+  /**
+   * Confirms the reviewed appointment details from an appointment letter.
+   */
   confirmAppointment(
     documentId: string,
     request: AppointmentConfirmationRequest,
@@ -87,6 +101,9 @@ export class DocumentApiService {
     );
   }
 
+  /**
+   * Rejects the appointment details produced from an appointment letter.
+   */
   rejectAppointment(
     documentId: string,
   ): Observable<DocumentProcessingResultResponse> {
@@ -96,6 +113,9 @@ export class DocumentApiService {
     );
   }
 
+  /**
+   * Submits the approved deidentified consultation text for summarisation.
+   */
   summariseDocument(
     documentId: string,
     request: DocumentSummarisationRequest,
@@ -106,6 +126,9 @@ export class DocumentApiService {
     );
   }
 
+  /**
+   * Accepts the reviewed consultation summary and its Medical History details.
+   */
   acceptDocumentSummary(
     documentId: string,
     request: DocumentSummaryAcceptanceRequest,
@@ -116,6 +139,9 @@ export class DocumentApiService {
     );
   }
 
+  /**
+   * Rejects a generated consultation summary.
+   */
   rejectDocumentSummary(
     documentId: string,
   ): Observable<DocumentProcessingResultResponse> {
@@ -125,6 +151,9 @@ export class DocumentApiService {
     );
   }
 
+  /**
+   * Archives a document.
+   */
   archiveDocument(
     documentId: string,
   ): Observable<DocumentResponse> {
@@ -134,6 +163,9 @@ export class DocumentApiService {
     );
   }
 
+  /**
+   * Downloads the original document together with its response information.
+   */
   downloadDocument(
     documentId: string,
   ): Observable<HttpResponse<Blob>> {

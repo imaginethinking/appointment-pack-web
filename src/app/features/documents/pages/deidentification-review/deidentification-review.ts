@@ -15,6 +15,9 @@ import { DocumentApiService } from '../../services/document-api-service';
 
 type ReviewPageStatus = 'loading' | 'ready' | 'recovery' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 
+/**
+ * Lets the user review and edit deidentified consultation text before approving it for summarisation.
+ */
 @Component({
   selector: 'app-deidentification-review',
   imports: [ReactiveFormsModule, RouterLink],
@@ -58,12 +61,18 @@ export class DeidentificationReview implements OnInit {
     ),
   });
 
+  /**
+   * Checks that the loaded consultation still belongs to the selected patient when patient context changes.
+   */
   constructor() {
     effect(() => {
       this.redirectIfPatientContextChanged();
     });
   }
 
+  /**
+   * Loads the privacy review using the document id from the route.
+   */
   ngOnInit(): void {
     const documentId = this.route.snapshot.paramMap.get('documentId');
 
@@ -75,6 +84,9 @@ export class DeidentificationReview implements OnInit {
     this.loadReview(documentId);
   }
 
+  /**
+   * Checks the reviewed text and explicit approval before submitting the exact text for summarisation.
+   */
   protected submit(): void {
     this.actionError.set('');
     clearServerFieldErrors(this.form);
@@ -106,6 +118,7 @@ export class DeidentificationReview implements OnInit {
 
     this.isSubmitting.set(true);
 
+    // Keep the reviewed text unchanged so the exact version approved by the user is submitted.
     this.documentApi
       .summariseDocument(document.id, { approvedDeidentifiedText: approvedText })
       .pipe(finalize(() => this.isSubmitting.set(false)))
@@ -115,6 +128,9 @@ export class DeidentificationReview implements OnInit {
       });
   }
 
+  /**
+   * Tries to load the privacy review again.
+   */
   protected retryLoad(): void {
     const documentId = this.route.snapshot.paramMap.get('documentId');
 
@@ -123,6 +139,9 @@ export class DeidentificationReview implements OnInit {
     }
   }
 
+  /**
+   * Loads the consultation document and fills the form with the deidentified text ready for review.
+   */
   private loadReview(documentId: string, actionMessage = ''): void {
     this.status.set('loading');
     this.errorMessage.set('');
@@ -185,6 +204,9 @@ export class DeidentificationReview implements OnInit {
       });
   }
 
+  /**
+   * Handles errors while loading the consultation privacy review.
+   */
   private handleLoadError(error: unknown): void {
     if (hasHttpStatus(error, 404)) {
       this.status.set('not-found');
@@ -201,6 +223,9 @@ export class DeidentificationReview implements OnInit {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the de-identification review.'),);
   }
 
+  /**
+   * Handles problems submitting the approved text and reloads the document when its state may have changed.
+   */
   private handleSubmissionError(error: unknown, documentId: string): void {
     if (applyServerFieldErrors(this.form, error)) {
       return;
@@ -226,6 +251,9 @@ export class DeidentificationReview implements OnInit {
     this.reloadAfterSubmissionFailure(documentId, message);
   }
 
+  /**
+   * Reloads the document after summarisation fails and moves the page to the correct recovery state.
+   */
   private reloadAfterSubmissionFailure(documentId: string, message: string): void {
     this.documentApi.getDocument(documentId).subscribe({
       next: (document) => {
@@ -254,6 +282,9 @@ export class DeidentificationReview implements OnInit {
     });
   }
 
+  /**
+   * Returns a useful message for the different ways summary generation can fail.
+   */
   private getSummarisationFailureMessage(error: unknown): string {
     if (hasHttpStatus(error, 409)) {
       return 'This document was updated while you were working. The latest version has been loaded.';
@@ -282,6 +313,9 @@ export class DeidentificationReview implements OnInit {
     return getHttpErrorMessage(error, 'Summarisation did not complete successfully.');
   }
 
+  /**
+   * Clears the consultation review and returns to documents when the selected patient changes.
+   */
   private redirectIfPatientContextChanged(): void {
     const document = this.document();
     const selectedPatient = this.selectedPatientState.selectedPatient();
@@ -293,13 +327,16 @@ export class DeidentificationReview implements OnInit {
     ) {
       return;
     }
-
+    // Remove the consultation text before leaving so it is not shown after switching patient.
     this.document.set(null);
     this.processing.set(null);
     this.status.set('loading');
     void this.router.navigate(['/documents']);
   }
 
+  /**
+   * Refreshes patient access and checks whether document editing is still available.
+   */
   private refreshPatientAccess(): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       next: () => {

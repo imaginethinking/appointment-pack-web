@@ -16,6 +16,9 @@ import { DocumentApiService } from '../../services/document-api-service';
 
 type AppointmentReviewStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 
+/**
+ * Lets the user review and edit appointment details found in an appointment letter.
+ */
 @Component({
   selector: 'app-appointment-review',
   imports: [ReactiveFormsModule, RouterLink, AppointmentFormFields],
@@ -71,12 +74,18 @@ export class AppointmentReview implements OnInit {
     return this.authorisation.can(this.selectedPatientState.selectedPatient(), 'document', 'edit');
   });
 
+  /**
+   * Checks the loaded document whenever the selected patient changes.
+   */
   constructor() {
     effect(() => {
       this.redirectIfPatientContextChanged();
     });
   }
 
+  /**
+   * Loads the appointment review using the document id from the route.
+   */
   ngOnInit(): void {
     const documentId = this.route.snapshot.paramMap.get('documentId');
 
@@ -88,6 +97,9 @@ export class AppointmentReview implements OnInit {
     this.loadReview(documentId);
   }
 
+  /**
+   * Checks the reviewed appointment form and confirms the details entered by the user.
+   */
   protected confirm(): void {
     this.actionError.set('');
     clearServerFieldErrors(this.form);
@@ -118,6 +130,9 @@ export class AppointmentReview implements OnInit {
       });
   }
 
+  /**
+   * Confirms the action before rejecting the extracted appointment details.
+   */
   protected reject(): void {
     this.actionError.set('');
 
@@ -141,6 +156,9 @@ export class AppointmentReview implements OnInit {
       });
   }
 
+  /**
+   * Loads the appointment review again after a failed request.
+   */
   protected retryLoad(): void {
     const documentId = this.route.snapshot.paramMap.get('documentId');
 
@@ -149,6 +167,9 @@ export class AppointmentReview implements OnInit {
     }
   }
 
+  /**
+   * Loads the appointment document and fills the form with the extracted appointment details.
+   */
   private loadReview(documentId: string, conflictMessage: string | null = null): void {
     this.status.set('loading');
     this.errorMessage.set('');
@@ -199,6 +220,9 @@ export class AppointmentReview implements OnInit {
       });
   }
 
+  /**
+   * Updates the review page when its document or processing information cannot be loaded.
+   */
   private handleLoadError(error: unknown): void {
     if (hasHttpStatus(error, 404)) {
       this.status.set('not-found');
@@ -216,6 +240,9 @@ export class AppointmentReview implements OnInit {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the appointment review.'));
   }
 
+  /**
+   * Handles validation access and document changes that occur while confirming the appointment.
+   */
   private handleConfirmError(error: unknown, document: DocumentResponse): void {
     if (applyServerFieldErrors(this.form, error)) {
       return;
@@ -248,6 +275,9 @@ export class AppointmentReview implements OnInit {
     this.actionError.set(getHttpErrorMessage(error, 'Unable to confirm the appointment.'));
   }
 
+  /**
+   * Handles failures while rejecting the extracted appointment details.
+   */
   private handleRejectError(error: unknown, document: DocumentResponse): void {
     if (hasHttpStatus(error, 403)) {
       this.refreshPatientAccess(false);
@@ -271,6 +301,9 @@ export class AppointmentReview implements OnInit {
     this.actionError.set(getHttpErrorMessage(error, 'Unable to reject the appointment details.'));
   }
 
+  /**
+   * Clears the loaded review and returns to documents when the user switches patient.
+   */
   private redirectIfPatientContextChanged(): void {
     const document = this.document();
     const selectedPatient = this.selectedPatientState.selectedPatient();
@@ -283,12 +316,16 @@ export class AppointmentReview implements OnInit {
       return;
     }
 
+    // Clear the current review before leaving so information from the previous patient is not left on screen.
     this.document.set(null);
     this.processing.set(null);
     this.status.set('loading');
     void this.router.navigate(['/documents']);
   }
 
+  /**
+   * Refreshes patient access and checks that the permissions needed for the current action are still available.
+   */
   private refreshPatientAccess(requireAppointmentEdit: boolean): void {
     const failedPatientRecordId = this.document()?.patientRecordId ?? null;
 

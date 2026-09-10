@@ -16,6 +16,9 @@ import { DocumentApiService } from '../../services/document-api-service';
 
 type SummaryReviewStatus = 'loading' | 'ready' | 'failed' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 
+/**
+ * Lets the user review a consultation summary or enter one manually when summary generation has failed.
+ */
 @Component({
   selector: 'app-summary-review',
   imports: [ReactiveFormsModule, RouterLink],
@@ -66,12 +69,18 @@ export class SummaryReview implements OnInit {
   protected readonly getDocumentTypeLabel = getDocumentTypeLabel;
   protected readonly getSummarySourceLabel = getSummarySourceLabel;
 
+  /**
+   * Checks the loaded summary whenever the selected patient changes.
+   */
   constructor() {
     effect(() => {
       this.redirectIfPatientContextChanged();
     });
   }
 
+  /**
+   * Loads the consultation summary using the document id from the route.
+   */
   ngOnInit(): void {
     const documentId = this.route.snapshot.paramMap.get('documentId');
 
@@ -83,6 +92,9 @@ export class SummaryReview implements OnInit {
     this.loadReview(documentId);
   }
 
+  /**
+   * Opens an empty summary form when the user chooses to continue manually after a failed summary.
+   */
   protected enableManualSummary(): void {
     if (this.status() !== 'failed') {
       return;
@@ -95,6 +107,9 @@ export class SummaryReview implements OnInit {
     this.form.controls.reviewedSummary.markAsUntouched();
   }
 
+  /**
+   * Leaves manual summary mode and clears the text entered into the summary field.
+   */
   protected cancelManualSummary(): void {
     if (this.status() !== 'failed') {
       return;
@@ -106,6 +121,9 @@ export class SummaryReview implements OnInit {
     this.form.controls.reviewedSummary.setValue('');
   }
 
+  /**
+   * Tries summary generation again using the consultation text that was previously approved.
+   */
   protected retrySummarisation(): void {
     this.actionError.set('');
 
@@ -126,6 +144,7 @@ export class SummaryReview implements OnInit {
 
     this.isRetrying.set(true);
 
+    // Retry with the same approved consultation text that was used for the previous attempt.
     this.documentApi.summariseDocument(document.id, { approvedDeidentifiedText: approvedText })
       .pipe(finalize(() => this.isRetrying.set(false)))
       .subscribe({
@@ -153,6 +172,9 @@ export class SummaryReview implements OnInit {
       });
   }
 
+  /**
+   * Validates the reviewed summary and adds it to Medical History with the entered title and date.
+   */
   protected accept(): void {
     this.actionError.set('');
     clearServerFieldErrors(this.form);
@@ -192,6 +214,9 @@ export class SummaryReview implements OnInit {
       });
   }
 
+  /**
+   * Confirms the action before rejecting the generated summary.
+   */
   protected reject(): void {
     this.actionError.set('');
 
@@ -215,6 +240,9 @@ export class SummaryReview implements OnInit {
       });
   }
 
+  /**
+   * Reloads the current summary review.
+   */
   protected retryLoad(): void {
     const documentId = this.route.snapshot.paramMap.get('documentId');
 
@@ -223,6 +251,9 @@ export class SummaryReview implements OnInit {
     }
   }
 
+  /**
+   * Loads the consultation document and prepares either the generated summary or its failed state for review.
+   */
   private loadReview(documentId: string, actionMessage = ''): void {
     this.status.set('loading');
     this.errorMessage.set('');
@@ -278,6 +309,9 @@ export class SummaryReview implements OnInit {
       });
   }
 
+  /**
+   * Fills the review form with the generated summary when usable summary text is available.
+   */
   private prepareGeneratedSummary(processing: DocumentProcessingResultResponse): void {
     if (processing.generatedSummary === null || processing.generatedSummary.trim().length === 0) {
       this.status.set('error');
@@ -290,6 +324,9 @@ export class SummaryReview implements OnInit {
     this.status.set('ready');
   }
 
+  /**
+   * Prepares the page for retry or manual entry when summary generation has failed.
+   */
   private prepareFailedSummary(processing: DocumentProcessingResultResponse): void {
     if (processing.approvedDeidentifiedText === null || processing.approvedDeidentifiedText.length === 0) {
       this.status.set('error');
@@ -302,6 +339,9 @@ export class SummaryReview implements OnInit {
     this.status.set('failed');
   }
 
+  /**
+   * Marks the summary and history title as required when they contain only spaces.
+   */
   private validateNonBlankFields(): void {
     if (this.form.controls.reviewedSummary.value.trim().length === 0) {
       this.form.controls.reviewedSummary.setErrors({
@@ -318,6 +358,9 @@ export class SummaryReview implements OnInit {
     }
   }
 
+  /**
+   * Handles errors while loading the consultation summary.
+   */
   private handleLoadError(error: unknown): void {
     if (hasHttpStatus(error, 404)) {
       this.status.set('not-found');
@@ -334,6 +377,9 @@ export class SummaryReview implements OnInit {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the consultation summary.'));
   }
 
+  /**
+   * Handles a failed summary retry and reloads the latest document information.
+   */
   private handleRetryError(error: unknown, documentId: string): void {
     if (hasHttpStatus(error, 403)) {
       this.refreshPatientAccess(false);
@@ -348,6 +394,9 @@ export class SummaryReview implements OnInit {
     this.loadReview(documentId, this.getRetryFailureMessage(error));
   }
 
+  /**
+   * Handles validation access and document changes that occur while accepting the summary.
+   */
   private handleAcceptError(error: unknown, documentId: string): void {
     if (applyServerFieldErrors(this.form, error)) {
       return;
@@ -376,6 +425,9 @@ export class SummaryReview implements OnInit {
     this.actionError.set(getHttpErrorMessage(error, 'Unable to add the summary to medical history.'));
   }
 
+  /**
+   * Handles problems that occur while rejecting the generated summary.
+   */
   private handleRejectError(error: unknown, documentId: string): void {
     if (hasHttpStatus(error, 403)) {
       this.refreshPatientAccess(false);
@@ -395,6 +447,9 @@ export class SummaryReview implements OnInit {
     this.actionError.set(getHttpErrorMessage(error, 'Unable to reject the summary.'));
   }
 
+  /**
+   * Returns the message shown when another attempt to generate the summary fails.
+   */
   private getRetryFailureMessage(error: unknown): string {
     if (hasHttpStatus(error, 409)) {
       return 'This document was updated while you were working. The latest version has been loaded.';
@@ -423,6 +478,9 @@ export class SummaryReview implements OnInit {
     return getHttpErrorMessage(error, 'Unable to generate the consultation summary.');
   }
 
+  /**
+   * Clears the loaded summary and returns to documents when the selected patient changes.
+   */
   private redirectIfPatientContextChanged(): void {
     const document = this.document();
     const selectedPatient = this.selectedPatientState.selectedPatient();
@@ -435,12 +493,16 @@ export class SummaryReview implements OnInit {
       return;
     }
 
+    // Clear the loaded consultation information before leaving the patient context.
     this.document.set(null);
     this.processing.set(null);
     this.status.set('loading');
     void this.router.navigate(['/documents']);
   }
 
+  /**
+   * Refreshes patient access and checks the permissions needed to continue reviewing or accepting the summary.
+   */
   private refreshPatientAccess(acceptanceAttempt: boolean): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       next: () => {

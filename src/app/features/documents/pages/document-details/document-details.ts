@@ -23,6 +23,9 @@ import { DocumentApiService } from '../../services/document-api-service';
 
 type DocumentDetailsStatus = 'loading' | 'ready' | 'not-found' | 'forbidden' | 'error';
 
+/**
+ * Shows a document together with its current processing and review state.
+ */
 @Component({
   selector: 'app-document-details',
   imports: [DatePipe, RouterLink],
@@ -89,6 +92,9 @@ export class DocumentDetails implements OnInit, OnDestroy {
   protected readonly getSummarySourceLabel = getSummarySourceLabel;
   protected readonly formatFileSize = formatFileSize;
 
+  /**
+   * Loads the document whenever the document id in the route changes.
+   */
   ngOnInit(): void {
     this.routeSubscription = this.route.paramMap.subscribe((params) => {
       const documentId = params.get('documentId');
@@ -100,10 +106,16 @@ export class DocumentDetails implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Stops listening for route changes when the page is destroyed.
+   */
   ngOnDestroy(): void {
     this.routeSubscription?.unsubscribe();
   }
 
+  /**
+   * Reloads the current document after a failed request.
+   */
   protected retryLoad(): void {
     const documentId = this.route.snapshot.paramMap.get('documentId');
     if (documentId === null) {
@@ -113,6 +125,9 @@ export class DocumentDetails implements OnInit, OnDestroy {
     this.loadDocument(documentId);
   }
 
+  /**
+   * Processes the current document and updates the page with its new state.
+   */
   protected extract(): void {
     this.actionError.set('');
     const document = this.document();
@@ -135,6 +150,9 @@ export class DocumentDetails implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Confirms the action before archiving the current document.
+   */
   protected archive(): void {
     this.actionError.set('');
     const document = this.document();
@@ -177,6 +195,9 @@ export class DocumentDetails implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Downloads the original file using a temporary browser URL.
+   */
   protected download(): void {
     this.actionError.set('');
     const document = this.document();
@@ -195,6 +216,7 @@ export class DocumentDetails implements OnInit, OnDestroy {
           return;
         }
 
+        // Create a temporary URL for the downloaded file and release it once the download has started.
         const url = URL.createObjectURL(response.body);
         const anchor = window.document.createElement('a');
         anchor.href = url;
@@ -220,6 +242,9 @@ export class DocumentDetails implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Returns the message shown for the current stage of the document workflow.
+   */
   protected workflowMessage(): string {
     const document = this.document();
 
@@ -257,6 +282,9 @@ export class DocumentDetails implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Loads the document and includes its processing information when it is available for the selected patient.
+   */
   private loadDocument(documentId: string, preserveActionError = false): void {
     const failedPatientRecordId = this.selectedPatientState.selectedPatient()?.patientRecordId ?? null;
     this.status.set('loading');
@@ -291,6 +319,9 @@ export class DocumentDetails implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Handles processing failures and reloads the document so the page shows its latest state.
+   */
   private handleExtractionError(error: unknown, document: DocumentResponse): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(document.patientRecordId, 'forbidden');
@@ -323,6 +354,9 @@ export class DocumentDetails implements OnInit, OnDestroy {
     this.loadDocument(document.id, true);
   }
 
+  /**
+   * Handles errors while loading the document and refreshes patient access when needed.
+   */
   private handleLoadError(error: unknown, failedPatientRecordId: string | null): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(failedPatientRecordId, 'forbidden');
@@ -338,6 +372,9 @@ export class DocumentDetails implements OnInit, OnDestroy {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the document.'));
   }
 
+  /**
+   * Refreshes patient access and updates the page if the selected patient is no longer available.
+   */
   private recoverPatientAccess(failedPatientRecordId: string | null, fallbackStatus: 'forbidden' | 'not-found'): void {
     this.status.set('loading');
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({

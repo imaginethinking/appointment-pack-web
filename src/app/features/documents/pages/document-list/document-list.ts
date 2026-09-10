@@ -14,6 +14,9 @@ import { DocumentApiService } from '../../services/document-api-service';
 
 type DocumentListPageStatus = 'loading' | 'ready' | 'no-selection' | 'forbidden' | 'not-found' | 'error';
 
+/**
+ * Shows the documents available for the patient currently selected.
+ */
 @Component({
   selector: 'app-document-list',
   imports: [DatePipe, RouterLink],
@@ -35,6 +38,9 @@ export class DocumentList {
   protected readonly getDocumentTypeLabel = getDocumentTypeLabel;
   protected readonly formatFileSize = formatFileSize;
 
+  /**
+   * Reloads the document list when the selected patient changes or the user retries.
+   */
   constructor() {
     effect((onCleanup) => {
       this.reloadVersion();
@@ -68,15 +74,24 @@ export class DocumentList {
     });
   }
 
+  /**
+   * Triggers another attempt to load the document list.
+   */
   protected retry(): void {
     this.reloadVersion.update((version) => version + 1);
   }
 
+  /**
+   * Returns the name of the patient currently shown on the page.
+   */
   protected selectedPatientName(): string {
     const selectedPatient = this.selectedPatient();
     return selectedPatient === null ? '' : getPatientContextName(selectedPatient);
   }
 
+  /**
+   * Handles document loading failures and checks whether patient access has changed.
+   */
   private handleLoadError(error: unknown, failedPatientRecordId: string): void {
     this.documents.set([]);
 

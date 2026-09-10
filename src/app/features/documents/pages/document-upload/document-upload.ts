@@ -14,6 +14,9 @@ import { DOCUMENT_MAXIMUM_FILE_SIZE_BYTES } from '../../models/document-constrai
 import { DOCUMENT_TYPES, DocumentType, getDocumentTypeLabel } from '../../models/document-model';
 import { DocumentApiService } from '../../services/document-api-service';
 
+/**
+ * Uploads appointment and consultation documents for the selected patient.
+ */
 @Component({
   selector: 'app-document-upload',
   imports: [ReactiveFormsModule, RouterLink],
@@ -47,6 +50,9 @@ export class DocumentUpload {
     documentType: this.formBuilder.nonNullable.control<DocumentType | ''>('', Validators.required),
   });
 
+  /**
+   * Clears the current upload when the selected patient changes.
+   */
   constructor() {
     effect(() => {
       this.selectedPatient()?.patientRecordId;
@@ -54,6 +60,9 @@ export class DocumentUpload {
     });
   }
 
+  /**
+   * Reads the selected file and checks its size before keeping it for upload.
+   */
   protected selectFile(event: Event): void {
     this.fileError.set('');
     this.errorMessage.set('');
@@ -78,6 +87,9 @@ export class DocumentUpload {
     this.selectedFile.set(file);
   }
 
+  /**
+   * Uploads the selected document and opens it when the same patient is still selected.
+   */
   protected upload(): void {
     this.errorMessage.set('');
     this.fileError.set('');
@@ -124,6 +136,9 @@ export class DocumentUpload {
     });
   }
 
+  /**
+   * Checks that the selected file is not empty or larger than the allowed upload size.
+   */
   private validateFile(file: File): string | null {
     if (file.size === 0) {
       return 'The selected file is empty.';
@@ -136,6 +151,9 @@ export class DocumentUpload {
     return null;
   }
 
+  /**
+   * Shows a suitable message for upload failures and refreshes patient access when required.
+   */
   private handleUploadError(error: unknown, failedPatientRecordId: string): void {
     if (hasHttpStatus(error, 413)) {
       this.errorMessage.set('The selected document exceeds the maximum upload size.');
@@ -160,6 +178,9 @@ export class DocumentUpload {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to upload the document.'));
   }
 
+  /**
+   * Refreshes patient access after an upload fails and checks whether the same patient is still available.
+   */
   private refreshPatientAccess(failedPatientRecordId: string): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       next: () => {
@@ -181,6 +202,9 @@ export class DocumentUpload {
     });
   }
 
+  /**
+   * Clears the selected document type file and any previous upload errors.
+   */
   private resetUploadSelection(): void {
     this.form.reset({ documentType: '' });
     this.selectedFile.set(null);
