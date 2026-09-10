@@ -1,7 +1,7 @@
-import { Component, input } from '@angular/core';
+import {Component, input} from '@angular/core';
 
-import { Permission } from '../../../../core/models/permission-model';
-import { CARE_NETWORK_PERMISSION_GROUPS, CareNetworkPermissionOption } from '../../models/patient-carer-access-model';
+import {Permission} from '../../../../core/models/permission-model';
+import {CARE_NETWORK_PERMISSION_GROUPS, CareNetworkPermissionOption} from '../../models/patient-carer-access-model';
 
 /**
  * Displays the permissions currently available through a carer relationship.

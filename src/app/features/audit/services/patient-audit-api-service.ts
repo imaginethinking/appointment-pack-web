@@ -1,9 +1,9 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import {HttpClient, HttpParams} from '@angular/common/http';
+import {inject, Injectable} from '@angular/core';
+import {Observable} from 'rxjs';
 
-import { environment } from '../../../../environments/environment';
-import { PatientAuditPageResponse } from '../models/patient-audit-model';
+import {environment} from '../../../../environments/environment';
+import {PatientAuditPageResponse} from '../models/patient-audit-model';
 
 /**
  * Loads the recorded activity for a patient.

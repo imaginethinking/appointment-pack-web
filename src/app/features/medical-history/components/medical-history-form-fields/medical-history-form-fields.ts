@@ -1,7 +1,7 @@
-import { Component, input } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import {Component, input} from '@angular/core';
+import {ReactiveFormsModule} from '@angular/forms';
 
-import { MedicalHistoryForm } from '../../forms/medical-history-form';
+import {MedicalHistoryForm} from '../../forms/medical-history-form';
 
 /**
  * Displays the shared fields used for creating and editing Medical History entries.

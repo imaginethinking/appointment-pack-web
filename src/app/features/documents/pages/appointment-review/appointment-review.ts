@@ -1,18 +1,22 @@
-import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { EMPTY, finalize, switchMap } from 'rxjs';
+import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
+import {FormBuilder, ReactiveFormsModule} from '@angular/forms';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {EMPTY, finalize, switchMap} from 'rxjs';
 
-import { applyServerFieldErrors, clearServerFieldErrors } from '../../../../core/forms/server-field-errors';
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
-import { AppointmentFormFields } from '../../../appointments/components/appointment-form-fields/appointment-form-fields';
-import { createAppointmentForm, mapAppointmentFormToRequest, resetAppointmentForm } from '../../../appointments/forms/appointment-form';
-import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import { DocumentProcessingResultResponse, DocumentResponse } from '../../models/document-model';
-import { DocumentApiService } from '../../services/document-api-service';
+import {applyServerFieldErrors, clearServerFieldErrors} from '../../../../core/forms/server-field-errors';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {hasHttpStatus} from '../../../../core/http/http-problem-detail';
+import {AppointmentFormFields} from '../../../appointments/components/appointment-form-fields/appointment-form-fields';
+import {
+  createAppointmentForm,
+  mapAppointmentFormToRequest,
+  resetAppointmentForm
+} from '../../../appointments/forms/appointment-form';
+import {PatientContextAuthorisation} from '../../../patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../../patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../patient-context/services/selected-patient-state';
+import {DocumentProcessingResultResponse, DocumentResponse} from '../../models/document-model';
+import {DocumentApiService} from '../../services/document-api-service';
 
 type AppointmentReviewStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 

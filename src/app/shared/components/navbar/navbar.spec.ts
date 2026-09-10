@@ -1,13 +1,13 @@
-import { signal } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
-import { describe, expect, it, vi } from 'vitest';
+import {signal} from '@angular/core';
+import {TestBed} from '@angular/core/testing';
+import {provideRouter} from '@angular/router';
+import {describe, expect, it, vi} from 'vitest';
 
-import { AuthService } from '../../../core/services/auth-service';
-import { PatientContextAuthorisation } from '../../../features/patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../../features/patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../features/patient-context/services/selected-patient-state';
-import { Navbar } from './navbar';
+import {AuthService} from '../../../core/services/auth-service';
+import {PatientContextAuthorisation} from '../../../features/patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../../features/patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../features/patient-context/services/selected-patient-state';
+import {Navbar} from './navbar';
 
 describe('Navbar', () => {
   // This creates the navbar with small state mocks so the test can focus only on menu behaviour.

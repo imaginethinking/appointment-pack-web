@@ -1,18 +1,18 @@
-import { DatePipe } from '@angular/common';
-import { Component, effect, inject, signal } from '@angular/core';
+import {DatePipe} from '@angular/common';
+import {Component, effect, inject, signal} from '@angular/core';
 
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
-import { getPatientContextName } from '../../../patient-context/models/selected-patient-context';
-import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {hasHttpStatus} from '../../../../core/http/http-problem-detail';
+import {getPatientContextName} from '../../../patient-context/models/selected-patient-context';
+import {PatientContextAuthorisation} from '../../../patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../../patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../patient-context/services/selected-patient-state';
 import {
   getPatientActivityActionLabel,
   getPatientResourceTypeLabel,
   PatientAuditPageResponse,
 } from '../../models/patient-audit-model';
-import { PatientAuditApiService } from '../../services/patient-audit-api-service';
+import {PatientAuditApiService} from '../../services/patient-audit-api-service';
 
 const AUDIT_PAGE_SIZE = 25;
 

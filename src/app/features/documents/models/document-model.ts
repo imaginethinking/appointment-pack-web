@@ -1,4 +1,4 @@
-import { AddressResponse } from '../../../shared/models/address-model';
+import {AddressResponse} from '../../../shared/models/address-model';
 
 export const DOCUMENT_TYPES = ['APPOINTMENT_LETTER', 'CONSULTATION_OUTCOME_LETTER'] as const;
 export type DocumentType = typeof DOCUMENT_TYPES[number];

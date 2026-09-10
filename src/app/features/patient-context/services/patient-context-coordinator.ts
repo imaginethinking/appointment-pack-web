@@ -1,10 +1,10 @@
-import { inject, Injectable, signal } from '@angular/core';
-import { catchError, finalize, forkJoin, map, Observable, of, shareReplay, tap, throwError } from 'rxjs';
+import {inject, Injectable, signal} from '@angular/core';
+import {catchError, finalize, forkJoin, map, Observable, of, shareReplay, tap, throwError} from 'rxjs';
 
-import { PatientCarerAccessState } from '../../care-network/services/patient-carer-access-state';
-import { PersonalPatientRecordState } from '../../patient-record/services/personal-patient-record-state';
-import { ProfileState } from '../../profile/services/profile-state';
-import { SelectedPatientState } from './selected-patient-state';
+import {PatientCarerAccessState} from '../../care-network/services/patient-carer-access-state';
+import {PersonalPatientRecordState} from '../../patient-record/services/personal-patient-record-state';
+import {ProfileState} from '../../profile/services/profile-state';
+import {SelectedPatientState} from './selected-patient-state';
 
 /**
  * Loads the shared information used to create and maintain the current patient selection.

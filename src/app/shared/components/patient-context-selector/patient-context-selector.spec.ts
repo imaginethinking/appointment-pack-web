@@ -1,12 +1,12 @@
-import { signal } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
-import { describe, expect, it, vi } from 'vitest';
+import {signal} from '@angular/core';
+import {TestBed} from '@angular/core/testing';
+import {describe, expect, it, vi} from 'vitest';
 
-import { Permission } from '../../../core/models/permission-model';
-import { SelectedPatientContext } from '../../../features/patient-context/models/selected-patient-context';
-import { PatientContextCoordinator } from '../../../features/patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../features/patient-context/services/selected-patient-state';
-import { PatientContextSelector } from './patient-context-selector';
+import {Permission} from '../../../core/models/permission-model';
+import {SelectedPatientContext} from '../../../features/patient-context/models/selected-patient-context';
+import {PatientContextCoordinator} from '../../../features/patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../features/patient-context/services/selected-patient-state';
+import {PatientContextSelector} from './patient-context-selector';
 
 describe('PatientContextSelector', () => {
   const contexts: readonly SelectedPatientContext[] = [

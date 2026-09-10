@@ -1,23 +1,23 @@
-import { DatePipe } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import {DatePipe} from '@angular/common';
+import {Component, computed, inject, OnInit, signal} from '@angular/core';
+import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {RouterLink} from '@angular/router';
+import {finalize} from 'rxjs';
 
-import { applyServerFieldErrors } from '../../../../core/forms/server-field-errors';
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
+import {applyServerFieldErrors} from '../../../../core/forms/server-field-errors';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {hasHttpStatus} from '../../../../core/http/http-problem-detail';
 import {
   addPermissionWithDependencies,
   Permission,
   removePermissionWithDependents,
 } from '../../../../core/models/permission-model';
-import { PersonalPatientRecordState } from '../../../patient-record/services/personal-patient-record-state';
-import { CareNetworkTabs } from '../../components/care-network-tabs/care-network-tabs';
-import { PermissionBadges } from '../../components/permission-badges/permission-badges';
-import { PermissionSelector } from '../../components/permission-selector/permission-selector';
-import { DEFAULT_CARER_PERMISSIONS, PatientCarerAccessResponse } from '../../models/patient-carer-access-model';
-import { PatientCarerAccessState } from '../../services/patient-carer-access-state';
+import {PersonalPatientRecordState} from '../../../patient-record/services/personal-patient-record-state';
+import {CareNetworkTabs} from '../../components/care-network-tabs/care-network-tabs';
+import {PermissionBadges} from '../../components/permission-badges/permission-badges';
+import {PermissionSelector} from '../../components/permission-selector/permission-selector';
+import {DEFAULT_CARER_PERMISSIONS, PatientCarerAccessResponse} from '../../models/patient-carer-access-model';
+import {PatientCarerAccessState} from '../../services/patient-carer-access-state';
 
 /**
  * Manages carers who have been invited to or given access to the user's patient record.

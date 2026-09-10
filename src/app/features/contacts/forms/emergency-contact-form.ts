@@ -1,7 +1,7 @@
-import { AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import {AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
 
-import { normaliseOptionalText } from '../../../shared/utils/formatting';
-import { EmergencyContactRequest, EmergencyContactResponse } from '../models/emergency-contact-model';
+import {normaliseOptionalText} from '../../../shared/utils/formatting';
+import {EmergencyContactRequest, EmergencyContactResponse} from '../models/emergency-contact-model';
 
 /**
  * Creates the form used to enter emergency contact details.

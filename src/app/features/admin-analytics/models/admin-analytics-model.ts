@@ -1,6 +1,6 @@
-import { ApplicationPage } from '../../../core/models/application-page-model';
-import { PatientActivityAction, PatientResourceType } from '../../audit/models/patient-audit-model';
-import { DocumentType } from '../../documents/models/document-model';
+import {ApplicationPage} from '../../../core/models/application-page-model';
+import {PatientActivityAction, PatientResourceType} from '../../audit/models/patient-audit-model';
+import {DocumentType} from '../../documents/models/document-model';
 
 export const OPERATIONAL_EVENT_CATEGORIES = [
   'PATIENT_ACTIVITY',

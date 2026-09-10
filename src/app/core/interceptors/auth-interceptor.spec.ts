@@ -1,14 +1,14 @@
 // These tests check the shared HTTP authentication behaviour used across the application.
 // HttpTestingController lets the request reach Angular's HTTP layer without making a real network call.
 
-import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
-import { provideRouter, Router } from '@angular/router';
+import {HttpClient, provideHttpClient, withInterceptors} from '@angular/common/http';
+import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
+import {TestBed} from '@angular/core/testing';
+import {provideRouter, Router} from '@angular/router';
 
-import { environment } from '../../../environments/environment';
-import { AuthService } from '../services/auth-service';
-import { authInterceptor } from './auth-interceptor';
+import {environment} from '../../../environments/environment';
+import {AuthService} from '../services/auth-service';
+import {authInterceptor} from './auth-interceptor';
 
 describe('authInterceptor', () => {
   let http: HttpClient;

@@ -1,9 +1,9 @@
-import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import {inject, Injectable} from '@angular/core';
+import {Observable} from 'rxjs';
 
-import { environment } from '../../../../environments/environment';
-import { BloodTestResponse, CreateBloodTestRequest, UpdateBloodTestRequest } from '../models/blood-test-model';
+import {environment} from '../../../../environments/environment';
+import {BloodTestResponse, CreateBloodTestRequest, UpdateBloodTestRequest} from '../models/blood-test-model';
 
 /**
  * Handles requests for blood tests and their individual results.

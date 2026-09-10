@@ -1,19 +1,19 @@
 // Summary review handles both normal AI-assisted review and the manual fallback after summarisation failure.
 // The tests below protect approved-text retry behaviour, manual acceptance and patient-context safety.
 
-import { signal, WritableSignal } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
-import { of } from 'rxjs';
+import {signal, WritableSignal} from '@angular/core';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {FormBuilder, FormGroup} from '@angular/forms';
+import {ActivatedRoute, convertToParamMap, Router} from '@angular/router';
+import {of} from 'rxjs';
 
-import { SelectedPatientContext } from '../../../patient-context/models/selected-patient-context';
-import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import { DocumentProcessingResultResponse, DocumentResponse } from '../../models/document-model';
-import { DocumentApiService } from '../../services/document-api-service';
-import { SummaryReview } from './summary-review';
+import {SelectedPatientContext} from '../../../patient-context/models/selected-patient-context';
+import {PatientContextAuthorisation} from '../../../patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../../patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../patient-context/services/selected-patient-state';
+import {DocumentProcessingResultResponse, DocumentResponse} from '../../models/document-model';
+import {DocumentApiService} from '../../services/document-api-service';
+import {SummaryReview} from './summary-review';
 
 describe('SummaryReview', () => {
   let fixture: ComponentFixture<SummaryReview>;

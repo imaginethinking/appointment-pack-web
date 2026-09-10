@@ -1,14 +1,14 @@
 // PatientContextCoordinator joins several existing state services together during application startup.
 // These tests check that loading stays coordinated and that patient selection is revalidated when access changes.
 
-import { TestBed } from '@angular/core/testing';
-import { firstValueFrom, of, Subject, throwError } from 'rxjs';
+import {TestBed} from '@angular/core/testing';
+import {firstValueFrom, of, Subject, throwError} from 'rxjs';
 
-import { PatientCarerAccessState } from '../../care-network/services/patient-carer-access-state';
-import { PersonalPatientRecordState } from '../../patient-record/services/personal-patient-record-state';
-import { ProfileState } from '../../profile/services/profile-state';
-import { PatientContextCoordinator } from './patient-context-coordinator';
-import { SelectedPatientState } from './selected-patient-state';
+import {PatientCarerAccessState} from '../../care-network/services/patient-carer-access-state';
+import {PersonalPatientRecordState} from '../../patient-record/services/personal-patient-record-state';
+import {ProfileState} from '../../profile/services/profile-state';
+import {PatientContextCoordinator} from './patient-context-coordinator';
+import {SelectedPatientState} from './selected-patient-state';
 
 describe('PatientContextCoordinator', () => {
   let profileState: {

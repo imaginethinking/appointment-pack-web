@@ -1,7 +1,12 @@
 // These tests focus on the permission dependency rules used by the care network.
 // The aim is to make sure a permission cannot be added or removed in an invalid combination.
 
-import {addPermissionWithDependencies, Permission, PERMISSION_DEPENDENCIES, removePermissionWithDependents} from './permission-model';
+import {
+  addPermissionWithDependencies,
+  Permission,
+  PERMISSION_DEPENDENCIES,
+  removePermissionWithDependents
+} from './permission-model';
 
 describe('permission model', () => {
   // Checks that the frontend dependency catalogue still matches the intended permission rules.

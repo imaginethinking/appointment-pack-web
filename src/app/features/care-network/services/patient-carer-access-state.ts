@@ -1,12 +1,12 @@
-import { inject, Injectable, signal } from '@angular/core';
-import { finalize, Observable, tap } from 'rxjs';
+import {inject, Injectable, signal} from '@angular/core';
+import {finalize, Observable, tap} from 'rxjs';
 
 import {
   CreateCarerInvitationRequest,
   PatientCarerAccessResponse,
   UpdatePatientCarerPermissionsRequest,
 } from '../models/patient-carer-access-model';
-import { PatientCarerAccessApiService } from './patient-carer-access-api-service';
+import {PatientCarerAccessApiService} from './patient-carer-access-api-service';
 
 /**
  * Keeps patient and carer relationships up to date as they are loaded or changed.

@@ -1,18 +1,18 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import {Component, computed, effect, inject, signal} from '@angular/core';
+import {RouterLink} from '@angular/router';
+import {forkJoin} from 'rxjs';
 
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
-import { formatAddressLines } from '../../../../shared/utils/formatting';
-import { getPatientContextName } from '../../../patient-context/models/selected-patient-context';
-import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import { EmergencyContactResponse } from '../../models/emergency-contact-model';
-import { HealthcareContactResponse } from '../../models/healthcare-contact-model';
-import { EmergencyContactApiService } from '../../services/emergency-contact-api-service';
-import { HealthcareContactApiService } from '../../services/healthcare-contact-api-service';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {hasHttpStatus} from '../../../../core/http/http-problem-detail';
+import {formatAddressLines} from '../../../../shared/utils/formatting';
+import {getPatientContextName} from '../../../patient-context/models/selected-patient-context';
+import {PatientContextAuthorisation} from '../../../patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../../patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../patient-context/services/selected-patient-state';
+import {EmergencyContactResponse} from '../../models/emergency-contact-model';
+import {HealthcareContactResponse} from '../../models/healthcare-contact-model';
+import {EmergencyContactApiService} from '../../services/emergency-contact-api-service';
+import {HealthcareContactApiService} from '../../services/healthcare-contact-api-service';
 
 type ContactListStatus = 'loading' | 'ready' | 'no-patient' | 'forbidden' | 'error';
 

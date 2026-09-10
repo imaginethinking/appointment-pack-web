@@ -1,11 +1,11 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import {computed, inject, Injectable, signal} from '@angular/core';
 
-import { Permission } from '../../../core/models/permission-model';
-import { PatientCarerAccessState } from '../../care-network/services/patient-carer-access-state';
-import { PersonalPatientRecordState } from '../../patient-record/services/personal-patient-record-state';
-import { ProfileState } from '../../profile/services/profile-state';
-import { SelectedPatientContext } from '../models/selected-patient-context';
-import { PatientContextAuthorisation } from './patient-context-auth';
+import {Permission} from '../../../core/models/permission-model';
+import {PatientCarerAccessState} from '../../care-network/services/patient-carer-access-state';
+import {PersonalPatientRecordState} from '../../patient-record/services/personal-patient-record-state';
+import {ProfileState} from '../../profile/services/profile-state';
+import {SelectedPatientContext} from '../models/selected-patient-context';
+import {PatientContextAuthorisation} from './patient-context-auth';
 
 /**
  * Keeps the available patient contexts and the patient currently selected by the user.

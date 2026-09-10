@@ -1,4 +1,4 @@
-import { Permission } from '../../../core/models/permission-model';
+import {Permission} from '../../../core/models/permission-model';
 
 export type PatientContextType = 'SELF' | 'CARER';
 

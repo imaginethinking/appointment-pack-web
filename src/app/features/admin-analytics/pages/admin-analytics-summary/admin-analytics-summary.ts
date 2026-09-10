@@ -1,26 +1,14 @@
-import { DatePipe } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  ReactiveFormsModule,
-  ValidationErrors,
-  ValidatorFn,
-} from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import {DatePipe} from '@angular/common';
+import {Component, inject, OnInit, signal} from '@angular/core';
+import {AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn,} from '@angular/forms';
+import {RouterLink} from '@angular/router';
 
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
-import { getApplicationPageLabel } from '../../../../core/models/application-page-model';
-import {
-  getPatientActivityActionLabel,
-  getPatientResourceTypeLabel,
-} from '../../../audit/models/patient-audit-model';
-import {
-  AdminAnalyticsSummaryResponse,
-  AnalyticsRangeQuery,
-} from '../../models/admin-analytics-model';
-import { AdminAnalyticsApiService } from '../../services/admin-analytics-api-service';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {hasHttpStatus} from '../../../../core/http/http-problem-detail';
+import {getApplicationPageLabel} from '../../../../core/models/application-page-model';
+import {getPatientActivityActionLabel, getPatientResourceTypeLabel,} from '../../../audit/models/patient-audit-model';
+import {AdminAnalyticsSummaryResponse, AnalyticsRangeQuery,} from '../../models/admin-analytics-model';
+import {AdminAnalyticsApiService} from '../../services/admin-analytics-api-service';
 
 /**
  * Shows the main application analytics with an optional date range.

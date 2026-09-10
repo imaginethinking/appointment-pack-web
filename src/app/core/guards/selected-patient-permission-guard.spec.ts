@@ -1,15 +1,15 @@
 // These tests check that patient-scoped routes use the current selected patient and the permission in route data.
 // The permission service itself was tested in Phase 11A, so this file only checks the guard's navigation decision.
 
-import { TestBed } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, provideRouter, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import {TestBed} from '@angular/core/testing';
+import {ActivatedRouteSnapshot, provideRouter, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
 
-import { Permission } from '../models/permission-model';
-import { PatientContextAuthorisation } from '../../features/patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../features/patient-context/services/patient-context-coordinator';
-import { SelectedPatientContext } from '../../features/patient-context/models/selected-patient-context';
-import { SelectedPatientState } from '../../features/patient-context/services/selected-patient-state';
-import { selectedPatientPermissionGuard } from './selected-patient-permission-guard';
+import {Permission} from '../models/permission-model';
+import {PatientContextAuthorisation} from '../../features/patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../features/patient-context/services/patient-context-coordinator';
+import {SelectedPatientContext} from '../../features/patient-context/models/selected-patient-context';
+import {SelectedPatientState} from '../../features/patient-context/services/selected-patient-state';
+import {selectedPatientPermissionGuard} from './selected-patient-permission-guard';
 
 describe('selectedPatientPermissionGuard', () => {
   const selectedPatient: SelectedPatientContext = {

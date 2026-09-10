@@ -1,15 +1,15 @@
-import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import {Component, inject, signal} from '@angular/core';
+import {FormBuilder, ReactiveFormsModule} from '@angular/forms';
+import {Router, RouterLink} from '@angular/router';
 
-import { applyServerFieldErrors } from '../../../../core/forms/server-field-errors';
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
-import { formatEnumLabel } from '../../../../shared/utils/formatting';
-import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import { createPatientRecordForm, mapPatientRecordFormToRequest} from '../../forms/patient-record-form';
-import { BLOOD_TYPES, HEIGHT_UNITS, WEIGHT_UNITS } from '../../models/patient-record-model';
-import { PersonalPatientRecordState } from '../../services/personal-patient-record-state';
+import {applyServerFieldErrors} from '../../../../core/forms/server-field-errors';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {hasHttpStatus} from '../../../../core/http/http-problem-detail';
+import {formatEnumLabel} from '../../../../shared/utils/formatting';
+import {SelectedPatientState} from '../../../patient-context/services/selected-patient-state';
+import {createPatientRecordForm, mapPatientRecordFormToRequest} from '../../forms/patient-record-form';
+import {BLOOD_TYPES, HEIGHT_UNITS, WEIGHT_UNITS} from '../../models/patient-record-model';
+import {PersonalPatientRecordState} from '../../services/personal-patient-record-state';
 
 /**
  * Creates the patient record owned by the current user.

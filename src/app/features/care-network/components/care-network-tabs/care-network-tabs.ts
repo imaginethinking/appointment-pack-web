@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import {Component} from '@angular/core';
+import {RouterLink, RouterLinkActive} from '@angular/router';
 
 /**
  * Displays the navigation between patient and carer views of the Care Network.

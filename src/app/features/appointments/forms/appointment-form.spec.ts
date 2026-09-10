@@ -1,8 +1,8 @@
 // Appointment form tests focus on rules added by this application rather than Angular's built-in validators.
 
-import { FormBuilder } from '@angular/forms';
+import {FormBuilder} from '@angular/forms';
 
-import { createAppointmentForm, mapAppointmentFormToRequest, resetAppointmentForm } from './appointment-form';
+import {createAppointmentForm, mapAppointmentFormToRequest, resetAppointmentForm} from './appointment-form';
 
 describe('appointment form', () => {
   let formBuilder: FormBuilder;

@@ -1,11 +1,11 @@
 // These tests check the main signed-in route guard.
 // The real AuthService is replaced with a small mock so the tests only focus on the navigation decision.
 
-import { TestBed } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, provideRouter, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import {TestBed} from '@angular/core/testing';
+import {ActivatedRouteSnapshot, provideRouter, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
 
-import { AuthService } from '../services/auth-service';
-import { authGuard } from './auth-guard';
+import {AuthService} from '../services/auth-service';
+import {authGuard} from './auth-guard';
 
 describe('authGuard', () => {
   let authService: {

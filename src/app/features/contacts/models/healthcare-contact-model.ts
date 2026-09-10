@@ -1,4 +1,4 @@
-import { AddressRequest, AddressResponse } from '../../../shared/models/address-model';
+import {AddressRequest, AddressResponse} from '../../../shared/models/address-model';
 
 export interface HealthcareContactRequest {
   name: string;

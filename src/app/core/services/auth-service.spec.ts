@@ -1,12 +1,12 @@
 // AuthService has quite a few responsibilities, so these tests concentrate on session and login state.
 // API calls are mocked so the tests only check frontend behaviour and do not need the backend running.
 
-import { TestBed } from '@angular/core/testing';
-import { firstValueFrom, of } from 'rxjs';
+import {TestBed} from '@angular/core/testing';
+import {firstValueFrom, of} from 'rxjs';
 
-import { LoginResponse } from '../models/auth-model';
-import { AuthApiService } from './auth-api-service';
-import { AuthService } from './auth-service';
+import {LoginResponse} from '../models/auth-model';
+import {AuthApiService} from './auth-api-service';
+import {AuthService} from './auth-service';
 
 describe('AuthService', () => {
   const accessTokenKey = 'appointmentPack.accessToken';

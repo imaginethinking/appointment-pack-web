@@ -1,13 +1,13 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
 import {
   buildPermission,
   Permission,
-  PermissionAction,
   PERMISSION_DEPENDENCIES,
+  PermissionAction,
   PermissionResource,
 } from '../../../core/models/permission-model';
-import { SelectedPatientContext } from '../models/selected-patient-context';
+import {SelectedPatientContext} from '../models/selected-patient-context';
 
 /**
  * Checks the permissions available for the selected patient context.

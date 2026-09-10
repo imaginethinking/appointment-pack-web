@@ -1,18 +1,18 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import {Component, computed, effect, inject, signal} from '@angular/core';
+import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Router, RouterLink} from '@angular/router';
+import {finalize} from 'rxjs';
 
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
-import { formatFileSize } from '../../../../shared/utils/formatting';
-import { getPatientContextName } from '../../../patient-context/models/selected-patient-context';
-import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import { DOCUMENT_MAXIMUM_FILE_SIZE_BYTES } from '../../models/document-constraints';
-import { DOCUMENT_TYPES, DocumentType, getDocumentTypeLabel } from '../../models/document-model';
-import { DocumentApiService } from '../../services/document-api-service';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {hasHttpStatus} from '../../../../core/http/http-problem-detail';
+import {formatFileSize} from '../../../../shared/utils/formatting';
+import {getPatientContextName} from '../../../patient-context/models/selected-patient-context';
+import {PatientContextAuthorisation} from '../../../patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../../patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../patient-context/services/selected-patient-state';
+import {DOCUMENT_MAXIMUM_FILE_SIZE_BYTES} from '../../models/document-constraints';
+import {DOCUMENT_TYPES, DocumentType, getDocumentTypeLabel} from '../../models/document-model';
+import {DocumentApiService} from '../../services/document-api-service';
 
 /**
  * Uploads appointment and consultation documents for the selected patient.

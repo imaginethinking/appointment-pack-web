@@ -1,14 +1,14 @@
-import { DatePipe } from '@angular/common';
-import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { map, of, Subscription, switchMap } from 'rxjs';
+import {DatePipe} from '@angular/common';
+import {Component, computed, inject, OnDestroy, OnInit, signal} from '@angular/core';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {map, of, Subscription, switchMap} from 'rxjs';
 
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
-import { formatFileSize } from '../../../../shared/utils/formatting';
-import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {hasHttpStatus} from '../../../../core/http/http-problem-detail';
+import {formatFileSize} from '../../../../shared/utils/formatting';
+import {PatientContextAuthorisation} from '../../../patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../../patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../patient-context/services/selected-patient-state';
 import {
   canArchiveDocument,
   canExtractDocument,
@@ -19,7 +19,7 @@ import {
   getDocumentTypeLabel,
   getSummarySourceLabel,
 } from '../../models/document-model';
-import { DocumentApiService } from '../../services/document-api-service';
+import {DocumentApiService} from '../../services/document-api-service';
 
 type DocumentDetailsStatus = 'loading' | 'ready' | 'not-found' | 'forbidden' | 'error';
 

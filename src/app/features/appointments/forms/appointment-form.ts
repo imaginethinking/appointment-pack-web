@@ -1,8 +1,8 @@
-import { AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import {AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
 
-import { PartialAddressRequest } from '../../../shared/models/address-model';
-import { normaliseOptionalText } from '../../../shared/utils/formatting';
-import { AppointmentRequest } from '../models/appointment-model';
+import {PartialAddressRequest} from '../../../shared/models/address-model';
+import {normaliseOptionalText} from '../../../shared/utils/formatting';
+import {AppointmentRequest} from '../models/appointment-model';
 
 /**
  * Contains appointment values that can be loaded into the shared appointment form.

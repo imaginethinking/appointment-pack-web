@@ -1,7 +1,13 @@
-import { AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import {AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
 
-import { normaliseOptionalText } from '../../../shared/utils/formatting';
-import { BloodType, HeightUnit, PatientRecordRequest, PatientRecordResponse, WeightUnit } from '../models/patient-record-model';
+import {normaliseOptionalText} from '../../../shared/utils/formatting';
+import {
+  BloodType,
+  HeightUnit,
+  PatientRecordRequest,
+  PatientRecordResponse,
+  WeightUnit
+} from '../models/patient-record-model';
 
 /**
  * Creates the form used to enter healthcare identifiers measurements and blood type.

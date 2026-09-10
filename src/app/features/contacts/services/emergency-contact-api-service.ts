@@ -1,9 +1,13 @@
-import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import {inject, Injectable} from '@angular/core';
+import {Observable} from 'rxjs';
 
-import { environment } from '../../../../environments/environment';
-import { CreateEmergencyContactRequest, EmergencyContactResponse, UpdateEmergencyContactRequest } from '../models/emergency-contact-model';
+import {environment} from '../../../../environments/environment';
+import {
+  CreateEmergencyContactRequest,
+  EmergencyContactResponse,
+  UpdateEmergencyContactRequest
+} from '../models/emergency-contact-model';
 
 /**
  * Provides the API calls used to manage emergency contacts.

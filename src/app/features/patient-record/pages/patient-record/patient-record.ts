@@ -1,15 +1,15 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import {Component, computed, effect, inject, signal} from '@angular/core';
+import {RouterLink} from '@angular/router';
 
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
-import { formatEnumLabel } from '../../../../shared/utils/formatting';
-import { getPatientContextName } from '../../../patient-context/models/selected-patient-context';
-import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import { PatientRecordResponse } from '../../models/patient-record-model';
-import { PatientRecordApiService } from '../../services/patient-record-api-service';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {hasHttpStatus} from '../../../../core/http/http-problem-detail';
+import {formatEnumLabel} from '../../../../shared/utils/formatting';
+import {getPatientContextName} from '../../../patient-context/models/selected-patient-context';
+import {PatientContextAuthorisation} from '../../../patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../../patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../patient-context/services/selected-patient-state';
+import {PatientRecordResponse} from '../../models/patient-record-model';
+import {PatientRecordApiService} from '../../services/patient-record-api-service';
 
 type PatientRecordPageStatus = 'loading' | 'ready' | 'no-selection' | 'forbidden' | 'not-found' | 'error';
 

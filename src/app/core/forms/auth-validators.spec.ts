@@ -1,9 +1,9 @@
 // These tests cover the shared account validators rather than Angular's built-in required/email rules.
 // The system time is fixed where dates are involved so results do not change depending on when tests run.
 
-import { FormControl, FormGroup } from '@angular/forms';
+import {FormControl, FormGroup} from '@angular/forms';
 
-import { matchingControlsValidator, pastDateValidator, strongPasswordValidator } from './auth-validators';
+import {matchingControlsValidator, pastDateValidator, strongPasswordValidator} from './auth-validators';
 
 describe('authentication validators', () => {
   // Restores real timers after any test that uses a fixed date.

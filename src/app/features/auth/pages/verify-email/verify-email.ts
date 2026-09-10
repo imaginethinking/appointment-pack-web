@@ -1,11 +1,11 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import {Component, inject, OnInit, signal} from '@angular/core';
+import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {ActivatedRoute, RouterLink} from '@angular/router';
+import {finalize} from 'rxjs';
 
-import { applyServerFieldErrors, clearServerFieldErrors } from '../../../../core/forms/server-field-errors';
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { AuthApiService } from '../../../../core/services/auth-api-service';
+import {applyServerFieldErrors, clearServerFieldErrors} from '../../../../core/forms/server-field-errors';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {AuthApiService} from '../../../../core/services/auth-api-service';
 
 type VerificationState = 'pending' | 'confirming' | 'confirmed' | 'failed';
 

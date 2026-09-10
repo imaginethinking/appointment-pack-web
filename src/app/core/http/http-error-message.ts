@@ -1,6 +1,6 @@
-import { HttpErrorResponse } from '@angular/common/http';
+import {HttpErrorResponse} from '@angular/common/http';
 
-import { getHttpProblemDetail } from './http-problem-detail';
+import {getHttpProblemDetail} from './http-problem-detail';
 
 /**
  * Returns a useful message to show for an HTTP or application error.

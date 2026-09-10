@@ -1,10 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import {Component, inject, signal} from '@angular/core';
+import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {ActivatedRoute, Router} from '@angular/router';
+import {finalize} from 'rxjs';
 
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { AuthService } from '../../../../core/services/auth-service';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {AuthService} from '../../../../core/services/auth-service';
 
 /**
  * Completes a pending login using the six digit code from the user's authenticator.

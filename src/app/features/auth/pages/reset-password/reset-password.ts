@@ -1,12 +1,12 @@
-import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import {Component, inject, signal} from '@angular/core';
+import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {finalize} from 'rxjs';
 
-import { matchingControlsValidator, strongPasswordValidator } from '../../../../core/forms/auth-validators';
-import { applyServerFieldErrors, clearServerFieldErrors } from '../../../../core/forms/server-field-errors';
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { AuthApiService } from '../../../../core/services/auth-api-service';
+import {matchingControlsValidator, strongPasswordValidator} from '../../../../core/forms/auth-validators';
+import {applyServerFieldErrors, clearServerFieldErrors} from '../../../../core/forms/server-field-errors';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {AuthApiService} from '../../../../core/services/auth-api-service';
 
 /**
  * Lets the user choose a new password from a valid password reset link.

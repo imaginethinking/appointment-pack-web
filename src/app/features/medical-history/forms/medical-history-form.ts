@@ -1,7 +1,11 @@
-import { AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import {AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
 
-import { pastOrPresentDateValidator } from '../../../core/forms/date-validators';
-import { CreateMedicalHistoryEntryRequest, MedicalHistoryEntryResponse, UpdateMedicalHistoryEntryRequest } from '../models/medical-history-model';
+import {pastOrPresentDateValidator} from '../../../core/forms/date-validators';
+import {
+  CreateMedicalHistoryEntryRequest,
+  MedicalHistoryEntryResponse,
+  UpdateMedicalHistoryEntryRequest
+} from '../models/medical-history-model';
 
 /**
  * Creates the form used to enter a Medical History entry.

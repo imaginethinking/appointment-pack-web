@@ -1,7 +1,7 @@
-import { Component, input } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import {Component, input} from '@angular/core';
+import {ReactiveFormsModule} from '@angular/forms';
 
-import { HealthcareContactForm } from '../../forms/healthcare-contact-form';
+import {HealthcareContactForm} from '../../forms/healthcare-contact-form';
 
 /**
  * Displays the shared fields used for creating and editing healthcare contacts.

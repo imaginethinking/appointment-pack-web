@@ -1,4 +1,4 @@
-import { AddressResponse } from '../models/address-model';
+import {AddressResponse} from '../models/address-model';
 
 /**
  * Converts an enum value into a readable label for display.

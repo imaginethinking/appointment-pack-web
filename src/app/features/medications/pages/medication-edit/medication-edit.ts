@@ -1,18 +1,18 @@
-import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
+import {FormBuilder, ReactiveFormsModule} from '@angular/forms';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {finalize} from 'rxjs';
 
-import { applyServerFieldErrors, clearServerFieldErrors } from '../../../../core/forms/server-field-errors';
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
-import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import { MedicationFormFields } from '../../components/medication-form-fields/medication-form-fields';
-import { createMedicationForm, mapMedicationFormToRequest, resetMedicationForm } from '../../forms/medication-form';
-import { MedicationResponse } from '../../models/medication-model';
-import { MedicationApiService } from '../../services/medication-api-service';
+import {applyServerFieldErrors, clearServerFieldErrors} from '../../../../core/forms/server-field-errors';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {hasHttpStatus} from '../../../../core/http/http-problem-detail';
+import {PatientContextAuthorisation} from '../../../patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../../patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../patient-context/services/selected-patient-state';
+import {MedicationFormFields} from '../../components/medication-form-fields/medication-form-fields';
+import {createMedicationForm, mapMedicationFormToRequest, resetMedicationForm} from '../../forms/medication-form';
+import {MedicationResponse} from '../../models/medication-model';
+import {MedicationApiService} from '../../services/medication-api-service';
 
 type MedicationEditStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 

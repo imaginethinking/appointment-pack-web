@@ -1,11 +1,11 @@
-import { Component, inject } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import {Component, inject} from '@angular/core';
+import {Router, RouterLink, RouterLinkActive} from '@angular/router';
 
-import { Permission } from '../../../core/models/permission-model';
-import { AuthService } from '../../../core/services/auth-service';
-import { PatientContextAuthorisation } from '../../../features/patient-context/services/patient-context-auth';
-import { SelectedPatientState } from '../../../features/patient-context/services/selected-patient-state';
-import { PatientContextSelector } from '../patient-context-selector/patient-context-selector';
+import {Permission} from '../../../core/models/permission-model';
+import {AuthService} from '../../../core/services/auth-service';
+import {PatientContextAuthorisation} from '../../../features/patient-context/services/patient-context-auth';
+import {SelectedPatientState} from '../../../features/patient-context/services/selected-patient-state';
+import {PatientContextSelector} from '../patient-context-selector/patient-context-selector';
 
 /**
  * Describes a link shown in the main navigation.

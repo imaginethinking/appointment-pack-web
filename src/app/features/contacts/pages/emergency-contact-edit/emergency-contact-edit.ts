@@ -1,18 +1,22 @@
-import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
+import {FormBuilder, ReactiveFormsModule} from '@angular/forms';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {finalize} from 'rxjs';
 
-import { applyServerFieldErrors, clearServerFieldErrors } from '../../../../core/forms/server-field-errors';
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
-import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import { EmergencyContactFormFields } from '../../components/emergency-contact-form-fields/emergency-contact-form-fields';
-import { createEmergencyContactForm, mapEmergencyContactFormToRequest, resetEmergencyContactForm } from '../../forms/emergency-contact-form';
-import { EmergencyContactResponse } from '../../models/emergency-contact-model';
-import { EmergencyContactApiService } from '../../services/emergency-contact-api-service';
+import {applyServerFieldErrors, clearServerFieldErrors} from '../../../../core/forms/server-field-errors';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {hasHttpStatus} from '../../../../core/http/http-problem-detail';
+import {PatientContextAuthorisation} from '../../../patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../../patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../patient-context/services/selected-patient-state';
+import {EmergencyContactFormFields} from '../../components/emergency-contact-form-fields/emergency-contact-form-fields';
+import {
+  createEmergencyContactForm,
+  mapEmergencyContactFormToRequest,
+  resetEmergencyContactForm
+} from '../../forms/emergency-contact-form';
+import {EmergencyContactResponse} from '../../models/emergency-contact-model';
+import {EmergencyContactApiService} from '../../services/emergency-contact-api-service';
 
 type EmergencyContactEditStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 

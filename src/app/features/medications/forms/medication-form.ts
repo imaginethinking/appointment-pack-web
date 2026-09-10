@@ -1,7 +1,7 @@
-import { AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import {AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
 
-import { normaliseOptionalText } from '../../../shared/utils/formatting';
-import { MedicationRequest, MedicationResponse } from '../models/medication-model';
+import {normaliseOptionalText} from '../../../shared/utils/formatting';
+import {MedicationRequest, MedicationResponse} from '../models/medication-model';
 
 /**
  * Creates the form used to enter medication details.

@@ -1,9 +1,9 @@
-import { HttpClient, HttpResponse } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import {HttpClient, HttpResponse} from '@angular/common/http';
+import {inject, Injectable} from '@angular/core';
+import {Observable} from 'rxjs';
 
-import { environment } from '../../../../environments/environment';
-import { AppointmentPackGenerationRequest, AppointmentPackResponse } from '../models/appointment-pack-model';
+import {environment} from '../../../../environments/environment';
+import {AppointmentPackGenerationRequest, AppointmentPackResponse} from '../models/appointment-pack-model';
 
 /**
  * Handles requests for creating viewing downloading and archiving Appointment Packs.

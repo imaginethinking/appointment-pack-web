@@ -1,10 +1,10 @@
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
+import {HttpErrorResponse, HttpInterceptorFn} from '@angular/common/http';
+import {inject} from '@angular/core';
+import {Router} from '@angular/router';
+import {catchError, throwError} from 'rxjs';
 
-import { environment } from '../../../environments/environment';
-import { AuthService } from '../services/auth-service';
+import {environment} from '../../../environments/environment';
+import {AuthService} from '../services/auth-service';
 
 /**
  * Adds the current access token to protected API requests and clears the

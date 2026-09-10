@@ -1,8 +1,8 @@
-import { inject } from '@angular/core';
-import { CanActivateFn } from '@angular/router';
-import { catchError, map, of } from 'rxjs';
+import {inject} from '@angular/core';
+import {CanActivateFn} from '@angular/router';
+import {catchError, map, of} from 'rxjs';
 
-import { PatientContextCoordinator } from '../../features/patient-context/services/patient-context-coordinator';
+import {PatientContextCoordinator} from '../../features/patient-context/services/patient-context-coordinator';
 
 /**
  * Attempts to load the state needed for patient selection before the route

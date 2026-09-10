@@ -1,9 +1,9 @@
-import { Component, inject, input } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import {Component, inject, input} from '@angular/core';
+import {FormBuilder, ReactiveFormsModule} from '@angular/forms';
 
-import { formatEnumLabel } from '../../../../shared/utils/formatting';
-import { addBloodTestResult, BloodTestForm, removeBloodTestResult } from '../../forms/blood-test-form';
-import { BLOOD_TEST_RESULT_FLAGS } from '../../models/blood-test-model';
+import {formatEnumLabel} from '../../../../shared/utils/formatting';
+import {addBloodTestResult, BloodTestForm, removeBloodTestResult} from '../../forms/blood-test-form';
+import {BLOOD_TEST_RESULT_FLAGS} from '../../models/blood-test-model';
 
 /**
  * Displays the shared fields used for entering a blood test and its results.

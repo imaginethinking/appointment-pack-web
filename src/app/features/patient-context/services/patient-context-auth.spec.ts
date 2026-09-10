@@ -1,9 +1,9 @@
 // These tests check the frontend permission rules for the currently selected patient.
 // Spring still makes the final security decision, but the frontend should hide or block invalid actions consistently.
 
-import { Permission } from '../../../core/models/permission-model';
-import { SelectedPatientContext } from '../models/selected-patient-context';
-import { PatientContextAuthorisation } from './patient-context-auth';
+import {Permission} from '../../../core/models/permission-model';
+import {SelectedPatientContext} from '../models/selected-patient-context';
+import {PatientContextAuthorisation} from './patient-context-auth';
 
 describe('PatientContextAuthorisation', () => {
   const authorisation = new PatientContextAuthorisation();

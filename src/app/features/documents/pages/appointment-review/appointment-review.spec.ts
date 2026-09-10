@@ -1,20 +1,20 @@
 // Appointment review contains patient-specific extracted clinical/administrative text.
 // These tests protect the patient-switch safety rule and confirm that reviewed form values are submitted.
 
-import { signal, WritableSignal } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder } from '@angular/forms';
-import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
-import { of } from 'rxjs';
+import {signal, WritableSignal} from '@angular/core';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {FormBuilder} from '@angular/forms';
+import {ActivatedRoute, convertToParamMap, Router} from '@angular/router';
+import {of} from 'rxjs';
 
-import { AppointmentResponse } from '../../../appointments/models/appointment-model';
-import { SelectedPatientContext } from '../../../patient-context/models/selected-patient-context';
-import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import { DocumentProcessingResultResponse, DocumentResponse } from '../../models/document-model';
-import { DocumentApiService } from '../../services/document-api-service';
-import { AppointmentReview } from './appointment-review';
+import {AppointmentResponse} from '../../../appointments/models/appointment-model';
+import {SelectedPatientContext} from '../../../patient-context/models/selected-patient-context';
+import {PatientContextAuthorisation} from '../../../patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../../patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../patient-context/services/selected-patient-state';
+import {DocumentProcessingResultResponse, DocumentResponse} from '../../models/document-model';
+import {DocumentApiService} from '../../services/document-api-service';
+import {AppointmentReview} from './appointment-review';
 
 describe('AppointmentReview', () => {
   let fixture: ComponentFixture<AppointmentReview>;

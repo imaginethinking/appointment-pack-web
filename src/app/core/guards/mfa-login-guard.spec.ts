@@ -1,10 +1,10 @@
 // These tests protect the MFA login route so it is only used while a login challenge is actually pending.
 
-import { TestBed } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, provideRouter, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import {TestBed} from '@angular/core/testing';
+import {ActivatedRouteSnapshot, provideRouter, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
 
-import { AuthService } from '../services/auth-service';
-import { mfaLoginGuard } from './mfa-login-guard';
+import {AuthService} from '../services/auth-service';
+import {mfaLoginGuard} from './mfa-login-guard';
 
 describe('mfaLoginGuard', () => {
   let authService: {

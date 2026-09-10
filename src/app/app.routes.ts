@@ -1,10 +1,10 @@
-import { Routes } from '@angular/router';
+import {Routes} from '@angular/router';
 
-import { adminGuard } from './core/guards/admin-guard';
-import { authGuard } from './core/guards/auth-guard';
-import { mfaLoginGuard } from './core/guards/mfa-login-guard';
-import { patientContextLoadGuard } from './core/guards/patient-context-load-guard';
-import { selectedPatientPermissionGuard } from './core/guards/selected-patient-permission-guard';
+import {adminGuard} from './core/guards/admin-guard';
+import {authGuard} from './core/guards/auth-guard';
+import {mfaLoginGuard} from './core/guards/mfa-login-guard';
+import {patientContextLoadGuard} from './core/guards/patient-context-load-guard';
+import {selectedPatientPermissionGuard} from './core/guards/selected-patient-permission-guard';
 
 export const routes: Routes = [
   // Public account pages that can be opened without signing in.

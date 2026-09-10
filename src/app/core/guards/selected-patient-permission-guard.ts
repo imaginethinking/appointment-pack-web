@@ -1,10 +1,10 @@
-import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import {inject} from '@angular/core';
+import {CanActivateFn, Router} from '@angular/router';
 
-import { PermissionRequirement } from '../models/permission-model';
-import { PatientContextAuthorisation } from '../../features/patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../features/patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../features/patient-context/services/selected-patient-state';
+import {PermissionRequirement} from '../models/permission-model';
+import {PatientContextAuthorisation} from '../../features/patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../features/patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../features/patient-context/services/selected-patient-state';
 
 /**
  * Checks the selected patient against the permission required by the route.

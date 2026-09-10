@@ -1,15 +1,15 @@
-import { DatePipe } from '@angular/common';
-import { Component, computed, effect, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import {DatePipe} from '@angular/common';
+import {Component, computed, effect, inject, signal} from '@angular/core';
+import {RouterLink} from '@angular/router';
 
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
-import { getPatientContextName } from '../../../patient-context/models/selected-patient-context';
-import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import { MedicationResponse } from '../../models/medication-model';
-import { MedicationApiService } from '../../services/medication-api-service';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {hasHttpStatus} from '../../../../core/http/http-problem-detail';
+import {getPatientContextName} from '../../../patient-context/models/selected-patient-context';
+import {PatientContextAuthorisation} from '../../../patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../../patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../patient-context/services/selected-patient-state';
+import {MedicationResponse} from '../../models/medication-model';
+import {MedicationApiService} from '../../services/medication-api-service';
 
 type MedicationListStatus = 'loading' | 'ready' | 'no-patient' | 'forbidden' | 'error';
 

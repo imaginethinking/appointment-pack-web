@@ -1,4 +1,4 @@
-import { Permission, PermissionGroup, PermissionOption, PERMISSION_GROUPS } from '../../../core/models/permission-model';
+import {Permission, PERMISSION_GROUPS, PermissionGroup, PermissionOption} from '../../../core/models/permission-model';
 
 export type CareNetworkPermissionOption = PermissionOption;
 export type CareNetworkPermissionGroup = PermissionGroup;

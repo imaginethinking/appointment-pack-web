@@ -1,4 +1,4 @@
-import { AddressResponse, PartialAddressRequest } from '../../../shared/models/address-model';
+import {AddressResponse, PartialAddressRequest} from '../../../shared/models/address-model';
 
 export interface AppointmentRequest {
   date: string;

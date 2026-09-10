@@ -1,16 +1,16 @@
-import { DatePipe } from '@angular/common';
-import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import {DatePipe} from '@angular/common';
+import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {finalize} from 'rxjs';
 
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
-import { getDocumentTypeLabel } from '../../../documents/models/document-model';
-import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import { getMedicalHistorySourceLabel, MedicalHistoryEntryResponse } from '../../models/medical-history-model';
-import { MedicalHistoryApiService } from '../../services/medical-history-api-service';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {hasHttpStatus} from '../../../../core/http/http-problem-detail';
+import {getDocumentTypeLabel} from '../../../documents/models/document-model';
+import {PatientContextAuthorisation} from '../../../patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../../patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../patient-context/services/selected-patient-state';
+import {getMedicalHistorySourceLabel, MedicalHistoryEntryResponse} from '../../models/medical-history-model';
+import {MedicalHistoryApiService} from '../../services/medical-history-api-service';
 
 type MedicalHistoryDetailsStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 

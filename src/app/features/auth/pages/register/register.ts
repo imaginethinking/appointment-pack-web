@@ -1,14 +1,18 @@
-import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import {Component, inject, signal} from '@angular/core';
+import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Router, RouterLink} from '@angular/router';
+import {finalize} from 'rxjs';
 
-import { matchingControlsValidator, pastDateValidator, strongPasswordValidator } from '../../../../core/forms/auth-validators';
-import { applyServerFieldErrors, clearServerFieldErrors } from '../../../../core/forms/server-field-errors';
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
-import { RegisterRequest } from '../../../../core/models/auth-model';
-import { AuthApiService } from '../../../../core/services/auth-api-service';
+import {
+  matchingControlsValidator,
+  pastDateValidator,
+  strongPasswordValidator
+} from '../../../../core/forms/auth-validators';
+import {applyServerFieldErrors, clearServerFieldErrors} from '../../../../core/forms/server-field-errors';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {hasHttpStatus} from '../../../../core/http/http-problem-detail';
+import {RegisterRequest} from '../../../../core/models/auth-model';
+import {AuthApiService} from '../../../../core/services/auth-api-service';
 
 /**
  * Collects the details needed to create a new account.

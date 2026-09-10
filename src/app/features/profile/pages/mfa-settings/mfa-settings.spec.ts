@@ -1,11 +1,11 @@
 // This is intentionally a small component test. It checks that the page asks the backend for MFA status
 // instead of assuming the browser already knows whether MFA is enabled.
 
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {of} from 'rxjs';
 
-import { AuthService } from '../../../../core/services/auth-service';
-import { MfaSettings } from './mfa-settings';
+import {AuthService} from '../../../../core/services/auth-service';
+import {MfaSettings} from './mfa-settings';
 
 describe('MfaSettings', () => {
   let fixture: ComponentFixture<MfaSettings>;

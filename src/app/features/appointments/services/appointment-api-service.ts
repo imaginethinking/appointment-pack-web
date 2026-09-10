@@ -1,9 +1,9 @@
-import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import {inject, Injectable} from '@angular/core';
+import {Observable} from 'rxjs';
 
-import { environment } from '../../../../environments/environment';
-import { AppointmentResponse, CreateAppointmentRequest, UpdateAppointmentRequest } from '../models/appointment-model';
+import {environment} from '../../../../environments/environment';
+import {AppointmentResponse, CreateAppointmentRequest, UpdateAppointmentRequest} from '../models/appointment-model';
 
 /**
  * Provides the API calls used to manage appointments.

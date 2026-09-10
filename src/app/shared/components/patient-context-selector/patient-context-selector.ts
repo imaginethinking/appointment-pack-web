@@ -1,8 +1,11 @@
-import { Component, ElementRef, HostListener, computed, inject, input, signal, viewChild } from '@angular/core';
+import {Component, computed, ElementRef, HostListener, inject, input, signal, viewChild} from '@angular/core';
 
-import { getPatientContextName, SelectedPatientContext } from '../../../features/patient-context/models/selected-patient-context';
-import { PatientContextCoordinator } from '../../../features/patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../features/patient-context/services/selected-patient-state';
+import {
+  getPatientContextName,
+  SelectedPatientContext
+} from '../../../features/patient-context/models/selected-patient-context';
+import {PatientContextCoordinator} from '../../../features/patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../features/patient-context/services/selected-patient-state';
 
 /**
  * Shows the current patient and lets the user switch between patient records they can access.

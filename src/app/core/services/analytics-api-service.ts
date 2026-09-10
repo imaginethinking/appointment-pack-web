@@ -1,9 +1,9 @@
-import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import {inject, Injectable} from '@angular/core';
+import {Observable} from 'rxjs';
 
-import { environment } from '../../../environments/environment';
-import { ApplicationPage, PageViewRequest } from '../models/application-page-model';
+import {environment} from '../../../environments/environment';
+import {ApplicationPage, PageViewRequest} from '../models/application-page-model';
 
 /**
  * Sends application page views to the analytics API.

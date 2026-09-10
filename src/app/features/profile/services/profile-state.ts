@@ -1,8 +1,8 @@
-import { inject, Injectable, signal } from '@angular/core';
-import { finalize, Observable, tap } from 'rxjs';
+import {inject, Injectable, signal} from '@angular/core';
+import {finalize, Observable, tap} from 'rxjs';
 
-import { ProfileResponse, UpdateProfileRequest } from '../models/profile-model';
-import { ProfileApiService } from './profile-api-service';
+import {ProfileResponse, UpdateProfileRequest} from '../models/profile-model';
+import {ProfileApiService} from './profile-api-service';
 
 /**
  * Keeps the current profile and its loading and saving state available across the application.

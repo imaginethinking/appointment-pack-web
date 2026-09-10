@@ -1,10 +1,10 @@
 // Field validation errors can target normal controls or nested FormArray rows.
 // These tests cover the shared helpers used to apply and clear those errors.
 
-import { HttpErrorResponse } from '@angular/common/http';
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import {HttpErrorResponse} from '@angular/common/http';
+import {FormArray, FormControl, FormGroup, Validators} from '@angular/forms';
 
-import { applyServerFieldErrors, clearServerFieldError, clearServerFieldErrors } from './server-field-errors';
+import {applyServerFieldErrors, clearServerFieldError, clearServerFieldErrors} from './server-field-errors';
 
 describe('server field error helpers', () => {
   // Checks a normal field error is applied to the matching control and marked as touched.

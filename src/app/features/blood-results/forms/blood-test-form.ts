@@ -1,8 +1,8 @@
-import { AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import {AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
 
-import { pastOrPresentDateValidator } from '../../../core/forms/date-validators';
-import { normaliseOptionalText } from '../../../shared/utils/formatting';
-import { BloodTestRequest, BloodTestResponse, BloodTestResultResponse } from '../models/blood-test-model';
+import {pastOrPresentDateValidator} from '../../../core/forms/date-validators';
+import {normaliseOptionalText} from '../../../shared/utils/formatting';
+import {BloodTestRequest, BloodTestResponse, BloodTestResultResponse} from '../models/blood-test-model';
 
 /**
  * Creates the form used to enter a blood test and its results.

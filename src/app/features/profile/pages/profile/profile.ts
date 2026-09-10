@@ -1,9 +1,9 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { DatePipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import {Component, inject, OnInit, signal} from '@angular/core';
+import {DatePipe} from '@angular/common';
+import {RouterLink} from '@angular/router';
 
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { ProfileState } from '../../services/profile-state';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {ProfileState} from '../../services/profile-state';
 
 /**
  * Displays the current user's profile information.

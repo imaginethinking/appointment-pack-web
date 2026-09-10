@@ -1,8 +1,8 @@
 // Clinical dates can normally be today or in the past, unlike date of birth which must be earlier than today.
 
-import { FormControl } from '@angular/forms';
+import {FormControl} from '@angular/forms';
 
-import { pastOrPresentDateValidator } from './date-validators';
+import {pastOrPresentDateValidator} from './date-validators';
 
 describe('pastOrPresentDateValidator', () => {
   // Uses one fixed date for every test so the expected result remains deterministic.

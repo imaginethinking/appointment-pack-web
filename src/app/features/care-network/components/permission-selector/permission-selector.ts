@@ -1,7 +1,7 @@
-import { Component, input, output } from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
-import { Permission } from '../../../../core/models/permission-model';
-import { CARE_NETWORK_PERMISSION_GROUPS } from '../../models/patient-carer-access-model';
+import {Permission} from '../../../../core/models/permission-model';
+import {CARE_NETWORK_PERMISSION_GROUPS} from '../../models/patient-carer-access-model';
 
 /**
  * Contains the permission and selected state produced by the permission selector.

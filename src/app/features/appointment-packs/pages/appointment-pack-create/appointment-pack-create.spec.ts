@@ -1,28 +1,28 @@
 // Appointment packs combine several patient resources, so the useful frontend tests are mainly selection and permission rules.
 // The tests use real PatientContextAuthorisation with mocked feature APIs to keep the permission behaviour realistic.
 
-import { signal, WritableSignal } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { Router } from '@angular/router';
-import { of } from 'rxjs';
+import {signal, WritableSignal} from '@angular/core';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {FormBuilder, FormGroup} from '@angular/forms';
+import {Router} from '@angular/router';
+import {of} from 'rxjs';
 
-import { Permission } from '../../../../core/models/permission-model';
-import { AppointmentResponse } from '../../../appointments/models/appointment-model';
-import { AppointmentApiService } from '../../../appointments/services/appointment-api-service';
-import { BloodTestApiService } from '../../../blood-results/services/blood-test-api-service';
-import { EmergencyContactApiService } from '../../../contacts/services/emergency-contact-api-service';
-import { HealthcareContactApiService } from '../../../contacts/services/healthcare-contact-api-service';
-import { MedicalHistoryApiService } from '../../../medical-history/services/medical-history-api-service';
-import { MedicationResponse } from '../../../medications/models/medication-model';
-import { MedicationApiService } from '../../../medications/services/medication-api-service';
-import { SelectedPatientContext } from '../../../patient-context/models/selected-patient-context';
-import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import { AppointmentPackResponse } from '../../models/appointment-pack-model';
-import { AppointmentPackApiService } from '../../services/appointment-pack-api-service';
-import { AppointmentPackCreate } from './appointment-pack-create';
+import {Permission} from '../../../../core/models/permission-model';
+import {AppointmentResponse} from '../../../appointments/models/appointment-model';
+import {AppointmentApiService} from '../../../appointments/services/appointment-api-service';
+import {BloodTestApiService} from '../../../blood-results/services/blood-test-api-service';
+import {EmergencyContactApiService} from '../../../contacts/services/emergency-contact-api-service';
+import {HealthcareContactApiService} from '../../../contacts/services/healthcare-contact-api-service';
+import {MedicalHistoryApiService} from '../../../medical-history/services/medical-history-api-service';
+import {MedicationResponse} from '../../../medications/models/medication-model';
+import {MedicationApiService} from '../../../medications/services/medication-api-service';
+import {SelectedPatientContext} from '../../../patient-context/models/selected-patient-context';
+import {PatientContextAuthorisation} from '../../../patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../../patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../patient-context/services/selected-patient-state';
+import {AppointmentPackResponse} from '../../models/appointment-pack-model';
+import {AppointmentPackApiService} from '../../services/appointment-pack-api-service';
+import {AppointmentPackCreate} from './appointment-pack-create';
 
 describe('AppointmentPackCreate', () => {
   let fixture: ComponentFixture<AppointmentPackCreate> | null = null;

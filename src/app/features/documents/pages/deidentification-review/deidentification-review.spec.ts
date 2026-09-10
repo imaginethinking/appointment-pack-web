@@ -1,19 +1,19 @@
 // De-identification review is the privacy checkpoint before consultation text can be summarised.
 // These tests protect both the exact reviewed-text submission and removal of old patient data after a context switch.
 
-import { signal, WritableSignal } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
-import { of } from 'rxjs';
+import {signal, WritableSignal} from '@angular/core';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {FormBuilder, FormGroup} from '@angular/forms';
+import {ActivatedRoute, convertToParamMap, Router} from '@angular/router';
+import {of} from 'rxjs';
 
-import { SelectedPatientContext } from '../../../patient-context/models/selected-patient-context';
-import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import { DocumentProcessingResultResponse, DocumentResponse } from '../../models/document-model';
-import { DocumentApiService } from '../../services/document-api-service';
-import { DeidentificationReview } from './deidentification-review';
+import {SelectedPatientContext} from '../../../patient-context/models/selected-patient-context';
+import {PatientContextAuthorisation} from '../../../patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../../patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../patient-context/services/selected-patient-state';
+import {DocumentProcessingResultResponse, DocumentResponse} from '../../models/document-model';
+import {DocumentApiService} from '../../services/document-api-service';
+import {DeidentificationReview} from './deidentification-review';
 
 describe('DeidentificationReview', () => {
   let fixture: ComponentFixture<DeidentificationReview>;

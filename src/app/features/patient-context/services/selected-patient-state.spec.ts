@@ -1,18 +1,18 @@
 // SelectedPatientState decides which patient the rest of the application is working with.
 // These tests mainly protect refresh persistence and the fallback behaviour when access changes.
 
-import { signal } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import {signal} from '@angular/core';
+import {TestBed} from '@angular/core/testing';
 
-import { Permission } from '../../../core/models/permission-model';
-import { PatientCarerAccessResponse } from '../../care-network/models/patient-carer-access-model';
-import { PatientCarerAccessState } from '../../care-network/services/patient-carer-access-state';
-import { PatientRecordResponse } from '../../patient-record/models/patient-record-model';
-import { PersonalPatientRecordState } from '../../patient-record/services/personal-patient-record-state';
-import { ProfileResponse } from '../../profile/models/profile-model';
-import { ProfileState } from '../../profile/services/profile-state';
-import { PatientContextAuthorisation } from './patient-context-auth';
-import { SelectedPatientState } from './selected-patient-state';
+import {Permission} from '../../../core/models/permission-model';
+import {PatientCarerAccessResponse} from '../../care-network/models/patient-carer-access-model';
+import {PatientCarerAccessState} from '../../care-network/services/patient-carer-access-state';
+import {PatientRecordResponse} from '../../patient-record/models/patient-record-model';
+import {PersonalPatientRecordState} from '../../patient-record/services/personal-patient-record-state';
+import {ProfileResponse} from '../../profile/models/profile-model';
+import {ProfileState} from '../../profile/services/profile-state';
+import {PatientContextAuthorisation} from './patient-context-auth';
+import {SelectedPatientState} from './selected-patient-state';
 
 describe('SelectedPatientState', () => {
   const storageKey = 'appointmentPack.selectedPatientRecordId';

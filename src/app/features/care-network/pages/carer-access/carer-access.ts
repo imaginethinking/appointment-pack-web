@@ -1,15 +1,15 @@
-import { DatePipe } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import {DatePipe} from '@angular/common';
+import {Component, computed, inject, signal} from '@angular/core';
+import {Router} from '@angular/router';
+import {finalize} from 'rxjs';
 
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import { CareNetworkTabs } from '../../components/care-network-tabs/care-network-tabs';
-import { PermissionBadges } from '../../components/permission-badges/permission-badges';
-import { PatientCarerAccessResponse } from '../../models/patient-carer-access-model';
-import { PatientCarerAccessState } from '../../services/patient-carer-access-state';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {PatientContextCoordinator} from '../../../patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../patient-context/services/selected-patient-state';
+import {CareNetworkTabs} from '../../components/care-network-tabs/care-network-tabs';
+import {PermissionBadges} from '../../components/permission-badges/permission-badges';
+import {PatientCarerAccessResponse} from '../../models/patient-carer-access-model';
+import {PatientCarerAccessState} from '../../services/patient-carer-access-state';
 
 /**
  * Shows patient records the current user has been invited to access as a carer.

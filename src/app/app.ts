@@ -1,11 +1,11 @@
-import { DOCUMENT } from '@angular/common';
-import { Component, effect, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import {DOCUMENT} from '@angular/common';
+import {Component, effect, inject} from '@angular/core';
+import {RouterOutlet} from '@angular/router';
 
-import { AuthService } from './core/services/auth-service';
-import { PageTelemetryService } from './core/services/page-telemetry-service';
-import { PatientContextCoordinator } from './features/patient-context/services/patient-context-coordinator';
-import { Navbar } from './shared/components/navbar/navbar';
+import {AuthService} from './core/services/auth-service';
+import {PageTelemetryService} from './core/services/page-telemetry-service';
+import {PatientContextCoordinator} from './features/patient-context/services/patient-context-coordinator';
+import {Navbar} from './shared/components/navbar/navbar';
 
 /**
  * Hosts the main application layout and loads shared patient context for signed in sessions.

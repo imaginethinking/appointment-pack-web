@@ -1,12 +1,12 @@
-import { signal } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
-import { describe, expect, it, vi } from 'vitest';
+import {signal} from '@angular/core';
+import {TestBed} from '@angular/core/testing';
+import {provideRouter} from '@angular/router';
+import {describe, expect, it, vi} from 'vitest';
 
-import { App } from './app';
-import { AuthService } from './core/services/auth-service';
-import { PageTelemetryService } from './core/services/page-telemetry-service';
-import { PatientContextCoordinator } from './features/patient-context/services/patient-context-coordinator';
+import {App} from './app';
+import {AuthService} from './core/services/auth-service';
+import {PageTelemetryService} from './core/services/page-telemetry-service';
+import {PatientContextCoordinator} from './features/patient-context/services/patient-context-coordinator';
 
 
 describe('App', () => {

@@ -1,12 +1,12 @@
 // This small test checks the normal patient-context loading path before authenticated routes are entered.
 // The known load-failure UX is deliberately not locked into a test because it is planned for final hardening.
 
-import { TestBed } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { firstValueFrom, Observable, of } from 'rxjs';
+import {TestBed} from '@angular/core/testing';
+import {ActivatedRouteSnapshot, RouterStateSnapshot} from '@angular/router';
+import {firstValueFrom, Observable, of} from 'rxjs';
 
-import { PatientContextCoordinator } from '../../features/patient-context/services/patient-context-coordinator';
-import { patientContextLoadGuard } from './patient-context-load-guard';
+import {PatientContextCoordinator} from '../../features/patient-context/services/patient-context-coordinator';
+import {patientContextLoadGuard} from './patient-context-load-guard';
 
 describe('patientContextLoadGuard', () => {
   let coordinator: {

@@ -1,23 +1,14 @@
-import { DatePipe } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  ReactiveFormsModule,
-  ValidationErrors,
-  ValidatorFn,
-} from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import {DatePipe} from '@angular/common';
+import {Component, inject, OnInit, signal} from '@angular/core';
+import {AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn,} from '@angular/forms';
+import {RouterLink} from '@angular/router';
 
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
-import { getApplicationPageLabel } from '../../../../core/models/application-page-model';
-import { formatEnumLabel } from '../../../../shared/utils/formatting';
-import {
-  getPatientActivityActionLabel,
-  getPatientResourceTypeLabel,
-} from '../../../audit/models/patient-audit-model';
-import { getDocumentTypeLabel } from '../../../documents/models/document-model';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {hasHttpStatus} from '../../../../core/http/http-problem-detail';
+import {getApplicationPageLabel} from '../../../../core/models/application-page-model';
+import {formatEnumLabel} from '../../../../shared/utils/formatting';
+import {getPatientActivityActionLabel, getPatientResourceTypeLabel,} from '../../../audit/models/patient-audit-model';
+import {getDocumentTypeLabel} from '../../../documents/models/document-model';
 import {
   AnalyticsRangeQuery,
   getOperationalEventCategoryLabel,
@@ -26,7 +17,7 @@ import {
   OperationalEventPageResponse,
   OperationalEventQuery,
 } from '../../models/admin-analytics-model';
-import { AdminAnalyticsApiService } from '../../services/admin-analytics-api-service';
+import {AdminAnalyticsApiService} from '../../services/admin-analytics-api-service';
 
 const EVENT_PAGE_SIZE = 50;
 

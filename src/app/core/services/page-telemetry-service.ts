@@ -1,10 +1,10 @@
-import { inject, Injectable } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
-import { filter } from 'rxjs';
+import {inject, Injectable} from '@angular/core';
+import {NavigationEnd, Router} from '@angular/router';
+import {filter} from 'rxjs';
 
-import { ApplicationPage } from '../models/application-page-model';
-import { AnalyticsApiService } from './analytics-api-service';
-import { AuthService } from './auth-service';
+import {ApplicationPage} from '../models/application-page-model';
+import {AnalyticsApiService} from './analytics-api-service';
+import {AuthService} from './auth-service';
 
 /**
  * Links a route to the application page recorded for analytics.

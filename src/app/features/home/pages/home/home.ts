@@ -1,15 +1,15 @@
-import { Component, computed, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import {Component, computed, inject} from '@angular/core';
+import {RouterLink} from '@angular/router';
 
-import { Permission } from '../../../../core/models/permission-model';
-import { AuthService } from '../../../../core/services/auth-service';
-import { PatientCarerAccessState } from '../../../care-network/services/patient-carer-access-state';
-import { getPatientContextName } from '../../../patient-context/models/selected-patient-context';
-import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import { PersonalPatientRecordState } from '../../../patient-record/services/personal-patient-record-state';
-import { ProfileState } from '../../../profile/services/profile-state';
+import {Permission} from '../../../../core/models/permission-model';
+import {AuthService} from '../../../../core/services/auth-service';
+import {PatientCarerAccessState} from '../../../care-network/services/patient-carer-access-state';
+import {getPatientContextName} from '../../../patient-context/models/selected-patient-context';
+import {PatientContextAuthorisation} from '../../../patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../../patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../patient-context/services/selected-patient-state';
+import {PersonalPatientRecordState} from '../../../patient-record/services/personal-patient-record-state';
+import {ProfileState} from '../../../profile/services/profile-state';
 
 /**
  * Describes a feature shown on the dashboard when the selected patient allows access to it.

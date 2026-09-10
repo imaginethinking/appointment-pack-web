@@ -1,17 +1,17 @@
-import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { EMPTY, finalize, switchMap } from 'rxjs';
+import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
+import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {EMPTY, finalize, switchMap} from 'rxjs';
 
-import { applyServerFieldErrors, clearServerFieldErrors } from '../../../../core/forms/server-field-errors';
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
-import { PatientContextAuthorisation } from '../../../patient-context/services/patient-context-auth';
-import { PatientContextCoordinator } from '../../../patient-context/services/patient-context-coordinator';
-import { SelectedPatientState } from '../../../patient-context/services/selected-patient-state';
-import { DOCUMENT_APPROVED_DEIDENTIFIED_TEXT_MAX_LENGTH } from '../../models/document-constraints';
-import { DocumentProcessingResultResponse, DocumentResponse } from '../../models/document-model';
-import { DocumentApiService } from '../../services/document-api-service';
+import {applyServerFieldErrors, clearServerFieldErrors} from '../../../../core/forms/server-field-errors';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {hasHttpStatus} from '../../../../core/http/http-problem-detail';
+import {PatientContextAuthorisation} from '../../../patient-context/services/patient-context-auth';
+import {PatientContextCoordinator} from '../../../patient-context/services/patient-context-coordinator';
+import {SelectedPatientState} from '../../../patient-context/services/selected-patient-state';
+import {DOCUMENT_APPROVED_DEIDENTIFIED_TEXT_MAX_LENGTH} from '../../models/document-constraints';
+import {DocumentProcessingResultResponse, DocumentResponse} from '../../models/document-model';
+import {DocumentApiService} from '../../services/document-api-service';
 
 type ReviewPageStatus = 'loading' | 'ready' | 'recovery' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 

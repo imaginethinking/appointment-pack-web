@@ -1,7 +1,7 @@
-import { Component, input } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import {Component, input} from '@angular/core';
+import {ReactiveFormsModule} from '@angular/forms';
 
-import { MedicationForm } from '../../forms/medication-form';
+import {MedicationForm} from '../../forms/medication-form';
 
 /**
  * Displays the shared fields used for creating and editing medications.

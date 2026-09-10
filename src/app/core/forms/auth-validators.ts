@@ -1,4 +1,4 @@
-import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import {AbstractControl, ValidationErrors, ValidatorFn} from '@angular/forms';
 
 // [AI-GENERATED: ChatGPT, 2026-08-15]
 // Used to generate REGEX pattern for a strong password

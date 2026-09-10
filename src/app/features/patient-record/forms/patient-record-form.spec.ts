@@ -1,8 +1,8 @@
 // Patient measurements have a few application-specific rules that are worth protecting separately from the page UI.
 
-import { FormBuilder } from '@angular/forms';
+import {FormBuilder} from '@angular/forms';
 
-import { createPatientRecordForm, mapPatientRecordFormToRequest } from './patient-record-form';
+import {createPatientRecordForm, mapPatientRecordFormToRequest} from './patient-record-form';
 
 describe('patient record form', () => {
   let formBuilder: FormBuilder;

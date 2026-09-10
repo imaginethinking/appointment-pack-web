@@ -1,5 +1,5 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
-import { Observable, tap, throwError } from 'rxjs';
+import {computed, inject, Injectable, signal} from '@angular/core';
+import {Observable, tap, throwError} from 'rxjs';
 
 import {
   AccountSecurityResponse,
@@ -10,7 +10,7 @@ import {
   PasswordChangeRequest,
   UserRole,
 } from '../models/auth-model';
-import { AuthApiService } from './auth-api-service';
+import {AuthApiService} from './auth-api-service';
 
 interface JwtPayload {
   exp?: number;

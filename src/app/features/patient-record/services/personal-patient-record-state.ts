@@ -1,8 +1,12 @@
 import {inject, Injectable, signal} from '@angular/core';
 import {catchError, finalize, Observable, of, tap, throwError} from 'rxjs';
 
-import { hasHttpStatus} from '../../../core/http/http-problem-detail';
-import {CreatePatientRecordRequest, PatientRecordResponse, UpdatePatientRecordRequest} from '../models/patient-record-model';
+import {hasHttpStatus} from '../../../core/http/http-problem-detail';
+import {
+  CreatePatientRecordRequest,
+  PatientRecordResponse,
+  UpdatePatientRecordRequest
+} from '../models/patient-record-model';
 import {PatientRecordApiService} from './patient-record-api-service';
 
 /**

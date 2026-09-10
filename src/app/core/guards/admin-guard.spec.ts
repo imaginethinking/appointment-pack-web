@@ -1,11 +1,11 @@
 // These tests check the small role-based guard used for administrator pages.
 // Spring Boot still provides the real security boundary, but this guard protects the frontend navigation experience.
 
-import { TestBed } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, provideRouter, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import {TestBed} from '@angular/core/testing';
+import {ActivatedRouteSnapshot, provideRouter, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
 
-import { AuthService } from '../services/auth-service';
-import { adminGuard } from './admin-guard';
+import {AuthService} from '../services/auth-service';
+import {adminGuard} from './admin-guard';
 
 describe('adminGuard', () => {
   let authService: {

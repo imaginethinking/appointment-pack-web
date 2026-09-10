@@ -1,13 +1,13 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { QrCodeComponent } from 'ng-qrcode';
-import { finalize } from 'rxjs';
+import {Component, inject, OnInit, signal} from '@angular/core';
+import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {QrCodeComponent} from 'ng-qrcode';
+import {finalize} from 'rxjs';
 
-import { matchingControlsValidator, strongPasswordValidator } from '../../../../core/forms/auth-validators';
-import { applyServerFieldErrors, clearServerFieldErrors } from '../../../../core/forms/server-field-errors';
-import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
-import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
-import { AuthService } from '../../../../core/services/auth-service';
+import {matchingControlsValidator, strongPasswordValidator} from '../../../../core/forms/auth-validators';
+import {applyServerFieldErrors, clearServerFieldErrors} from '../../../../core/forms/server-field-errors';
+import {getHttpErrorMessage} from '../../../../core/http/http-error-message';
+import {hasHttpStatus} from '../../../../core/http/http-problem-detail';
+import {AuthService} from '../../../../core/services/auth-service';
 
 /**
  * Manages password changes and multi factor authentication settings for the current account.

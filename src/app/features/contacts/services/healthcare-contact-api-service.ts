@@ -1,9 +1,13 @@
-import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import {inject, Injectable} from '@angular/core';
+import {Observable} from 'rxjs';
 
-import { environment } from '../../../../environments/environment';
-import { CreateHealthcareContactRequest, HealthcareContactResponse, UpdateHealthcareContactRequest } from '../models/healthcare-contact-model';
+import {environment} from '../../../../environments/environment';
+import {
+  CreateHealthcareContactRequest,
+  HealthcareContactResponse,
+  UpdateHealthcareContactRequest
+} from '../models/healthcare-contact-model';
 
 /**
  * Provides the API calls used to manage healthcare contacts.

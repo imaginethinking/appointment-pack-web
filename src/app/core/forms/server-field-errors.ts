@@ -1,6 +1,6 @@
-import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
+import {AbstractControl, FormArray, FormGroup} from '@angular/forms';
 
-import { getHttpFieldErrors } from '../http/http-problem-detail';
+import {getHttpFieldErrors} from '../http/http-problem-detail';
 
 /**
  * Adds returned field errors to the matching form controls and marks them as touched.

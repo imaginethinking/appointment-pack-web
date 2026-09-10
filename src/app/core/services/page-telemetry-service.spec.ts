@@ -1,13 +1,13 @@
 // Page telemetry should record only broad application areas and should never affect navigation.
 // These tests use a small fake Router event stream so no real navigation or HTTP request is needed.
 
-import { NavigationEnd, Router } from '@angular/router';
-import { of, Subject, throwError } from 'rxjs';
-import { TestBed } from '@angular/core/testing';
+import {NavigationEnd, Router} from '@angular/router';
+import {of, Subject, throwError} from 'rxjs';
+import {TestBed} from '@angular/core/testing';
 
-import { AnalyticsApiService } from './analytics-api-service';
-import { AuthService } from './auth-service';
-import { PageTelemetryService } from './page-telemetry-service';
+import {AnalyticsApiService} from './analytics-api-service';
+import {AuthService} from './auth-service';
+import {PageTelemetryService} from './page-telemetry-service';
 
 describe('PageTelemetryService', () => {
   let routerEvents: Subject<NavigationEnd>;

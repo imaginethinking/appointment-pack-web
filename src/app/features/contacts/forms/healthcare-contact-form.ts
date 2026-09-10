@@ -1,8 +1,8 @@
-import { AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import {AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
 
-import { AddressRequest } from '../../../shared/models/address-model';
-import { normaliseOptionalText } from '../../../shared/utils/formatting';
-import { HealthcareContactRequest, HealthcareContactResponse } from '../models/healthcare-contact-model';
+import {AddressRequest} from '../../../shared/models/address-model';
+import {normaliseOptionalText} from '../../../shared/utils/formatting';
+import {HealthcareContactRequest, HealthcareContactResponse} from '../models/healthcare-contact-model';
 
 /**
  * Creates the form used to enter healthcare contact details.

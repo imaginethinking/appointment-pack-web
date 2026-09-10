@@ -1,9 +1,9 @@
-import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import {inject, Injectable} from '@angular/core';
+import {Observable} from 'rxjs';
 
-import { environment } from '../../../../environments/environment';
-import { ProfileResponse, UpdateProfileRequest } from '../models/profile-model';
+import {environment} from '../../../../environments/environment';
+import {ProfileResponse, UpdateProfileRequest} from '../models/profile-model';
 
 /**
  * Provides the API calls used to load and update the current profile.
