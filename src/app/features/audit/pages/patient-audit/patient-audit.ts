@@ -18,6 +18,9 @@ const AUDIT_PAGE_SIZE = 25;
 
 type PatientAuditStatus = 'loading' | 'ready' | 'no-patient' | 'forbidden' | 'error';
 
+/**
+ * Shows the recorded activity for the patient currently selected.
+ */
 @Component({
   selector: 'app-patient-audit',
   imports: [DatePipe],
@@ -41,6 +44,9 @@ export class PatientAudit {
   protected readonly getResourceTypeLabel = getPatientResourceTypeLabel;
   protected readonly getActionLabel = getPatientActivityActionLabel;
 
+  /**
+   * Loads activity when the selected patient page or retry state changes.
+   */
   constructor() {
     effect((onCleanup) => {
       this.reloadVersion();
@@ -90,10 +96,16 @@ export class PatientAudit {
     });
   }
 
+  /**
+   * Reloads the current page of activity.
+   */
   protected retry(): void {
     this.reloadVersion.update((version) => version + 1);
   }
 
+  /**
+   * Moves to the previous page when one is available.
+   */
   protected previousPage(): void {
     if (this.pageIndex() === 0 || this.status() === 'loading') {
       return;
@@ -102,6 +114,9 @@ export class PatientAudit {
     this.pageIndex.update((page) => page - 1);
   }
 
+  /**
+   * Moves to the next page when more activity is available.
+   */
   protected nextPage(): void {
     const auditPage = this.auditPage();
 
@@ -112,6 +127,9 @@ export class PatientAudit {
     this.pageIndex.update((page) => page + 1);
   }
 
+  /**
+   * Returns the first activity number shown on the current page.
+   */
   protected showingFrom(auditPage: PatientAuditPageResponse): number {
     if (auditPage.totalElements === 0) {
       return 0;
@@ -120,10 +138,16 @@ export class PatientAudit {
     return auditPage.page * auditPage.size + 1;
   }
 
+  /**
+   * Returns the last activity number shown on the current page.
+   */
   protected showingTo(auditPage: PatientAuditPageResponse): number {
     return Math.min((auditPage.page + 1) * auditPage.size, auditPage.totalElements);
   }
 
+  /**
+   * Handles errors while loading activity and refreshes patient access when needed.
+   */
   private handleLoadError(error: unknown): void {
     if (hasHttpStatus(error, 403)) {
       this.status.set('forbidden');
@@ -142,6 +166,9 @@ export class PatientAudit {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load activity history.'));
   }
 
+  /**
+   * Refreshes patient access and checks whether activity can still be viewed.
+   */
   private refreshPatientAccess(): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       next: () => {

@@ -8,6 +8,9 @@ import { applyServerFieldErrors, clearServerFieldErrors } from '../../../../core
 import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
 import { AuthApiService } from '../../../../core/services/auth-api-service';
 
+/**
+ * Lets the user choose a new password from a valid password reset link.
+ */
 @Component({
   selector: 'app-reset-password',
   imports: [ReactiveFormsModule, RouterLink],
@@ -32,6 +35,9 @@ export class ResetPassword {
     validators: matchingControlsValidator('newPassword', 'confirmPassword', 'passwordMismatch'),
   });
 
+  /**
+   * Checks the reset link and password form before saving the new password.
+   */
   protected resetPassword(): void {
     this.errorMessage.set('');
     clearServerFieldErrors(this.form);

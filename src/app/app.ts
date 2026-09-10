@@ -7,6 +7,9 @@ import { PageTelemetryService } from './core/services/page-telemetry-service';
 import { PatientContextCoordinator } from './features/patient-context/services/patient-context-coordinator';
 import { Navbar } from './shared/components/navbar/navbar';
 
+/**
+ * Hosts the main application layout and loads shared patient context for signed in sessions.
+ */
 @Component({
   selector: 'app-root',
   imports: [Navbar, RouterOutlet],
@@ -18,6 +21,9 @@ export class App {
   private readonly pageTelemetryService = inject(PageTelemetryService);
   private readonly patientContextCoordinator = inject(PatientContextCoordinator);
 
+  /**
+   * Starts page analytics and keeps patient context in sync with the current session.
+   */
   constructor() {
     this.pageTelemetryService.start();
 
@@ -37,8 +43,9 @@ export class App {
     });
   }
 
-  // The normal #main-content link is resolved against Angular's base URL, which can return us to '/'.
-  // Preventing the navigation lets the link simply move keyboard focus to the current page content instead.
+  /**
+   * Moves keyboard focus to the current page content without changing the current route.
+   */
   protected skipToMainContent(event: Event): void {
     event.preventDefault();
     this.document.getElementById('main-content')?.focus();

@@ -6,6 +6,9 @@ import { finalize } from 'rxjs';
 import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
 import { AuthService } from '../../../../core/services/auth-service';
 
+/**
+ * Completes a pending login using the six digit code from the user's authenticator.
+ */
 @Component({
   selector: 'app-mfa-login',
   imports: [ReactiveFormsModule],
@@ -27,6 +30,9 @@ export class MfaLogin {
     ]),
   });
 
+  /**
+   * Checks the entered code and completes the pending login.
+   */
   protected completeLogin(): void {
     this.errorMessage.set('');
 
@@ -47,11 +53,17 @@ export class MfaLogin {
     });
   }
 
+  /**
+   * Cancels the pending MFA login and returns to the login page.
+   */
   protected cancel(): void {
     this.authService.cancelMfaLogin();
     void this.router.navigate(['/login']);
   }
 
+  /**
+   * Returns the page requested before MFA or falls back to the home page.
+   */
   private getReturnUrl(): string {
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
     return returnUrl !== null && returnUrl.startsWith('/') ? returnUrl : '/home';

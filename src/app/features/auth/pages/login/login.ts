@@ -8,6 +8,9 @@ import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
 import { LoginRequest } from '../../../../core/models/auth-model';
 import { AuthService } from '../../../../core/services/auth-service';
 
+/**
+ * Handles password login and directs the user to the next step required for their account.
+ */
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule, RouterLink],
@@ -28,6 +31,9 @@ export class Login {
     password: this.formBuilder.nonNullable.control('', Validators.required),
   });
 
+  /**
+   * Checks the login form and continues with the response returned for the account.
+   */
   protected login(): void {
     this.errorMessage.set('');
     clearServerFieldErrors(this.form);
@@ -82,6 +88,9 @@ export class Login {
     });
   }
 
+  /**
+   * Returns the requested page after login or uses the home page when no valid return path is supplied.
+   */
   private getReturnUrl(): string {
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
     return returnUrl !== null && returnUrl.startsWith('/') ? returnUrl : '/home';

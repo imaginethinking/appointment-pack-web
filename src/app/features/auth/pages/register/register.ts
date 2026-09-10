@@ -10,6 +10,9 @@ import { hasHttpStatus } from '../../../../core/http/http-problem-detail';
 import { RegisterRequest } from '../../../../core/models/auth-model';
 import { AuthApiService } from '../../../../core/services/auth-api-service';
 
+/**
+ * Collects the details needed to create a new account.
+ */
 @Component({
   selector: 'app-register',
   imports: [ReactiveFormsModule, RouterLink],
@@ -34,6 +37,9 @@ export class Register {
     validators: matchingControlsValidator('password', 'confirmPassword', 'passwordMismatch'),
   });
 
+  /**
+   * Checks the registration form and creates the account using the entered details.
+   */
   protected register(): void {
     this.errorMessage.set('');
     clearServerFieldErrors(this.form);

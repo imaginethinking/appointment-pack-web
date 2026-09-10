@@ -174,6 +174,9 @@ export interface OperationalEventQuery extends AnalyticsRangeQuery {
   size: number;
 }
 
+/**
+ * Returns the display name for an operational event category.
+ */
 export function getOperationalEventCategoryLabel(category: OperationalEventCategory): string {
   switch (category) {
     case 'PATIENT_ACTIVITY':

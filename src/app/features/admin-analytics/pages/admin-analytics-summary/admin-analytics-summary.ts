@@ -22,6 +22,9 @@ import {
 } from '../../models/admin-analytics-model';
 import { AdminAnalyticsApiService } from '../../services/admin-analytics-api-service';
 
+/**
+ * Shows the main application analytics with an optional date range.
+ */
 @Component({
   selector: 'app-admin-analytics-summary',
   imports: [DatePipe, ReactiveFormsModule, RouterLink],
@@ -45,10 +48,16 @@ export class AdminAnalyticsSummary implements OnInit {
     validators: analyticsDateRangeValidator,
   });
 
+  /**
+   * Loads the analytics summary when the page opens.
+   */
   ngOnInit(): void {
     this.loadSummary();
   }
 
+  /**
+   * Checks the selected dates and reloads the summary using that range.
+   */
   protected applyRange(): void {
     this.errorMessage.set('');
 
@@ -60,6 +69,9 @@ export class AdminAnalyticsSummary implements OnInit {
     this.loadSummary();
   }
 
+  /**
+   * Clears the date range and reloads the full summary.
+   */
   protected resetRange(): void {
     this.rangeForm.reset({
       from: '',
@@ -69,10 +81,16 @@ export class AdminAnalyticsSummary implements OnInit {
     this.loadSummary();
   }
 
+  /**
+   * Tries to load the analytics summary again.
+   */
   protected retry(): void {
     this.loadSummary();
   }
 
+  /**
+   * Formats a duration as milliseconds or seconds for display.
+   */
   protected formatDuration(durationMs: number | null): string {
     if (durationMs === null) {
       return 'Not available';
@@ -85,6 +103,9 @@ export class AdminAnalyticsSummary implements OnInit {
     return `${(durationMs / 1000).toFixed(2)} s`;
   }
 
+  /**
+   * Loads the analytics summary using the current date range.
+   */
   private loadSummary(): void {
     if (this.rangeForm.invalid) {
       return;
@@ -112,6 +133,9 @@ export class AdminAnalyticsSummary implements OnInit {
     });
   }
 
+  /**
+   * Creates the date range query from the values entered in the form.
+   */
   private buildRangeQuery(): AnalyticsRangeQuery {
     const value = this.rangeForm.getRawValue();
     const query: AnalyticsRangeQuery = {};
@@ -128,6 +152,9 @@ export class AdminAnalyticsSummary implements OnInit {
   }
 }
 
+/**
+ * Checks that the end of an analytics date range is later than the start.
+ */
 const analyticsDateRangeValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const from = control.get('from')?.value;
   const to = control.get('to')?.value;

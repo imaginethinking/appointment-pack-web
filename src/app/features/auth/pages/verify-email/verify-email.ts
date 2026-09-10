@@ -9,6 +9,9 @@ import { AuthApiService } from '../../../../core/services/auth-api-service';
 
 type VerificationState = 'pending' | 'confirming' | 'confirmed' | 'failed';
 
+/**
+ * Confirms an email verification link and allows another verification email to be requested.
+ */
 @Component({
   selector: 'app-verify-email',
   imports: [ReactiveFormsModule, RouterLink],
@@ -34,6 +37,9 @@ export class VerifyEmail implements OnInit {
     ]),
   });
 
+  /**
+   * Confirms the email automatically when a verification token is present in the page URL.
+   */
   ngOnInit(): void {
     const token = this.route.snapshot.queryParamMap.get('token');
 
@@ -42,6 +48,9 @@ export class VerifyEmail implements OnInit {
     }
   }
 
+  /**
+   * Checks the email address and requests another verification email.
+   */
   protected resend(): void {
     this.errorMessage.set('');
     this.resendMessage.set('');
@@ -72,6 +81,9 @@ export class VerifyEmail implements OnInit {
     });
   }
 
+  /**
+   * Confirms the supplied verification token and updates the page with the result.
+   */
   private confirmVerification(token: string): void {
     this.state.set('confirming');
     this.errorMessage.set('');
@@ -85,6 +97,9 @@ export class VerifyEmail implements OnInit {
     });
   }
 
+  /**
+   * Returns the page requested before verification or uses the home page as a fallback.
+   */
   private getReturnUrl(): string {
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
     return returnUrl !== null && returnUrl.startsWith('/') ? returnUrl : '/home';

@@ -3,6 +3,9 @@ import {RouterLink} from '@angular/router';
 
 import {AuthService} from '../../../../core/services/auth-service';
 
+/**
+ * Shows the not found page with navigation suited to the current session.
+ */
 @Component({
   selector: 'app-not-found',
   imports: [RouterLink],

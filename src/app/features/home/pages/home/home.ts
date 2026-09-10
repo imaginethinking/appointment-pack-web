@@ -11,6 +11,9 @@ import { SelectedPatientState } from '../../../patient-context/services/selected
 import { PersonalPatientRecordState } from '../../../patient-record/services/personal-patient-record-state';
 import { ProfileState } from '../../../profile/services/profile-state';
 
+/**
+ * Describes a feature shown on the dashboard when the selected patient allows access to it.
+ */
 interface DashboardFeature {
   title: string;
   description: string;
@@ -68,6 +71,9 @@ const HEALTH_RECORD_FEATURES: readonly DashboardFeature[] = [
   },
 ];
 
+/**
+ * Shows the dashboard for the current account and selected patient.
+ */
 @Component({
   selector: 'app-home',
   imports: [RouterLink],
@@ -123,6 +129,9 @@ export class Home {
     return selectedPatient !== null && this.authorisation.has(selectedPatient, 'audit:view');
   });
 
+  /**
+   * Returns the dashboard features available for the selected patient.
+   */
   private availableFeatures(features: readonly DashboardFeature[]): readonly DashboardFeature[] {
     const selectedPatient = this.selectedPatient();
 

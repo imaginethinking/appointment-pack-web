@@ -7,6 +7,7 @@ import { patientContextLoadGuard } from './core/guards/patient-context-load-guar
 import { selectedPatientPermissionGuard } from './core/guards/selected-patient-permission-guard';
 
 export const routes: Routes = [
+  // Public account pages that can be opened without signing in.
   {
     path: '',
     pathMatch: 'full',
@@ -37,6 +38,8 @@ export const routes: Routes = [
     path: 'reset-password',
     loadComponent: () => import('./features/auth/pages/reset-password/reset-password').then((module) => module.ResetPassword),
   },
+
+  // Signed in pages share the same session and patient context loading.
   {
     path: '',
     canActivate: [authGuard, patientContextLoadGuard],

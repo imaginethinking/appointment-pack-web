@@ -54,6 +54,9 @@ export interface PatientAuditPageResponse {
   totalPages: number;
 }
 
+/**
+ * Returns the display name for a patient activity resource.
+ */
 export function getPatientResourceTypeLabel(resourceType: PatientResourceType): string {
   switch (resourceType) {
     case 'PATIENT_RECORD':
@@ -81,6 +84,9 @@ export function getPatientResourceTypeLabel(resourceType: PatientResourceType): 
   }
 }
 
+/**
+ * Returns the text shown for an activity action.
+ */
 export function getPatientActivityActionLabel(action: PatientActivityAction): string {
   switch (action) {
     case 'CREATED':

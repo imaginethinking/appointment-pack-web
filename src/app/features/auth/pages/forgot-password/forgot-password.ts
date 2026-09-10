@@ -7,6 +7,9 @@ import { applyServerFieldErrors, clearServerFieldErrors } from '../../../../core
 import { getHttpErrorMessage } from '../../../../core/http/http-error-message';
 import { AuthApiService } from '../../../../core/services/auth-api-service';
 
+/**
+ * Lets the user request a password reset using their email address.
+ */
 @Component({
   selector: 'app-forgot-password',
   imports: [ReactiveFormsModule, RouterLink],
@@ -24,6 +27,9 @@ export class ForgotPassword {
     email: this.formBuilder.nonNullable.control('', [Validators.required, Validators.email, Validators.maxLength(254)]),
   });
 
+  /**
+   * Checks the email form and submits a password reset request.
+   */
   protected requestReset(): void {
     this.errorMessage.set('');
     clearServerFieldErrors(this.form);

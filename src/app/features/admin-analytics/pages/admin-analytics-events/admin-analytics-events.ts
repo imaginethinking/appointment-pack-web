@@ -30,6 +30,9 @@ import { AdminAnalyticsApiService } from '../../services/admin-analytics-api-ser
 
 const EVENT_PAGE_SIZE = 50;
 
+/**
+ * Displays operational events with date category and page filters.
+ */
 @Component({
   selector: 'app-admin-analytics-events',
   imports: [DatePipe, ReactiveFormsModule, RouterLink],
@@ -58,10 +61,16 @@ export class AdminAnalyticsEvents implements OnInit {
     validators: analyticsDateRangeValidator,
   });
 
+  /**
+   * Loads the first page of operational events when the page opens.
+   */
   ngOnInit(): void {
     this.loadEvents(0);
   }
 
+  /**
+   * Checks the selected filters and loads the first matching page.
+   */
   protected applyFilters(): void {
     this.errorMessage.set('');
 
@@ -73,6 +82,9 @@ export class AdminAnalyticsEvents implements OnInit {
     this.loadEvents(0);
   }
 
+  /**
+   * Clears the event filters and returns to the first page.
+   */
   protected resetFilters(): void {
     this.filterForm.reset({
       from: '',
@@ -83,11 +95,17 @@ export class AdminAnalyticsEvents implements OnInit {
     this.loadEvents(0);
   }
 
+  /**
+   * Reloads the page of events currently being viewed.
+   */
   protected retry(): void {
     const currentPage = this.eventPage()?.page ?? 0;
     this.loadEvents(currentPage);
   }
 
+  /**
+   * Loads the previous page when one is available.
+   */
   protected previousPage(): void {
     const currentPage = this.eventPage();
 
@@ -102,6 +120,9 @@ export class AdminAnalyticsEvents implements OnInit {
     this.loadEvents(currentPage.page - 1);
   }
 
+  /**
+   * Loads the next page when more events are available.
+   */
   protected nextPage(): void {
     const currentPage = this.eventPage();
 
@@ -116,12 +137,18 @@ export class AdminAnalyticsEvents implements OnInit {
     this.loadEvents(currentPage.page + 1);
   }
 
+  /**
+   * Returns the first event number shown on the current page.
+   */
   protected showingFrom(page: OperationalEventPageResponse): number {
     return page.totalElements === 0
       ? 0
       : page.page * page.size + 1;
   }
 
+  /**
+   * Returns the last event number shown on the current page.
+   */
   protected showingTo(page: OperationalEventPageResponse): number {
     return Math.min(
       (page.page + 1) * page.size,
@@ -129,6 +156,9 @@ export class AdminAnalyticsEvents implements OnInit {
     );
   }
 
+  /**
+   * Formats an event duration as milliseconds or seconds.
+   */
   protected formatDuration(durationMs: number | null): string {
     if (durationMs === null) {
       return 'Not provided';
@@ -141,6 +171,9 @@ export class AdminAnalyticsEvents implements OnInit {
     return `${(durationMs / 1000).toFixed(2)} s`;
   }
 
+  /**
+   * Loads the requested page using the filters currently selected.
+   */
   private loadEvents(page: number): void {
     if (this.filterForm.invalid) {
       return;
@@ -168,6 +201,9 @@ export class AdminAnalyticsEvents implements OnInit {
     });
   }
 
+  /**
+   * Creates the event query using the current filters and requested page.
+   */
   private buildEventQuery(page: number): OperationalEventQuery {
     const range = this.buildRangeQuery();
     const category = this.filterForm.controls.category.value;
@@ -180,6 +216,9 @@ export class AdminAnalyticsEvents implements OnInit {
     };
   }
 
+  /**
+   * Creates the optional date range used by the event request.
+   */
   private buildRangeQuery(): AnalyticsRangeQuery {
     const value = this.filterForm.getRawValue();
     const query: AnalyticsRangeQuery = {};
@@ -196,6 +235,9 @@ export class AdminAnalyticsEvents implements OnInit {
   }
 }
 
+/**
+ * Checks that the end of the selected date range is later than the start.
+ */
 const analyticsDateRangeValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const from = control.get('from')?.value;
   const to = control.get('to')?.value;

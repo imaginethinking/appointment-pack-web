@@ -1,4 +1,4 @@
-/* You can add global styles to this file, and also import other style files */
+/* Loads the application font locally and keep text visible while the font is loading. */
 @font-face {
   font-family: 'Cause';
   src: url('/fonts/Cause-VariableFont_wght.ttf') format('truetype');
@@ -20,6 +20,7 @@
   --font-sans: 'Cause', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+/* Shared button colours used by the button styles below. */
 :root {
   --button-primary-background: var(--color-brand-plum);
   --button-primary-hover: #4c3f4d;
@@ -80,6 +81,7 @@
       opacity 150ms ease;
   }
 
+  /* Keep keyboard focus clearly visible on links and form controls. */
   .btn:focus-visible {
     outline: 3px solid var(--button-focus-ring);
     outline-offset: 2px;
@@ -140,6 +142,7 @@
 }
 
 @layer components {
+  /* Keep the skip link hidden until it receives keyboard focus. */
   .skip-link {
     position: fixed;
     top: 0.75rem;
