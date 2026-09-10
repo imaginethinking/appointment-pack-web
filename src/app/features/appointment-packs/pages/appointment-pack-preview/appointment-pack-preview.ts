@@ -14,6 +14,9 @@ import { AppointmentPackApiService } from '../../services/appointment-pack-api-s
 
 type AppointmentPackPreviewStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 
+/**
+ * Loads an Appointment Pack PDF and displays it in the browser for the selected patient.
+ */
 @Component({
   selector: 'app-appointment-pack-preview',
   imports: [RouterLink],
@@ -38,6 +41,9 @@ export class AppointmentPackPreview implements OnInit, OnDestroy {
   protected readonly isDownloading = signal(false);
   protected readonly selectedPatient = this.selectedPatientState.selectedPatient;
 
+  /**
+   * Clears the preview and returns to the pack list if the selected patient changes.
+   */
   constructor() {
     effect(() => {
       const appointmentPack = this.appointmentPack();
@@ -53,6 +59,9 @@ export class AppointmentPackPreview implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Loads the Appointment Pack preview identified by the current route.
+   */
   ngOnInit(): void {
     const appointmentPackId = this.route.snapshot.paramMap.get('appointmentPackId');
 
@@ -64,10 +73,16 @@ export class AppointmentPackPreview implements OnInit, OnDestroy {
     this.loadPreview(appointmentPackId);
   }
 
+  /**
+   * Releases the temporary PDF URL when the preview page is destroyed.
+   */
   ngOnDestroy(): void {
     this.clearPreviewUrl();
   }
 
+  /**
+   * Tries to load the current Appointment Pack preview again.
+   */
   protected retry(): void {
     const appointmentPackId = this.route.snapshot.paramMap.get('appointmentPackId');
 
@@ -76,6 +91,9 @@ export class AppointmentPackPreview implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Downloads the Appointment Pack currently being previewed.
+   */
   protected download(): void {
     const appointmentPack = this.appointmentPack();
     this.actionError.set('');
@@ -96,6 +114,7 @@ export class AppointmentPackPreview implements OnInit, OnDestroy {
           return;
         }
 
+        // Create a temporary URL for the PDF and release it after starting the download.
         const url = URL.createObjectURL(response.body);
         const anchor = window.document.createElement('a');
 
@@ -109,6 +128,9 @@ export class AppointmentPackPreview implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Loads the Appointment Pack details before requesting its PDF preview.
+   */
   private loadPreview(appointmentPackId: string): void {
     const failedPatientRecordId = this.selectedPatient()?.patientRecordId ?? null;
 
@@ -140,6 +162,9 @@ export class AppointmentPackPreview implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Loads the PDF for the Appointment Pack and prepares it for display.
+   */
   private loadPdf(appointmentPack: AppointmentPackResponse): void {
     this.appointmentPackApi.previewAppointmentPack(appointmentPack.id).pipe(
       takeUntilDestroyed(this.destroyRef),
@@ -158,6 +183,9 @@ export class AppointmentPackPreview implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Creates the browser URL used by the PDF preview and replaces any previous one.
+   */
   private setPreviewUrl(pdf: Blob): void {
     this.clearPreviewUrl();
 
@@ -167,6 +195,9 @@ export class AppointmentPackPreview implements OnInit, OnDestroy {
     this.previewUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl));
   }
 
+  /**
+   * Releases the current preview URL and clears it from the page.
+   */
   private clearPreviewUrl(): void {
     if (this.previewObjectUrl !== null) {
       URL.revokeObjectURL(this.previewObjectUrl);
@@ -176,6 +207,9 @@ export class AppointmentPackPreview implements OnInit, OnDestroy {
     this.previewUrl.set(null);
   }
 
+  /**
+   * Handles failures while loading the Appointment Pack details.
+   */
   private handleLoadError(error: unknown, failedPatientRecordId: string | null): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(failedPatientRecordId);
@@ -191,6 +225,9 @@ export class AppointmentPackPreview implements OnInit, OnDestroy {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the appointment pack preview.'));
   }
 
+  /**
+   * Handles errors raised while previewing or downloading the Appointment Pack PDF.
+   */
   private handleFileError(
     error: unknown,
     appointmentPack: AppointmentPackResponse,
@@ -217,6 +254,9 @@ export class AppointmentPackPreview implements OnInit, OnDestroy {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load the appointment pack preview.'));
   }
 
+  /**
+   * Refreshes patient access and returns to the pack list when the original patient is no longer selected.
+   */
   private recoverPatientAccess(failedPatientRecordId: string | null): void {
     this.clearPreviewUrl();
     this.status.set('loading');

@@ -14,6 +14,9 @@ import { AppointmentPackApiService } from '../../services/appointment-pack-api-s
 
 type AppointmentPackListStatus = 'loading' | 'ready' | 'no-patient' | 'forbidden' | 'error';
 
+/**
+ * Shows the Appointment Packs that have been generated for the selected patient.
+ */
 @Component({
   selector: 'app-appointment-pack-list',
   imports: [DatePipe, RouterLink],
@@ -37,6 +40,9 @@ export class AppointmentPackList {
   protected readonly getPatientContextName = getPatientContextName;
   protected readonly formatFileSize = formatFileSize;
 
+  /**
+   * Reloads the list whenever the selected patient changes or the user retries the request.
+   */
   constructor() {
     effect((onCleanup) => {
       this.reloadVersion();
@@ -69,10 +75,16 @@ export class AppointmentPackList {
     });
   }
 
+  /**
+   * Tries to load the Appointment Packs again.
+   */
   protected retry(): void {
     this.reloadVersion.update((version) => version + 1);
   }
 
+  /**
+   * Handles problems loading Appointment Packs and refreshes patient access when needed.
+   */
   private handleLoadError(error: unknown): void {
     if (hasHttpStatus(error, 403)) {
       this.status.set('forbidden');
@@ -91,6 +103,9 @@ export class AppointmentPackList {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load appointment packs.'));
   }
 
+  /**
+   * Refreshes the patients currently available to the user after an access change.
+   */
   private refreshPatientAccess(): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       error: (error: unknown) => {

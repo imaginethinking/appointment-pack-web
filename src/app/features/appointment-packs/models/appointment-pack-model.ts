@@ -39,6 +39,9 @@ export interface AppointmentPackResponse {
   items: AppointmentPackItemResponse[];
 }
 
+/**
+ * Returns the plural label used when displaying items included in an Appointment Pack.
+ */
 export function getAppointmentPackItemTypePluralLabel(itemType: AppointmentPackItemType): string {
   switch (itemType) {
     case 'MEDICATION':

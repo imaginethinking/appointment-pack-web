@@ -20,6 +20,9 @@ import { AppointmentPackApiService } from '../../services/appointment-pack-api-s
 
 type AppointmentPackDetailsStatus = 'loading' | 'ready' | 'invalid' | 'not-found' | 'forbidden' | 'error';
 
+/**
+ * Displays an Appointment Pack and the patient information that was included when it was generated.
+ */
 @Component({
   selector: 'app-appointment-pack-details',
   imports: [DatePipe, RouterLink],
@@ -46,6 +49,9 @@ export class AppointmentPackDetails implements OnInit {
   protected readonly itemTypes = APPOINTMENT_PACK_ITEM_TYPES;
   protected readonly getItemTypePluralLabel = getAppointmentPackItemTypePluralLabel;
 
+  /**
+   * Returns to the pack list if the loaded Appointment Pack no longer matches the selected patient.
+   */
   constructor() {
     effect(() => {
       const appointmentPack = this.appointmentPack();
@@ -57,6 +63,9 @@ export class AppointmentPackDetails implements OnInit {
     });
   }
 
+  /**
+   * Loads the Appointment Pack identified by the current route.
+   */
   ngOnInit(): void {
     const appointmentPackId = this.route.snapshot.paramMap.get('appointmentPackId');
 
@@ -68,6 +77,9 @@ export class AppointmentPackDetails implements OnInit {
     this.loadAppointmentPack(appointmentPackId);
   }
 
+  /**
+   * Attempts to load the current Appointment Pack again.
+   */
   protected retry(): void {
     const appointmentPackId = this.route.snapshot.paramMap.get('appointmentPackId');
 
@@ -76,6 +88,9 @@ export class AppointmentPackDetails implements OnInit {
     }
   }
 
+  /**
+   * Downloads the Appointment Pack PDF using its stored file name.
+   */
   protected download(): void {
     const appointmentPack = this.appointmentPack();
     this.actionError.set('');
@@ -95,6 +110,7 @@ export class AppointmentPackDetails implements OnInit {
           return;
         }
 
+        // Use a temporary browser URL for the PDF and release it once the download has started.
         const url = URL.createObjectURL(response.body);
         const anchor = window.document.createElement('a');
         anchor.href = url;
@@ -106,6 +122,9 @@ export class AppointmentPackDetails implements OnInit {
     });
   }
 
+  /**
+   * Confirms the action before archiving the current Appointment Pack.
+   */
   protected archive(): void {
     const appointmentPack = this.appointmentPack();
     this.actionError.set('');
@@ -128,10 +147,16 @@ export class AppointmentPackDetails implements OnInit {
     });
   }
 
+  /**
+   * Returns the items included in the pack for the requested resource type.
+   */
   protected itemsFor(itemType: AppointmentPackItemType): readonly AppointmentPackItemResponse[] {
     return this.appointmentPack()?.items.filter((item) => item.resourceType === itemType) ?? [];
   }
 
+  /**
+   * Checks whether the selected patient context allows the included item to be opened.
+   */
   protected canOpenItem(itemType: AppointmentPackItemType): boolean {
     const selectedPatient = this.selectedPatient();
 
@@ -148,6 +173,9 @@ export class AppointmentPackDetails implements OnInit {
     }
   }
 
+  /**
+   * Returns the route used to open an item included in the Appointment Pack.
+   */
   protected itemRoute(item: AppointmentPackItemResponse): string[] {
     switch (item.resourceType) {
       case 'MEDICATION':
@@ -163,6 +191,9 @@ export class AppointmentPackDetails implements OnInit {
     }
   }
 
+  /**
+   * Loads the Appointment Pack and checks that it belongs to the patient currently selected.
+   */
   private loadAppointmentPack(appointmentPackId: string): void {
     const failedPatientRecordId = this.selectedPatient()?.patientRecordId ?? null;
 
@@ -188,6 +219,9 @@ export class AppointmentPackDetails implements OnInit {
     });
   }
 
+  /**
+   * Handles errors raised while loading the Appointment Pack.
+   */
   private handleLoadError(error: unknown, failedPatientRecordId: string | null): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(failedPatientRecordId, 'view');
@@ -217,6 +251,9 @@ export class AppointmentPackDetails implements OnInit {
     this.actionError.set(getHttpErrorMessage(error, 'Unable to download the appointment pack.'));
   }
 
+  /**
+   * Handles problems that occur while archiving the Appointment Pack.
+   */
   private handleArchiveError(error: unknown, appointmentPack: AppointmentPackResponse): void {
     if (hasHttpStatus(error, 403)) {
       this.recoverPatientAccess(appointmentPack.patientRecordId, 'archive');
@@ -231,6 +268,9 @@ export class AppointmentPackDetails implements OnInit {
     this.actionError.set(getHttpErrorMessage(error, 'Unable to archive the appointment pack.'));
   }
 
+  /**
+   * Refreshes patient access and updates the page depending on whether the pack can still be viewed or archived.
+   */
   private recoverPatientAccess(failedPatientRecordId: string | null, action: 'view' | 'archive'): void {
     this.status.set('loading');
 

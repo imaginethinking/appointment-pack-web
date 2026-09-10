@@ -31,6 +31,9 @@ type AppointmentPackCreateStatus = 'loading' | 'ready' | 'no-patient' | 'forbidd
 
 type SelectionCategory = 'medications' | 'healthcare contacts' | 'emergency contacts' | 'medical history entries' | 'blood tests';
 
+/**
+ * Builds a new Appointment Pack from an appointment and the patient information selected by the user.
+ */
 @Component({
   selector: 'app-appointment-pack-create',
   imports: [DatePipe, ReactiveFormsModule, RouterLink],
@@ -92,6 +95,9 @@ export class AppointmentPackCreate {
 
   protected readonly formatLocalTime = formatLocalTime;
 
+  /**
+   * Loads the information available for the selected patient and resets the page when the patient changes.
+   */
   constructor() {
     effect((onCleanup) => {
       this.reloadVersion();
@@ -147,30 +153,51 @@ export class AppointmentPackCreate {
     });
   }
 
+  /**
+   * Reloads the information used to create the Appointment Pack.
+   */
   protected retry(): void {
     this.reloadVersion.update((version) => version + 1);
   }
 
+  /**
+   * Adds or removes a medication from the current pack selection.
+   */
   protected toggleMedication(id: string, event: Event): void {
     this.updateSelection(this.selectedMedicationIds, id, this.isChecked(event), 'medications');
   }
 
+  /**
+   * Adds or removes a healthcare contact from the current pack selection.
+   */
   protected toggleHealthcareContact(id: string, event: Event): void {
     this.updateSelection(this.selectedHealthcareContactIds, id, this.isChecked(event), 'healthcare contacts');
   }
 
+  /**
+   * Adds or removes an emergency contact from the current pack selection.
+   */
   protected toggleEmergencyContact(id: string, event: Event): void {
     this.updateSelection(this.selectedEmergencyContactIds, id, this.isChecked(event), 'emergency contacts');
   }
 
+  /**
+   * Adds or removes a Medical History entry from the current pack selection.
+   */
   protected toggleMedicalHistoryEntry(id: string, event: Event): void {
     this.updateSelection(this.selectedMedicalHistoryEntryIds, id, this.isChecked(event), 'medical history entries');
   }
 
+  /**
+   * Adds or removes a blood test from the current pack selection.
+   */
   protected toggleBloodTest(id: string, event: Event): void {
     this.updateSelection(this.selectedBloodTestIds, id, this.isChecked(event), 'blood tests');
   }
 
+  /**
+   * Checks the current selections and generates an Appointment Pack for the selected patient.
+   */
   protected generate(): void {
     this.actionError.set('');
     this.selectionError.set('');
@@ -212,10 +239,16 @@ export class AppointmentPackCreate {
     });
   }
 
+  /**
+   * Returns the checked state from a selection checkbox event.
+   */
   private isChecked(event: Event): boolean {
     return (event.target as HTMLInputElement).checked;
   }
 
+  /**
+   * Creates the generation request using the appointment and patient information selected on the page.
+   */
   private buildRequest(): AppointmentPackGenerationRequest {
     const value = this.form.getRawValue();
 
@@ -231,6 +264,9 @@ export class AppointmentPackCreate {
     };
   }
 
+  /**
+   * Updates one of the resource selections while keeping it within the maximum number of items allowed.
+   */
   private updateSelection(selection: WritableSignal<ReadonlySet<string>>, id: string, checked: boolean, category: SelectionCategory): void {
     this.selectionError.set('');
     const nextSelection = new Set(selection());
@@ -249,6 +285,9 @@ export class AppointmentPackCreate {
     selection.set(nextSelection);
   }
 
+  /**
+   * Handles failures while loading the information needed to create an Appointment Pack.
+   */
   private handleLoadError(error: unknown): void {
     if (hasHttpStatus(error, 403)) {
       this.status.set('loading');
@@ -267,6 +306,9 @@ export class AppointmentPackCreate {
     this.errorMessage.set(getHttpErrorMessage(error, 'Unable to load appointment pack information.'));
   }
 
+  /**
+   * Applies form errors and handles problems that occur while generating the Appointment Pack.
+   */
   private handleGenerateError(error: unknown, failedPatientRecordId: string): void {
     if (applyServerFieldErrors(this.form, error)) {
       return;
@@ -285,6 +327,9 @@ export class AppointmentPackCreate {
     this.actionError.set(getHttpErrorMessage(error, 'Unable to generate the appointment pack.'));
   }
 
+  /**
+   * Refreshes patient access and checks whether generation can continue for the same patient.
+   */
   private refreshPatientAccess(failedPatientRecordId: string | null): void {
     this.patientContextCoordinator.refreshSelectedPatientAccess().subscribe({
       next: () => {
@@ -320,6 +365,9 @@ export class AppointmentPackCreate {
     });
   }
 
+  /**
+   * Clears the form resource lists selections and messages ready for another patient or reload.
+   */
   private resetPageState(): void {
     this.form.reset({ appointmentId: '', title: '', notes: '' });
     this.appointments.set([]);
